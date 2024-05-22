@@ -25,6 +25,9 @@ pub enum ClickCrateErrors {
     #[msg("Product Listing already deactived!")]
     ProductListingDeactivated,
 
+    #[msg("The product is out of stock")]
+    ProductOutOfStock,
+
     #[msg("Invalid clickcrate registration")]
     InvalidProductListingRegistration,
 

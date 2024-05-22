@@ -1,13 +1,16 @@
 use anchor_lang::prelude::*;
+
+declare_id!("4KPCvn6poBFfuH45wWT5owq3Lu4PLXFPzkRbVkEXBf6u");
+
 pub mod account;
+pub mod anchor;
 pub mod context;
 pub mod error;
 
 use crate::account::*;
+// use crate::anchor::*;
 use crate::context::*;
 use crate::error::*;
-
-declare_id!("7AGmMcgd1SjoMsCcXAAYwRgB9ihCyM8cZqjsUqriNRQt");
 
 #[program]
 pub mod clickcrate_registry {
@@ -31,6 +34,21 @@ pub mod clickcrate_registry {
         Ok(())
     }
 
+    pub fn update_clickcrate(
+        ctx: Context<UpdateClickCrate>,
+        id: Pubkey,
+        eligible_placement_types: Vec<PlacementType>,
+        eligible_product_categories: Vec<ProductCategory>,
+        manager: Pubkey,
+    ) -> Result<()> {
+        let clickcrate = &mut ctx.accounts.clickcrate;
+        clickcrate.id = id;
+        clickcrate.manager = manager;
+        clickcrate.eligible_placement_types = eligible_placement_types;
+        clickcrate.eligible_product_categories = eligible_product_categories;
+        Ok(())
+    }
+
     pub fn register_product_listing(
         ctx: Context<RegisterProductListing>,
         id: Pubkey,
@@ -50,6 +68,19 @@ pub mod clickcrate_registry {
         product_listing.in_stock = in_stock;
         product_listing.sold = 0;
         product_listing.is_active = false;
+        Ok(())
+    }
+
+    pub fn update_product_listing(
+        ctx: Context<UpdateProductListing>,
+        new_placement_types: Vec<PlacementType>,
+        new_product_category: ProductCategory,
+        new_manager: Pubkey,
+    ) -> Result<()> {
+        let product_listing = &mut ctx.accounts.product_listing;
+        product_listing.manager = new_manager;
+        product_listing.placement_types = new_placement_types;
+        product_listing.product_category = new_product_category;
         Ok(())
     }
 
@@ -79,18 +110,36 @@ pub mod clickcrate_registry {
 
     pub fn place_product_listing(
         ctx: Context<PlaceProductListing>,
-        product_pubkey: Pubkey,
+        product_id: Pubkey,
     ) -> Result<()> {
         let clickcrate = &mut ctx.accounts.clickcrate;
-        clickcrate.product = Some(product_pubkey);
+        clickcrate.product = Some(product_id);
         Ok(())
     }
 
-    pub fn make_purchase(ctx: Context<MakePurchase>, product_pubkey: Pubkey) -> Result<()> {
+    pub fn remove_product_listing(ctx: Context<RemoveProductListing>) -> Result<()> {
         let clickcrate = &mut ctx.accounts.clickcrate;
+        clickcrate.product = None;
+        Ok(())
+    }
+
+    pub fn make_purchase(ctx: Context<MakePurchase>, product_id: Pubkey) -> Result<()> {
+        let clickcrate = &mut ctx.accounts.clickcrate;
+        let product_listing = &mut ctx.accounts.product_listing;
+
         if let Some(product) = clickcrate.product {
-            require_keys_eq!(product, product_pubkey, ClickCrateErrors::ProductNotFound);
+            require_keys_eq!(product, product_id, ClickCrateErrors::ProductNotFound);
+
+            if product_listing.in_stock > 0 {
+                product_listing.in_stock -= 1;
+                product_listing.sold += 1;
+            } else {
+                return Err(ClickCrateErrors::ProductOutOfStock.into());
+            }
+        } else {
+            return Err(ClickCrateErrors::ProductNotFound.into());
         }
+
         Ok(())
     }
 }
