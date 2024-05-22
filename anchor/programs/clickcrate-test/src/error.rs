@@ -1,0 +1,33 @@
+use anchor_lang::prelude::*;
+#[error_code]
+pub enum ClickCrateErrors {
+    #[msg("ClickCrate has already been registered")]
+    ClickCrateExists,
+
+    #[msg("ClickCrate already actived!")]
+    ClickCrateActivated,
+
+    #[msg("ClickCrate already deactived!")]
+    ClickCrateDeactivated,
+
+    #[msg("Invalid clickcrate registration")]
+    InvalidClickCrateRegistration,
+
+    #[msg("Product Listing was not found")]
+    ProductNotFound,
+
+    #[msg("Product Listing has already been registered")]
+    ProductListingExists,
+
+    #[msg("Product Listing already actived!")]
+    ProductListingActivated,
+
+    #[msg("Product Listing already deactived!")]
+    ProductListingDeactivated,
+
+    #[msg("Invalid clickcrate registration")]
+    InvalidProductListingRegistration,
+
+    #[msg("Purchase did not go through")]
+    PurchaseFailed,
+}
