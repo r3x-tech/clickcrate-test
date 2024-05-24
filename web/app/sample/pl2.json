@@ -1,0 +1,59 @@
+{
+  "name": "SAMPLE PL COLLECTION #2",
+  "symbol": "SPLC2",
+  "description": "A sample PL collection",
+  "seller_fee_basis_points": 10000,
+  "image": "https://shdw-drive.genesysgo.net/ShQjp6rAiAj7oLUZNFqkcZsNFPc6FCBUBUewkxbxaqC/listing%202.svg",
+  "animation_url": "",
+  "external_url": "https://clickcrate.tech",
+  "creator_url": "https://www.r3x.tech/",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Product Listing"
+    },
+    {
+      "trait_type": "Product Category",
+      "value": "Apparel"
+    },
+    {
+      "trait_type": "Brand",
+      "value": "REX"
+    },
+    {
+      "trait_type": "Size(s)",
+      "value": "Unisex"
+    },
+    {
+      "trait_type": "Placement Type",
+      "value": "Related Purchase"
+    },
+    {
+      "trait_type": "Additional Placement Requirements",
+      "value": "None"
+    },
+    {
+      "trait_type": "Discount",
+      "value": "None"
+    },
+    {
+      "trait_type": "Customer Profile Uri",
+      "value": "None"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://shdw-drive.genesysgo.net/ShQjp6rAiAj7oLUZNFqkcZsNFPc6FCBUBUewkxbxaqC/listing%202.svg",
+        "type": "image/svg"
+      }
+    ],
+    "category": "image",
+    "creators": [
+      {
+        "address": "Fmf9jcmt9z4ky8L4ZNMMWL9pXyJiL4VGnxxb2VzgReaN",
+        "share": 100
+      }
+    ]
+  }
+}

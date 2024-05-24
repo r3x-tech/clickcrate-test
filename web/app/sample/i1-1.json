@@ -1,0 +1,43 @@
+{
+  "name": "Sample Shoe #1",
+  "symbol": "SS1",
+  "description": "Sample shoe by SAMPLE",
+  "seller_fee_basis_points": 1,
+  "image": "https://shdw-drive.genesysgo.net/ShQjp6rAiAj7oLUZNFqkcZsNFPc6FCBUBUewkxbxaqC/item%201.1.svg",
+  "animation_url": "",
+  "external_url": "https://clickcrate.tech",
+  "creator_url": "https://www.r3x.tech/",
+  "attributes": [
+      {
+          "trait_type": "Type",
+          "value": "Product"
+      },
+      {
+          "trait_type": "Product Category",
+          "value": "Apparel"
+      },
+              {
+          "trait_type": "Brand",
+          "value": "SAMPLE"
+      },
+      {
+          "trait_type": "Size",
+          "value": "Unisex"
+      }
+  ],
+  "properties": {
+      "files": [
+          {
+              "uri": "https://shdw-drive.genesysgo.net/ShQjp6rAiAj7oLUZNFqkcZsNFPc6FCBUBUewkxbxaqC/item%201.1.svg",
+              "type": "image/svg"
+          }
+      ],
+      "category": "image",
+      "creators": [
+          {
+              "address": "Fmf9jcmt9z4ky8L4ZNMMWL9pXyJiL4VGnxxb2VzgReaN",
+              "share": 100
+          }
+      ]
+  }
+}

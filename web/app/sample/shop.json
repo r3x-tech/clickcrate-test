@@ -1,0 +1,47 @@
+{
+  "name": "SAMPLE (POS) COLLECTION",
+  "symbol": "SPOSC",
+  "description": "A SAMPLE (POS) COLLECTION",
+  "seller_fee_basis_points": 10000,
+  "image": "https://shdw-drive.genesysgo.net/3CjrSiTMjg73qjNb9Phpd54sT2ZNXM6YmUudRHvwwppx/shop.svg",
+  "animation_url": "",
+  "external_url": "https://dogwifhatris.r3x.tech/",
+  "creator_url": "https://www.clickcrate.xyz/",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "ClickCrate"
+    },
+    {
+      "trait_type": "Placement Type",
+      "value": "Related Purchase"
+    },
+    {
+      "trait_type": "Additional Placement Requirements",
+      "value": "None"
+    },
+    {
+      "trait_type": "Placement Fee (USDC)",
+      "value": "1.00"
+    },
+    {
+      "trait_type": "User Profile Uri",
+      "value": "None"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "https://shdw-drive.genesysgo.net/3CjrSiTMjg73qjNb9Phpd54sT2ZNXM6YmUudRHvwwppx/shop.svg",
+        "type": "image/svg"
+      }
+    ],
+    "category": "image",
+    "creators": [
+      {
+        "address": "Engvm8giPGZvLV115DkzhVGkWKR5j11ZTrggo5EUQBau",
+        "share": 100
+      }
+    ]
+  }
+}

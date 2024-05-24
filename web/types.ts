@@ -45,9 +45,10 @@ export interface ProductListingState {
 // Define instruction argument types
 export type RegisterClickCrateArgs = {
   id: PublicKey;
+  owner: PublicKey;
+  manager: PublicKey;
   eligiblePlacementTypes: PlacementType[];
   eligibleProductCategories: ProductCategory[];
-  manager: PublicKey;
 };
 
 export type UpdateClickCrateArgs = {
@@ -60,10 +61,11 @@ export type UpdateClickCrateArgs = {
 export type RegisterProductListingArgs = {
   id: PublicKey;
   origin: Origin;
+  owner: PublicKey;
+  manager: PublicKey;
   placementTypes: PlacementType[];
   productCategory: ProductCategory;
   inStock: BN;
-  manager: PublicKey;
 };
 
 export type UpdateProductListingArgs = {

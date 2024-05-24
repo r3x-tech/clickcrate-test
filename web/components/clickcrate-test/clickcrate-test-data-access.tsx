@@ -64,7 +64,7 @@ export function useClickcrateTestProgram() {
         eligibleProductCategories,
         manager,
       } = args;
-      const [clickcrateAddress] = await PublicKey.findProgramAddress(
+      const [clickcrateAddress] = await PublicKey.findProgramAddressSync(
         [Buffer.from('clickcrate'), id.toBuffer()],
         programId
       );
@@ -93,9 +93,16 @@ export function useClickcrateTestProgram() {
   const registerProductListing = useMutation({
     mutationKey: ['clickcrate-test', 'registerProductListing', { cluster }],
     mutationFn: async (args: RegisterProductListingArgs) => {
-      const { id, origin, placementTypes, productCategory, inStock, manager } =
-        args;
-      const [productListingAddress] = await PublicKey.findProgramAddress(
+      const {
+        id,
+        origin,
+        placementTypes,
+        productCategory,
+        inStock,
+        manager,
+        owner,
+      } = args;
+      const [productListingAddress] = await PublicKey.findProgramAddressSync(
         [Buffer.from('product_listing'), id.toBuffer()],
         programId
       );
@@ -111,7 +118,7 @@ export function useClickcrateTestProgram() {
         )
         .accounts({
           productListing: productListingAddress,
-          owner: provider.wallet.publicKey,
+          owner: owner,
           systemProgram: programId,
         })
         .rpc();
