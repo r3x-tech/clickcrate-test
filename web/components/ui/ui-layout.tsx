@@ -26,7 +26,14 @@ export function UiLayout({
 
   return (
     <div className="h-full flex flex-col">
-      <div className="navbar bg-base-300 text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0">
+      <div className="navbar bg-background text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0">
+        <div
+          style={{
+            backgroundImage: "url('/background.svg')",
+            backgroundSize: 'auto auto',
+          }}
+          className="absolute inset-0 bg-background bg-cover bg-center bg-repeat-y -z-10"
+        ></div>
         <div className="flex-1">
           <Link
             className="btn btn-ghost normal-case text-xl"
@@ -68,11 +75,11 @@ export function UiLayout({
       <ClusterChecker>
         <AccountChecker />
       </ClusterChecker>
-      <div className="flex-grow mx-4 lg:mx-auto">
+      <div className="flex-grow mx-4 lg:mx-auto relative  overflow-y-auto">
         <Suspense
           fallback={
-            <div className="text-center my-32">
-              <span className="loading loading-spinner loading-lg"></span>
+            <div className="text-center my-32 bg-transparent">
+              <span className="loading loading-spainner loading-lg"></span>
             </div>
           }
         >
@@ -80,7 +87,8 @@ export function UiLayout({
         </Suspense>
         <Toaster position="bottom-right" />
       </div>
-      <footer className="footer footer-center p-4 bg-base-300 text-base-content">
+
+      {/* <footer className="footer footer-center p-4 bg-background text-base-content">
         <aside>
           <p>
             POWERED BY{' '}
@@ -94,7 +102,7 @@ export function UiLayout({
             </a>
           </p>
         </aside>
-      </footer>
+      </footer> */}
     </div>
   );
 }

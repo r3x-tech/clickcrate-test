@@ -19,7 +19,7 @@ export default function ClickcrateTestFeature() {
       <AppHero
         title="ClickcrateTest"
         subtitle={
-          'Create a new account by clicking the "Create" button. The state of a account is stored on-chain and can be manipulated by calling the program\'s methods (increment, decrement, set, and close).'
+          'Create a new ClickCrate POS or product listing by clicking the "Register" button. The state of a account is stored on-chain and can be manipulated by calling the program\'s methods (update, place, etc.).'
         }
       >
         <p className="mb-6">

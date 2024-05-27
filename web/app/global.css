@@ -2,9 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap');
+
+html, body {
   height: 100%;
+  @apply text-white font-body;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply text-white font-heading;
+}
+
+p {
+  @apply text-white font-body;
 }
 
 .wallet-adapter-button-trigger {
@@ -13,7 +23,7 @@ body {
   padding-left: 16px !important;
   padding-right: 16px !important;
 }
-.wallet-adapter-dropdown-list,
-.wallet-adapter-button {
+
+.wallet-adapter-dropdown-list, .wallet-adapter-button {
   font-family: inherit !important;
 }

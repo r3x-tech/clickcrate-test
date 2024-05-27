@@ -63,6 +63,13 @@ export function useClickcrateTestProgram() {
         eligibleProductCategory
       );
 
+      console.log('registerClickCrate input:', {
+        id: id.toString(),
+        eligiblePlacementType,
+        eligibleProductCategory,
+        manager: manager.toString(),
+      });
+
       return program.methods
         .registerClickcrate(
           id,
@@ -81,7 +88,10 @@ export function useClickcrateTestProgram() {
       transactionToast(signature);
       return accounts.refetch();
     },
-    onError: () => toast.error('Failed to register ClickCrate'),
+    onError: (error) => {
+      console.error('Failed to register ClickCrate:', error);
+      toast.error('Failed to register ClickCrate');
+    },
   });
 
   const registerProductListing = useMutation({

@@ -4,20 +4,20 @@ import { AppHero } from '../ui/ui-layout';
 
 const links: { label: string; href: string }[] = [
   { label: 'ClickCrate Docs', href: 'https://docs.clickcrate.xyz/' },
-  { label: 'ClickCrate Website', href: 'https://www.clickcrate.xyz/' },
   {
     label: 'ClickCrate GitHub',
     href: 'https://github.com/r3x-tech/clickcrate',
   },
+  { label: 'ClickCrate Website', href: 'https://www.clickcrate.xyz/' },
 ];
 
 export default function DashboardFeature() {
   return (
     <div>
-      <AppHero title="gm" subtitle="Welcome to ClickCrate dashboard!" />
+      <AppHero title="gm" subtitle="Connect your wallet to start selling" />
       <div className="max-w-xl mx-auto py-6 sm:px-6 lg:px-8 text-center">
         <div className="space-y-2">
-          <p>Resources:</p>
+          {/* <p>Resources:</p> */}
           {links.map((link, index) => (
             <div key={index}>
               <a
