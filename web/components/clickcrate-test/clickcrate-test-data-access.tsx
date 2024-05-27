@@ -1,9 +1,12 @@
 'use client';
 
-import { ClickcrateTestIDL } from '@clickcrate-test/anchor';
+import {
+  ClickcrateTestIDL,
+  getClickcrateTestProgramId,
+} from '@clickcrate-test/anchor';
 import { BN, Program } from '@coral-xyz/anchor';
 import { useConnection } from '@solana/wallet-adapter-react';
-import { PublicKey } from '@solana/web3.js';
+import { Cluster, PublicKey, SystemProgram } from '@solana/web3.js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useCluster } from '../cluster/cluster-data-access';
@@ -16,19 +19,20 @@ import {
   getProductCategoryFromString,
   getOriginFromString,
 } from '../../types';
+import { useMemo } from 'react';
 
 export function useClickcrateTestProgram() {
   const { connection } = useConnection();
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const provider = useAnchorProvider();
-  // const programId = useMemo(
-  //   () => getClickcrateTestProgramId(cluster.network as Cluster),
-  //   [cluster]
-  // );
-  const programId = new PublicKey(
-    'RcGXdMiga83T527zSoCQDaWdMmU2qVQA3GCkfZyGrXc'
+  const programId = useMemo(
+    () => getClickcrateTestProgramId(cluster.network as Cluster),
+    [cluster]
   );
+  // const programId = new PublicKey(
+  //   'RcGXdMiga83T527zSoCQDaWdMmU2qVQA3GCkfZyGrXc'
+  // );
 
   const program = new Program(ClickcrateTestIDL, programId, provider);
 
@@ -69,7 +73,7 @@ export function useClickcrateTestProgram() {
         .accounts({
           clickcrate: clickcrateAddress,
           owner: manager,
-          systemProgram: programId,
+          systemProgram: SystemProgram.programId,
         })
         .rpc();
     },
@@ -109,7 +113,7 @@ export function useClickcrateTestProgram() {
         .accounts({
           productListing: productListingAddress,
           owner: program.provider.publicKey,
-          systemProgram: programId,
+          systemProgram: SystemProgram.programId,
         })
         .rpc();
     },
