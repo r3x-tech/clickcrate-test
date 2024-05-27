@@ -1,6 +1,6 @@
-export type ClickcrateRegistry = {
-  "version": "0.1.0",
-  "name": "clickcrate_registry",
+export type ClickcrateTest = {
+  "version": "0.3.0",
+  "name": "clickcrate_test",
   "instructions": [
     {
       "name": "registerClickcrate",
@@ -27,19 +27,15 @@ export type ClickcrateRegistry = {
           "type": "publicKey"
         },
         {
-          "name": "eligiblePlacementTypes",
+          "name": "eligiblePlacementType",
           "type": {
-            "vec": {
-              "defined": "PlacementType"
-            }
+            "defined": "PlacementType"
           }
         },
         {
-          "name": "eligibleProductCategories",
+          "name": "eligibleProductCategory",
           "type": {
-            "vec": {
-              "defined": "ProductCategory"
-            }
+            "defined": "ProductCategory"
           }
         },
         {
@@ -73,19 +69,15 @@ export type ClickcrateRegistry = {
           "type": "publicKey"
         },
         {
-          "name": "eligiblePlacementTypes",
+          "name": "eligiblePlacementType",
           "type": {
-            "vec": {
-              "defined": "PlacementType"
-            }
+            "defined": "PlacementType"
           }
         },
         {
-          "name": "eligibleProductCategories",
+          "name": "eligibleProductCategory",
           "type": {
-            "vec": {
-              "defined": "ProductCategory"
-            }
+            "defined": "ProductCategory"
           }
         },
         {
@@ -125,11 +117,9 @@ export type ClickcrateRegistry = {
           }
         },
         {
-          "name": "placementTypes",
+          "name": "placementType",
           "type": {
-            "vec": {
-              "defined": "PlacementType"
-            }
+            "defined": "PlacementType"
           }
         },
         {
@@ -169,11 +159,9 @@ export type ClickcrateRegistry = {
       ],
       "args": [
         {
-          "name": "newPlacementTypes",
+          "name": "newPlacementType",
           "type": {
-            "vec": {
-              "defined": "PlacementType"
-            }
+            "defined": "PlacementType"
           }
         },
         {
@@ -335,19 +323,15 @@ export type ClickcrateRegistry = {
             "type": "publicKey"
           },
           {
-            "name": "eligiblePlacementTypes",
+            "name": "eligiblePlacementType",
             "type": {
-              "vec": {
-                "defined": "PlacementType"
-              }
+              "defined": "PlacementType"
             }
           },
           {
-            "name": "eligibleProductCategories",
+            "name": "eligibleProductCategory",
             "type": {
-              "vec": {
-                "defined": "ProductCategory"
-              }
+              "defined": "ProductCategory"
             }
           },
           {
@@ -387,11 +371,9 @@ export type ClickcrateRegistry = {
             "type": "publicKey"
           },
           {
-            "name": "placementTypes",
+            "name": "placementType",
             "type": {
-              "vec": {
-                "defined": "PlacementType"
-              }
+              "defined": "PlacementType"
             }
           },
           {
@@ -549,9 +531,9 @@ export type ClickcrateRegistry = {
   ]
 };
 
-export const IDL: ClickcrateRegistry = {
-  "version": "0.1.0",
-  "name": "clickcrate_registry",
+export const IDL: ClickcrateTest = {
+  "version": "0.3.0",
+  "name": "clickcrate_test",
   "instructions": [
     {
       "name": "registerClickcrate",
@@ -578,19 +560,15 @@ export const IDL: ClickcrateRegistry = {
           "type": "publicKey"
         },
         {
-          "name": "eligiblePlacementTypes",
+          "name": "eligiblePlacementType",
           "type": {
-            "vec": {
-              "defined": "PlacementType"
-            }
+            "defined": "PlacementType"
           }
         },
         {
-          "name": "eligibleProductCategories",
+          "name": "eligibleProductCategory",
           "type": {
-            "vec": {
-              "defined": "ProductCategory"
-            }
+            "defined": "ProductCategory"
           }
         },
         {
@@ -624,19 +602,15 @@ export const IDL: ClickcrateRegistry = {
           "type": "publicKey"
         },
         {
-          "name": "eligiblePlacementTypes",
+          "name": "eligiblePlacementType",
           "type": {
-            "vec": {
-              "defined": "PlacementType"
-            }
+            "defined": "PlacementType"
           }
         },
         {
-          "name": "eligibleProductCategories",
+          "name": "eligibleProductCategory",
           "type": {
-            "vec": {
-              "defined": "ProductCategory"
-            }
+            "defined": "ProductCategory"
           }
         },
         {
@@ -676,11 +650,9 @@ export const IDL: ClickcrateRegistry = {
           }
         },
         {
-          "name": "placementTypes",
+          "name": "placementType",
           "type": {
-            "vec": {
-              "defined": "PlacementType"
-            }
+            "defined": "PlacementType"
           }
         },
         {
@@ -720,11 +692,9 @@ export const IDL: ClickcrateRegistry = {
       ],
       "args": [
         {
-          "name": "newPlacementTypes",
+          "name": "newPlacementType",
           "type": {
-            "vec": {
-              "defined": "PlacementType"
-            }
+            "defined": "PlacementType"
           }
         },
         {
@@ -886,19 +856,15 @@ export const IDL: ClickcrateRegistry = {
             "type": "publicKey"
           },
           {
-            "name": "eligiblePlacementTypes",
+            "name": "eligiblePlacementType",
             "type": {
-              "vec": {
-                "defined": "PlacementType"
-              }
+              "defined": "PlacementType"
             }
           },
           {
-            "name": "eligibleProductCategories",
+            "name": "eligibleProductCategory",
             "type": {
-              "vec": {
-                "defined": "ProductCategory"
-              }
+              "defined": "ProductCategory"
             }
           },
           {
@@ -938,11 +904,9 @@ export const IDL: ClickcrateRegistry = {
             "type": "publicKey"
           },
           {
-            "name": "placementTypes",
+            "name": "placementType",
             "type": {
-              "vec": {
-                "defined": "PlacementType"
-              }
+              "defined": "PlacementType"
             }
           },
           {

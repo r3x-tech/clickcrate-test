@@ -5,7 +5,10 @@ import { WalletButton } from '../solana/solana-provider';
 import { AppHero, ellipsify } from '../ui/ui-layout';
 import { ExplorerLink } from '../cluster/cluster-ui';
 import { useClickcrateTestProgram } from './clickcrate-test-data-access';
-import { ClickcrateTestCreate, ClickcrateTestList } from './clickcrate-test-ui';
+import {
+  ClickcrateTestRegister,
+  ClickcrateTestList,
+} from './clickcrate-test-ui';
 
 export default function ClickcrateTestFeature() {
   const { publicKey } = useWallet();
@@ -25,7 +28,7 @@ export default function ClickcrateTestFeature() {
             label={ellipsify(programId.toString())}
           />
         </p>
-        <ClickcrateTestCreate />
+        <ClickcrateTestRegister />
       </AppHero>
       <ClickcrateTestList />
     </div>

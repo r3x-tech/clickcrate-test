@@ -8,7 +8,7 @@ export { ClickcrateTest, ClickcrateTestIDL };
 
 // After updating your program ID (e.g. after running `anchor keys sync`) update the value below.
 export const CLICKCRATE_TEST_PROGRAM_ID = new PublicKey(
-  '7jRDDp6J9q4C1ZKy8uKsoCy7ffGUWuQar5wYk2vFgK1v'
+  'HDZ4ZSNfcuSnCEzfgmpHXgCV7vU6SvjkRmUZP8rp8bgB'
 );
 
 // This is a helper function to get the program ID for the ClickcrateTest program depending on the cluster.

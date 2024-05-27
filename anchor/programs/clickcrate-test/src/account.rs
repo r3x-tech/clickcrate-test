@@ -5,15 +5,15 @@ pub struct ClickCrateState {
     pub id: Pubkey,
     pub owner: Pubkey,
     pub manager: Pubkey,
-    pub eligible_placement_types: Vec<PlacementType>,
-    pub eligible_product_categories: Vec<ProductCategory>,
+    pub eligible_placement_type: PlacementType,
+    pub eligible_product_category: ProductCategory,
     pub product: Option<Pubkey>,
     pub is_active: bool,
 }
 
 impl MaxSize for ClickCrateState {
     fn get_max_size() -> usize {
-        return 8 + 32 + 32 + 32 + (4 + 3 * 1) + (4 + 10 * 1) + 1 + 1;
+        return 8 + 32 + 32 + 32 + 1 + 1 + 1 + 1;
     }
 }
 
@@ -23,7 +23,7 @@ pub struct ProductListingState {
     pub origin: Origin,
     pub owner: Pubkey,
     pub manager: Pubkey,
-    pub placement_types: Vec<PlacementType>,
+    pub placement_type: PlacementType,
     pub product_category: ProductCategory,
     pub in_stock: u64,
     pub sold: u64,
@@ -32,7 +32,7 @@ pub struct ProductListingState {
 
 impl MaxSize for ProductListingState {
     fn get_max_size() -> usize {
-        return 8 + 32 + 1 + 32 + 32 + (4 + 3 * 1) + 1 + 8 + 8 + 1;
+        return 8 + 32 + 1 + 32 + 32 + 1 + 1 + 8 + 8 + 1;
     }
 }
 

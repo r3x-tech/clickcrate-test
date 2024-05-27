@@ -2,30 +2,90 @@ import { BN } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 
 export type PlacementType =
-  | { digitalReplica: {} }
-  | { relatedPurchase: {} }
-  | { targetedPlacement: {} };
+  | 'DigitalReplica'
+  | 'RelatedPurchase'
+  | 'TargetedPlacement';
+
+export const getPlacementTypeFromString = (
+  placementType: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any => {
+  switch (placementType) {
+    case 'DigitalReplica':
+      return { digitalReplica: {} };
+    case 'RelatedPurchase':
+      return { relatedPurchase: {} };
+    case 'TargetedPlacement':
+      return { targetedPlacement: {} };
+    default:
+      throw new Error(`Invalid placement type: ${placementType}`);
+  }
+};
 
 export type ProductCategory =
-  | { clothing: {} }
-  | { electronics: {} }
-  | { books: {} }
-  | { home: {} }
-  | { beauty: {} }
-  | { toys: {} }
-  | { sports: {} }
-  | { automotive: {} }
-  | { grocery: {} }
-  | { health: {} };
+  | 'Clothing'
+  | 'Electronics'
+  | 'Books'
+  | 'Home'
+  | 'Beauty'
+  | 'Toys'
+  | 'Sports'
+  | 'Automotive'
+  | 'Grocery'
+  | 'Health';
 
-export type Origin = { clickcrate: {} } | { shopify: {} } | { square: {} };
+export const getProductCategoryFromString = (
+  productCategory: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any => {
+  switch (productCategory) {
+    case 'Clothing':
+      return { clothing: {} };
+    case 'Electronics':
+      return { electronics: {} };
+    case 'Books':
+      return { books: {} };
+    case 'Home':
+      return { home: {} };
+    case 'Beauty':
+      return { beauty: {} };
+    case 'Toys':
+      return { toys: {} };
+    case 'Sports':
+      return { sports: {} };
+    case 'Automotive':
+      return { automotive: {} };
+    case 'Grocery':
+      return { grocery: {} };
+    case 'Health':
+      return { health: {} };
+    default:
+      throw new Error(`Invalid product category: ${productCategory}`);
+  }
+};
+
+export type Origin = 'Clickcrate' | 'Shopify' | 'Square';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getOriginFromString = (origin: string): any => {
+  switch (origin) {
+    case 'Clickcrate':
+      return { clickcrate: {} };
+    case 'Shopify':
+      return { shopify: {} };
+    case 'Square':
+      return { square: {} };
+    default:
+      throw new Error(`Invalid origin: ${origin}`);
+  }
+};
 
 export interface ClickCrateState {
   id: PublicKey;
   owner: PublicKey;
   manager: PublicKey;
-  eligiblePlacementTypes: PlacementType[];
-  eligibleProductCategories: ProductCategory[];
+  eligiblePlacementType: PlacementType;
+  eligibleProductCategory: ProductCategory;
   product: PublicKey | null;
   isActive: boolean;
 }
@@ -35,43 +95,18 @@ export interface ProductListingState {
   origin: Origin;
   owner: PublicKey;
   manager: PublicKey;
-  placementTypes: PlacementType[];
+  placementType: PlacementType;
   productCategory: ProductCategory;
   inStock: BN;
   sold: BN;
   isActive: boolean;
 }
 
-// Define instruction argument types
 export type RegisterClickCrateArgs = {
   id: PublicKey;
-  owner: PublicKey;
+  eligiblePlacementType: PlacementType;
+  eligibleProductCategory: ProductCategory;
   manager: PublicKey;
-  eligiblePlacementTypes: PlacementType[];
-  eligibleProductCategories: ProductCategory[];
-};
-
-export type UpdateClickCrateArgs = {
-  id: PublicKey;
-  eligiblePlacementTypes: PlacementType[];
-  eligibleProductCategories: ProductCategory[];
-  manager: PublicKey;
-};
-
-export type RegisterProductListingArgs = {
-  id: PublicKey;
-  origin: Origin;
-  owner: PublicKey;
-  manager: PublicKey;
-  placementTypes: PlacementType[];
-  productCategory: ProductCategory;
-  inStock: BN;
-};
-
-export type UpdateProductListingArgs = {
-  newPlacementTypes: PlacementType[];
-  newProductCategory: ProductCategory;
-  newManager: PublicKey;
 };
 
 export type PlaceProductListingArgs = {
@@ -81,28 +116,3 @@ export type PlaceProductListingArgs = {
 export type MakePurchaseArgs = {
   productId: PublicKey;
 };
-
-// Define error types
-export type ClickCrateExistsError = { clickCrateExists: { msg: string } };
-export type ClickCrateActivatedError = { clickCrateActivated: { msg: string } };
-export type ClickCrateDeactivatedError = {
-  clickCrateDeactivated: { msg: string };
-};
-export type InvalidClickCrateRegistrationError = {
-  invalidClickCrateRegistration: { msg: string };
-};
-export type ProductNotFoundError = { productNotFound: { msg: string } };
-export type ProductListingExistsError = {
-  productListingExists: { msg: string };
-};
-export type ProductListingActivatedError = {
-  productListingActivated: { msg: string };
-};
-export type ProductListingDeactivatedError = {
-  productListingDeactivated: { msg: string };
-};
-export type ProductOutOfStockError = { productOutOfStock: { msg: string } };
-export type InvalidProductListingRegistrationError = {
-  invalidProductListingRegistration: { msg: string };
-};
-export type PurchaseFailedError = { purchaseFailed: { msg: string } };

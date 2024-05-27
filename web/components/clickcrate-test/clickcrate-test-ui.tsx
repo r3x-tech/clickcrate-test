@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
-import { Keypair, PublicKey } from '@solana/web3.js';
-import { useMemo, useState } from 'react';
+import { PublicKey } from '@solana/web3.js';
+import { useState } from 'react';
 import { ellipsify } from '../ui/ui-layout';
 import { ExplorerLink } from '../cluster/cluster-ui';
 import {
@@ -18,60 +19,51 @@ export function ClickcrateTestRegister() {
   const { publicKey } = useWallet();
 
   const [productId, setProductId] = useState('');
-  const [productOrigin, setProductOrigin] = useState<Origin>({
-    clickcrate: {},
-  });
-
-  const [productEligiblePlacementTypes, setProductEligiblePlacementTypes] =
-    useState<PlacementType[]>([]);
-  const [productEligibleProductCategory, setProductEligibleProductCategory] =
+  const [productOrigin, setProductOrigin] = useState<Origin | null>(null);
+  const [productPlacementType, setProductPlacementType] =
+    useState<PlacementType | null>(null);
+  const [productCategory, setProductCategory] =
     useState<ProductCategory | null>(null);
   const [productInStock, setProductInStock] = useState<BN>(new BN(0));
 
   const [clickcrateId, setClickcrateId] = useState('');
-  const [
-    clickcrateEligiblePlacementTypes,
-    setClickcrateEligiblePlacementTypes,
-  ] = useState<PlacementType[]>([]);
-  const [
-    clickcrateEligibleProductCategories,
-    setClickcrateEligibleProductCategories,
-  ] = useState<ProductCategory[]>([]);
+  const [clickcratePlacementType, setClickcratePlacementType] =
+    useState<PlacementType>();
+  const [clickcrateProductCategory, setClickcrateProductCategory] =
+    useState<ProductCategory>();
 
   const isProductFormValid =
     productId.trim() !== '' &&
-    productOrigin !== undefined &&
-    productEligiblePlacementTypes.length > 0 &&
-    productEligibleProductCategory !== null;
+    productOrigin !== null &&
+    productPlacementType !== null &&
+    productCategory !== null;
 
   const isClickcrateFormValid =
     clickcrateId.trim() !== '' &&
-    clickcrateEligiblePlacementTypes.length > 0 &&
-    clickcrateEligibleProductCategories.length > 0;
+    clickcratePlacementType !== undefined &&
+    clickcrateProductCategory !== undefined;
 
   const handleProductRegistration = () => {
     if (publicKey && isProductFormValid) {
-      registerProductListing.mutateAsync({
-        id: new PublicKey(productId),
-        origin: productOrigin,
-        placementTypes: productEligiblePlacementTypes,
-        productCategory: productEligibleProductCategory,
-        inStock: productInStock,
-        manager: publicKey,
-        owner: publicKey,
-      });
+      registerProductListing.mutateAsync([
+        new PublicKey(productId),
+        productOrigin,
+        productPlacementType,
+        productCategory!,
+        productInStock.toNumber(),
+        publicKey,
+      ]);
     }
   };
 
   const handleClickcrateRegistration = () => {
     if (publicKey && isClickcrateFormValid) {
-      registerClickCrate.mutateAsync({
-        id: new PublicKey(clickcrateId),
-        owner: publicKey,
-        eligiblePlacementTypes: clickcrateEligiblePlacementTypes,
-        eligibleProductCategories: clickcrateEligibleProductCategories,
-        manager: publicKey,
-      });
+      registerClickCrate.mutateAsync([
+        new PublicKey(clickcrateId),
+        clickcratePlacementType!,
+        clickcrateProductCategory!,
+        publicKey,
+      ]);
     }
   };
 
@@ -81,21 +73,112 @@ export function ClickcrateTestRegister() {
 
   return (
     <>
-      <button
-        className="btn btn-xs lg:btn-md btn-primary"
-        onClick={handleProductRegistration}
-        disabled={registerClickCrate.isPending}
-      >
-        Register ClickCrate {registerClickCrate.isPending && '...'}
-      </button>
+      <div>
+        <h3>Register ClickCrate</h3>
+        <input
+          type="text"
+          placeholder="ClickCrate ID"
+          value={clickcrateId}
+          onChange={(e) => setClickcrateId(e.target.value)}
+        />
+        <select
+          value={clickcratePlacementType}
+          onChange={(e) =>
+            setClickcratePlacementType(e.target.value as PlacementType)
+          }
+        >
+          <option value="">Select a placement type</option>
+          <option value="DigitalReplica">Digital Replica</option>
+          <option value="RelatedPurchase">Related Purchase</option>
+          <option value="TargetedPlacement">Targeted Placement</option>
+        </select>
+        <select
+          value={clickcrateProductCategory}
+          onChange={(e) =>
+            setClickcrateProductCategory(e.target.value as ProductCategory)
+          }
+        >
+          <option value="">Select a product category</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Books">Books</option>
+          <option value="Home">Home</option>
+          <option value="Beauty">Beauty</option>
+          <option value="Toys">Toys</option>
+          <option value="Sports">Sports</option>
+          <option value="Automotive">Automotive</option>
+          <option value="Grocery">Grocery</option>
+          <option value="Health">Health</option>
+        </select>
+        <button
+          className="btn btn-xs lg:btn-md btn-primary"
+          onClick={handleClickcrateRegistration}
+          disabled={registerClickCrate.isPending}
+        >
+          Register ClickCrate {registerClickCrate.isPending && '...'}
+        </button>
+      </div>
 
-      <button
-        className="btn btn-xs lg:btn-md btn-primary"
-        onClick={handleClickcrateRegistration}
-        disabled={registerProductListing.isPending}
-      >
-        Register Product Listing {registerProductListing.isPending && '...'}
-      </button>
+      <div>
+        <h3>Register Product Listing</h3>
+        <input
+          type="text"
+          placeholder="Product ID"
+          value={productId}
+          onChange={(e) => setProductId(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Product Stock"
+          value={productInStock.toString()}
+          onChange={(e) => setProductInStock(new BN(parseInt(e.target.value)))}
+        />
+        <select
+          value={productOrigin || ''}
+          onChange={(e) => setProductOrigin(e.target.value as Origin)}
+        >
+          <option value="">Select an origin</option>
+          <option value="Clickcrate">Clickcrate</option>
+          <option value="Shopify">Shopify</option>
+          <option value="Square">Square</option>
+        </select>
+        <select
+          value={productPlacementType || ''}
+          onChange={(e) =>
+            setProductPlacementType(e.target.value as PlacementType)
+          }
+        >
+          <option value="">Select a placement type</option>
+          <option value="DigitalReplica">Digital Replica</option>
+          <option value="RelatedPurchase">Related Purchase</option>
+          <option value="TargetedPlacement">Targeted Placement</option>
+        </select>
+        <select
+          value={productCategory || ''}
+          onChange={(e) =>
+            setProductCategory(e.target.value as ProductCategory)
+          }
+        >
+          <option value="">Select a product category</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Books">Books</option>
+          <option value="Home">Home</option>
+          <option value="Beauty">Beauty</option>
+          <option value="Toys">Toys</option>
+          <option value="Sports">Sports</option>
+          <option value="Automotive">Automotive</option>
+          <option value="Grocery">Grocery</option>
+          <option value="Health">Health</option>
+        </select>
+        <button
+          className="btn btn-xs lg:btn-md btn-primary"
+          onClick={handleProductRegistration}
+          disabled={registerProductListing.isPending}
+        >
+          Register Product Listing {registerProductListing.isPending && '...'}
+        </button>
+      </div>
     </>
   );
 }
@@ -122,7 +205,7 @@ export function ClickcrateTestList() {
         <span className="loading loading-spinner loading-lg"></span>
       ) : accounts.data?.length ? (
         <div className="grid md:grid-cols-2 gap-4">
-          {accounts.data?.map((account) => (
+          {accounts.data?.map((account: { publicKey: PublicKey }) => (
             <ClickCrateCard
               key={account.publicKey.toString()}
               account={account.publicKey}
@@ -151,30 +234,27 @@ function ClickCrateCard({ account }: { account: PublicKey }) {
   } = useClickcrateTestProgramAccount({ account });
 
   const { publicKey } = useWallet();
-  const [eligiblePlacementTypes, setEligiblePlacementTypes] = useState<
-    PlacementType[]
-  >([]);
-  const [eligibleProductCategories, setEligibleProductCategories] = useState<
-    ProductCategory[]
-  >([]);
+  const [placementType, setPlacementType] = useState<PlacementType | null>(
+    null
+  );
+  const [productCategory, setProductCategory] =
+    useState<ProductCategory | null>(null);
   const [manager, setManager] = useState<PublicKey | null>(null);
   const [productId, setProductId] = useState('');
 
   const isUpdateClickCrateFormValid =
-    eligiblePlacementTypes.length > 0 &&
-    eligibleProductCategories.length > 0 &&
-    manager !== null;
+    placementType !== null && productCategory !== null && manager !== null;
 
   const isPlaceProductListingFormValid = productId.trim() !== '';
 
   const handleUpdateClickCrate = () => {
     if (publicKey && isUpdateClickCrateFormValid) {
-      updateClickCrate.mutateAsync({
-        id: account,
-        eligiblePlacementTypes,
-        eligibleProductCategories,
-        manager,
-      });
+      updateClickCrate.mutateAsync([
+        account,
+        placementType!,
+        productCategory!,
+        manager!,
+      ]);
     }
   };
 
@@ -206,46 +286,25 @@ function ClickCrateCard({ account }: { account: PublicKey }) {
             {/* Update ClickCrate form */}
             <div>
               <select
-                multiple
-                value={eligiblePlacementTypes.map((type) => type.toString())}
-                onChange={(e) => {
-                  const selectedTypes = Array.from(
-                    e.target.selectedOptions,
-                    (option) => JSON.parse(option.value)
-                  );
-                  setEligiblePlacementTypes(selectedTypes);
-                }}
+                value={placementType || ''}
+                onChange={(e) =>
+                  setPlacementType(e.target.value as PlacementType)
+                }
               >
-                <option value={JSON.stringify({ relatedPurchase: {} })}>
-                  Related Purchase
-                </option>
-                <option value={JSON.stringify({ digitalReplica: {} })}>
-                  Digital Replica
-                </option>
-                <option value={JSON.stringify({ targetedPlacement: {} })}>
-                  Targeted Placement
-                </option>
+                <option value="">Select a placement type</option>
+                <option value="RelatedPurchase">Related Purchase</option>
+                <option value="DigitalReplica">Digital Replica</option>
+                <option value="TargetedPlacement">Targeted Placement</option>
               </select>
               <select
-                multiple
-                value={eligibleProductCategories.map((category) =>
-                  category.toString()
-                )}
-                onChange={(e) => {
-                  const selectedCategories = Array.from(
-                    e.target.selectedOptions,
-                    (option) => JSON.parse(option.value)
-                  );
-                  setEligibleProductCategories(selectedCategories);
-                }}
+                value={productCategory || ''}
+                onChange={(e) =>
+                  setProductCategory(e.target.value as ProductCategory)
+                }
               >
-                <option value={JSON.stringify({ clothing: {} })}>
-                  Clothing
-                </option>
-                <option value={JSON.stringify({ electronics: {} })}>
-                  Electronics
-                </option>
-                {/* Add more product category options */}
+                <option value="">Select a product category</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Electronics">Electronics</option>
               </select>
               <input
                 type="text"
@@ -262,6 +321,7 @@ function ClickCrateCard({ account }: { account: PublicKey }) {
                 Update ClickCrate {updateClickCrate.isPending && '...'}
               </button>
             </div>
+
             <button
               className="btn btn-xs lg:btn-md btn-outline"
               onClick={() => activateClickCrate.mutateAsync()}
@@ -318,6 +378,7 @@ function ClickCrateCard({ account }: { account: PublicKey }) {
 }
 
 // ProductListingCard component
+// ProductListingCard component
 function ProductListingCard({ account }: { account: PublicKey }) {
   const {
     accountQuery,
@@ -328,28 +389,26 @@ function ProductListingCard({ account }: { account: PublicKey }) {
   } = useClickcrateTestProgramAccount({ account });
 
   const { publicKey } = useWallet();
-  const [newPlacementTypes, setNewPlacementTypes] = useState<PlacementType[]>(
-    []
+  const [placementType, setPlacementType] = useState<PlacementType | null>(
+    null
   );
-  const [newProductCategory, setNewProductCategory] =
+  const [productCategory, setProductCategory] =
     useState<ProductCategory | null>(null);
-  const [newManager, setNewManager] = useState<PublicKey | null>(null);
+  const [manager, setManager] = useState<PublicKey | null>(null);
   const [productId, setProductId] = useState('');
 
   const isUpdateProductListingFormValid =
-    newPlacementTypes.length > 0 &&
-    newProductCategory !== null &&
-    newManager !== null;
+    placementType !== null && productCategory !== null && manager !== null;
 
   const isMakePurchaseFormValid = productId.trim() !== '';
 
   const handleUpdateProductListing = () => {
     if (publicKey && isUpdateProductListingFormValid) {
-      updateProductListing.mutateAsync({
-        newPlacementTypes,
-        newProductCategory,
-        newManager,
-      });
+      updateProductListing.mutateAsync([
+        placementType!,
+        productCategory!,
+        manager!,
+      ]);
     }
   };
 
@@ -379,45 +438,30 @@ function ProductListingCard({ account }: { account: PublicKey }) {
             {/* Update Product Listing form */}
             <div>
               <select
-                multiple
-                value={newPlacementTypes.map((type) => type.toString())}
-                onChange={(e) => {
-                  const selectedTypes = Array.from(
-                    e.target.selectedOptions,
-                    (option) => JSON.parse(option.value)
-                  );
-                  setNewPlacementTypes(selectedTypes);
-                }}
-              >
-                <option value={JSON.stringify({ relatedPurchase: {} })}>
-                  Related Purchase
-                </option>
-                <option value={JSON.stringify({ digitalReplica: {} })}>
-                  Digital Replica
-                </option>
-                <option value={JSON.stringify({ targetedPlacement: {} })}>
-                  Targeted Placement
-                </option>
-              </select>
-              <select
-                value={newProductCategory?.toString() || ''}
+                value={placementType || ''}
                 onChange={(e) =>
-                  setNewProductCategory(JSON.parse(e.target.value))
+                  setPlacementType(e.target.value as PlacementType)
                 }
               >
-                <option value="">Select a category</option>
-                <option value={JSON.stringify({ clothing: {} })}>
-                  Clothing
-                </option>
-                <option value={JSON.stringify({ electronics: {} })}>
-                  Electronics
-                </option>
-                {/* Add more product category options */}
+                <option value="">Select a placement type</option>
+                <option value="RelatedPurchase">Related Purchase</option>
+                <option value="DigitalReplica">Digital Replica</option>
+                <option value="TargetedPlacement">Targeted Placement</option>
+              </select>
+              <select
+                value={productCategory || ''}
+                onChange={(e) =>
+                  setProductCategory(e.target.value as ProductCategory)
+                }
+              >
+                <option value="">Select a product category</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Electronics">Electronics</option>
               </select>
               <input
                 type="text"
-                placeholder="New Manager"
-                onChange={(e) => setNewManager(new PublicKey(e.target.value))}
+                placeholder="Manager"
+                onChange={(e) => setManager(new PublicKey(e.target.value))}
               />
               <button
                 className="btn btn-xs lg:btn-md btn-outline"

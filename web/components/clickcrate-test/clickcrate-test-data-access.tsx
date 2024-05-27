@@ -1,30 +1,20 @@
 'use client';
 
-import {
-  ClickcrateTestIDL,
-  getClickcrateTestProgramId,
-} from '@clickcrate-test/anchor';
-import { Program } from '@coral-xyz/anchor';
+import { ClickcrateTestIDL } from '@clickcrate-test/anchor';
+import { BN, Program } from '@coral-xyz/anchor';
 import { useConnection } from '@solana/wallet-adapter-react';
-import { Cluster, PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { useCluster } from '../cluster/cluster-data-access';
 import { useAnchorProvider } from '../solana/solana-provider';
 import { useTransactionToast } from '../ui/ui-layout';
 import {
-  PlacementType,
-  ProductCategory,
-  Origin,
-  ClickCrateState,
-  ProductListingState,
-  RegisterClickCrateArgs,
-  UpdateClickCrateArgs,
-  RegisterProductListingArgs,
-  UpdateProductListingArgs,
   PlaceProductListingArgs,
   MakePurchaseArgs,
+  getPlacementTypeFromString,
+  getProductCategoryFromString,
+  getOriginFromString,
 } from '../../types';
 
 export function useClickcrateTestProgram() {
@@ -32,15 +22,19 @@ export function useClickcrateTestProgram() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const provider = useAnchorProvider();
-  const programId = useMemo(
-    () => getClickcrateTestProgramId(cluster.network as Cluster),
-    [cluster]
+  // const programId = useMemo(
+  //   () => getClickcrateTestProgramId(cluster.network as Cluster),
+  //   [cluster]
+  // );
+  const programId = new PublicKey(
+    'RcGXdMiga83T527zSoCQDaWdMmU2qVQA3GCkfZyGrXc'
   );
+
   const program = new Program(ClickcrateTestIDL, programId, provider);
 
   const accounts = useQuery({
     queryKey: ['clickcrate-test', 'all', { cluster }],
-    queryFn: () => program.account.clickcrateTest.all(),
+    queryFn: () => program.account.clickCrateState.all(),
   });
 
   const getProgramAccount = useQuery({
@@ -50,35 +44,31 @@ export function useClickcrateTestProgram() {
 
   const registerClickCrate = useMutation({
     mutationKey: ['clickcrate-test', 'registerClickCrate', { cluster }],
-    mutationFn: async (args: {
-      id: PublicKey;
-      owner: PublicKey;
-      eligiblePlacementTypes: PlacementType[];
-      eligibleProductCategories: ProductCategory[];
-      manager: PublicKey;
-    }) => {
-      const {
-        id,
-        owner,
-        eligiblePlacementTypes,
-        eligibleProductCategories,
-        manager,
-      } = args;
+    mutationFn: async (args: [PublicKey, string, string, PublicKey]) => {
+      const [id, eligiblePlacementType, eligibleProductCategory, manager] =
+        args;
       const [clickcrateAddress] = await PublicKey.findProgramAddressSync(
         [Buffer.from('clickcrate'), id.toBuffer()],
         programId
       );
 
+      const convertedPlacementType = getPlacementTypeFromString(
+        eligiblePlacementType
+      );
+      const convertedProductCategory = getProductCategoryFromString(
+        eligibleProductCategory
+      );
+
       return program.methods
         .registerClickcrate(
           id,
-          eligiblePlacementTypes,
-          eligibleProductCategories,
+          convertedPlacementType,
+          convertedProductCategory,
           manager
         )
         .accounts({
           clickcrate: clickcrateAddress,
-          owner: owner,
+          owner: manager,
           systemProgram: programId,
         })
         .rpc();
@@ -92,33 +82,33 @@ export function useClickcrateTestProgram() {
 
   const registerProductListing = useMutation({
     mutationKey: ['clickcrate-test', 'registerProductListing', { cluster }],
-    mutationFn: async (args: RegisterProductListingArgs) => {
-      const {
-        id,
-        origin,
-        placementTypes,
-        productCategory,
-        inStock,
-        manager,
-        owner,
-      } = args;
+    mutationFn: async (
+      args: [PublicKey, string, string, string, number, PublicKey]
+    ) => {
+      const [id, origin, placementType, productCategory, inStock, manager] =
+        args;
       const [productListingAddress] = await PublicKey.findProgramAddressSync(
         [Buffer.from('product_listing'), id.toBuffer()],
         programId
       );
 
+      const convertedOrigin = getOriginFromString(origin);
+      const convertedPlacementType = getPlacementTypeFromString(placementType);
+      const convertedProductCategory =
+        getProductCategoryFromString(productCategory);
+
       return program.methods
         .registerProductListing(
           id,
-          origin,
-          placementTypes,
-          productCategory,
-          inStock,
+          convertedOrigin,
+          convertedPlacementType,
+          convertedProductCategory,
+          new BN(inStock),
           manager
         )
         .accounts({
           productListing: productListingAddress,
-          owner: owner,
+          owner: program.provider.publicKey,
           systemProgram: programId,
         })
         .rpc();
@@ -151,59 +141,7 @@ export function useClickcrateTestProgramAccount({
 
   const accountQuery = useQuery({
     queryKey: ['clickcrate-test', 'fetch', { cluster, account }],
-    queryFn: () => program.account.clickcrateTest.fetch(account),
-  });
-
-  const updateClickCrate = useMutation({
-    mutationKey: ['clickcrate-test', 'updateClickCrate', { cluster, account }],
-    mutationFn: async (args: UpdateClickCrateArgs) => {
-      const { id, eligiblePlacementTypes, eligibleProductCategories, manager } =
-        args;
-
-      return program.methods
-        .updateClickcrate(
-          id,
-          eligiblePlacementTypes,
-          eligibleProductCategories,
-          manager
-        )
-        .accounts({
-          clickcrate: account,
-          owner: program.provider.publicKey,
-          systemProgram: program.programId,
-        })
-        .rpc();
-    },
-    onSuccess: (signature) => {
-      transactionToast(signature);
-      return accounts.refetch();
-    },
-    onError: () => toast.error('Failed to update ClickCrate'),
-  });
-
-  const updateProductListing = useMutation({
-    mutationKey: [
-      'clickcrate-test',
-      'updateProductListing',
-      { cluster, account },
-    ],
-    mutationFn: async (args: UpdateProductListingArgs) => {
-      const { newPlacementTypes, newProductCategory, newManager } = args;
-
-      return program.methods
-        .updateProductListing(newPlacementTypes, newProductCategory, newManager)
-        .accounts({
-          productListing: account,
-          owner: program.provider.publicKey,
-          systemProgram: program.programId,
-        })
-        .rpc();
-    },
-    onSuccess: (signature) => {
-      transactionToast(signature);
-      return accounts.refetch();
-    },
-    onError: () => toast.error('Failed to update Product Listing'),
+    queryFn: () => program.account.clickCrateState.fetch(account),
   });
 
   const activateClickCrate = useMutation({
@@ -365,10 +303,76 @@ export function useClickcrateTestProgramAccount({
     onError: () => toast.error('Failed to make purchase'),
   });
 
+  const updateClickCrate = useMutation({
+    mutationKey: ['clickcrate-test', 'updateClickCrate', { cluster, account }],
+    mutationFn: async (args: [PublicKey, string, string, PublicKey]) => {
+      const [id, eligiblePlacementType, eligibleProductCategory, manager] =
+        args;
+
+      const convertedPlacementType = getPlacementTypeFromString(
+        eligiblePlacementType
+      );
+      const convertedProductCategory = getProductCategoryFromString(
+        eligibleProductCategory
+      );
+
+      return program.methods
+        .updateClickcrate(
+          id,
+          convertedPlacementType,
+          convertedProductCategory,
+          manager
+        )
+        .accounts({
+          clickcrate: account,
+          owner: program.provider.publicKey,
+          systemProgram: program.programId,
+        })
+        .rpc();
+    },
+    onSuccess: (signature) => {
+      transactionToast(signature);
+      return accounts.refetch();
+    },
+    onError: () => toast.error('Failed to update ClickCrate'),
+  });
+
+  const updateProductListing = useMutation({
+    mutationKey: [
+      'clickcrate-test',
+      'updateProductListing',
+      { cluster, account },
+    ],
+    mutationFn: async (args: [string, string, PublicKey]) => {
+      const [newPlacementType, newProductCategory, newManager] = args;
+
+      const convertedPlacementType =
+        getPlacementTypeFromString(newPlacementType);
+      const convertedProductCategory =
+        getProductCategoryFromString(newProductCategory);
+
+      return program.methods
+        .updateProductListing(
+          convertedPlacementType,
+          convertedProductCategory,
+          newManager
+        )
+        .accounts({
+          productListing: account,
+          owner: program.provider.publicKey,
+          systemProgram: program.programId,
+        })
+        .rpc();
+    },
+    onSuccess: (signature) => {
+      transactionToast(signature);
+      return accounts.refetch();
+    },
+    onError: () => toast.error('Failed to update Product Listing'),
+  });
+
   return {
     accountQuery,
-    updateClickCrate,
-    updateProductListing,
     activateClickCrate,
     deactivateClickCrate,
     activateProductListing,
@@ -376,5 +380,7 @@ export function useClickcrateTestProgramAccount({
     placeProductListing,
     removeProductListing,
     makePurchase,
+    updateClickCrate,
+    updateProductListing,
   };
 }

@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 use crate::account::*;
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, eligible_placement_types: Vec<PlacementType>, eligible_product_categories: Vec<ProductCategory>)]
+#[instruction(id: Pubkey, eligible_placement_type: PlacementType, eligible_product_category: ProductCategory)]
 pub struct RegisterClickCrate<'info> {
     #[account(
         init,
@@ -19,7 +19,7 @@ pub struct RegisterClickCrate<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, eligible_placement_types: Vec<PlacementType>, eligible_product_categories: Vec<ProductCategory>)]
+#[instruction(id: Pubkey, eligible_placement_type: PlacementType, eligible_product_category: ProductCategory)]
 pub struct UpdateClickCrate<'info> {
     #[account(
         mut,
@@ -36,7 +36,7 @@ pub struct UpdateClickCrate<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, origin: Origin, placement_types: Vec<PlacementType>, product_category: ProductCategory, in_stock: u64)]
+#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, in_stock: u64)]
 pub struct RegisterProductListing<'info> {
     #[account(
         init,
@@ -52,7 +52,7 @@ pub struct RegisterProductListing<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, origin: Origin, placement_types: Vec<PlacementType>, product_category: ProductCategory, in_stock: u64)]
+#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, in_stock: u64)]
 pub struct UpdateProductListing<'info> {
     #[account(
         mut,

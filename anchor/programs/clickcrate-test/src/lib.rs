@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("Hmjd3oWSBgwhhqid9P6zdkLG2Nh3MGVim2Kkoi5e9vSv");
+declare_id!("RcGXdMiga83T527zSoCQDaWdMmU2qVQA3GCkfZyGrXc");
 
 pub mod account;
 pub mod anchor;
@@ -13,22 +13,22 @@ use crate::context::*;
 use crate::error::*;
 
 #[program]
-pub mod clickcrate_registry {
+pub mod clickcrate_test {
     use super::*;
 
     pub fn register_clickcrate(
         ctx: Context<RegisterClickCrate>,
         id: Pubkey,
-        eligible_placement_types: Vec<PlacementType>,
-        eligible_product_categories: Vec<ProductCategory>,
+        eligible_placement_type: PlacementType,
+        eligible_product_category: ProductCategory,
         manager: Pubkey,
     ) -> Result<()> {
         let clickcrate = &mut ctx.accounts.clickcrate;
         clickcrate.id = id;
         clickcrate.owner = ctx.accounts.owner.key();
         clickcrate.manager = manager;
-        clickcrate.eligible_placement_types = eligible_placement_types;
-        clickcrate.eligible_product_categories = eligible_product_categories;
+        clickcrate.eligible_placement_type = eligible_placement_type;
+        clickcrate.eligible_product_category = eligible_product_category;
         clickcrate.product = None;
         clickcrate.is_active = false;
         Ok(())
@@ -37,15 +37,15 @@ pub mod clickcrate_registry {
     pub fn update_clickcrate(
         ctx: Context<UpdateClickCrate>,
         id: Pubkey,
-        eligible_placement_types: Vec<PlacementType>,
-        eligible_product_categories: Vec<ProductCategory>,
+        eligible_placement_type: PlacementType,
+        eligible_product_category: ProductCategory,
         manager: Pubkey,
     ) -> Result<()> {
         let clickcrate = &mut ctx.accounts.clickcrate;
         clickcrate.id = id;
         clickcrate.manager = manager;
-        clickcrate.eligible_placement_types = eligible_placement_types;
-        clickcrate.eligible_product_categories = eligible_product_categories;
+        clickcrate.eligible_placement_type = eligible_placement_type;
+        clickcrate.eligible_product_category = eligible_product_category;
         Ok(())
     }
 
@@ -53,7 +53,7 @@ pub mod clickcrate_registry {
         ctx: Context<RegisterProductListing>,
         id: Pubkey,
         origin: Origin,
-        placement_types: Vec<PlacementType>,
+        placement_type: PlacementType,
         product_category: ProductCategory,
         in_stock: u64,
         manager: Pubkey,
@@ -63,7 +63,7 @@ pub mod clickcrate_registry {
         product_listing.origin = origin;
         product_listing.owner = ctx.accounts.owner.key();
         product_listing.manager = manager;
-        product_listing.placement_types = placement_types;
+        product_listing.placement_type = placement_type;
         product_listing.product_category = product_category;
         product_listing.in_stock = in_stock;
         product_listing.sold = 0;
@@ -73,13 +73,13 @@ pub mod clickcrate_registry {
 
     pub fn update_product_listing(
         ctx: Context<UpdateProductListing>,
-        new_placement_types: Vec<PlacementType>,
+        new_placement_type: PlacementType,
         new_product_category: ProductCategory,
         new_manager: Pubkey,
     ) -> Result<()> {
         let product_listing = &mut ctx.accounts.product_listing;
         product_listing.manager = new_manager;
-        product_listing.placement_types = new_placement_types;
+        product_listing.placement_type = new_placement_type;
         product_listing.product_category = new_product_category;
         Ok(())
     }

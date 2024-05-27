@@ -1,6 +1,6 @@
 {
-  "version": "0.1.0",
-  "name": "clickcrate_registry",
+  "version": "0.3.0",
+  "name": "clickcrate_test",
   "instructions": [
     {
       "name": "registerClickcrate",
@@ -27,19 +27,15 @@
           "type": "publicKey"
         },
         {
-          "name": "eligiblePlacementTypes",
+          "name": "eligiblePlacementType",
           "type": {
-            "vec": {
-              "defined": "PlacementType"
-            }
+            "defined": "PlacementType"
           }
         },
         {
-          "name": "eligibleProductCategories",
+          "name": "eligibleProductCategory",
           "type": {
-            "vec": {
-              "defined": "ProductCategory"
-            }
+            "defined": "ProductCategory"
           }
         },
         {
@@ -73,19 +69,15 @@
           "type": "publicKey"
         },
         {
-          "name": "eligiblePlacementTypes",
+          "name": "eligiblePlacementType",
           "type": {
-            "vec": {
-              "defined": "PlacementType"
-            }
+            "defined": "PlacementType"
           }
         },
         {
-          "name": "eligibleProductCategories",
+          "name": "eligibleProductCategory",
           "type": {
-            "vec": {
-              "defined": "ProductCategory"
-            }
+            "defined": "ProductCategory"
           }
         },
         {
@@ -125,11 +117,9 @@
           }
         },
         {
-          "name": "placementTypes",
+          "name": "placementType",
           "type": {
-            "vec": {
-              "defined": "PlacementType"
-            }
+            "defined": "PlacementType"
           }
         },
         {
@@ -169,11 +159,9 @@
       ],
       "args": [
         {
-          "name": "newPlacementTypes",
+          "name": "newPlacementType",
           "type": {
-            "vec": {
-              "defined": "PlacementType"
-            }
+            "defined": "PlacementType"
           }
         },
         {
@@ -335,19 +323,15 @@
             "type": "publicKey"
           },
           {
-            "name": "eligiblePlacementTypes",
+            "name": "eligiblePlacementType",
             "type": {
-              "vec": {
-                "defined": "PlacementType"
-              }
+              "defined": "PlacementType"
             }
           },
           {
-            "name": "eligibleProductCategories",
+            "name": "eligibleProductCategory",
             "type": {
-              "vec": {
-                "defined": "ProductCategory"
-              }
+              "defined": "ProductCategory"
             }
           },
           {
@@ -387,11 +371,9 @@
             "type": "publicKey"
           },
           {
-            "name": "placementTypes",
+            "name": "placementType",
             "type": {
-              "vec": {
-                "defined": "PlacementType"
-              }
+              "defined": "PlacementType"
             }
           },
           {
