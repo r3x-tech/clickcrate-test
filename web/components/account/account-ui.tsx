@@ -93,20 +93,20 @@ export function AccountButtons({ address }: { address: PublicKey }) {
       <div className="space-x-2">
         <button
           disabled={cluster.network?.includes('mainnet')}
-          className="btn btn-xs lg:btn-md btn-outline"
+          className="btn btn-xs lg:btn-sm btn-primary py-3"
           onClick={() => setShowAirdropModal(true)}
         >
           Airdrop
         </button>
         <button
           disabled={wallet.publicKey?.toString() !== address.toString()}
-          className="btn btn-xs lg:btn-md btn-outline"
+          className="btn btn-xs lg:btn-sm btn-primary py-3"
           onClick={() => setShowSendModal(true)}
         >
           Send
         </button>
         <button
-          className="btn btn-xs lg:btn-md btn-outline"
+          className="btn btn-xs lg:btn-sm btn-primary py-3"
           onClick={() => setShowReceiveModal(true)}
         >
           Receive
@@ -135,7 +135,7 @@ export function AccountTokens({ address }: { address: PublicKey }) {
               <span className="loading loading-spinner"></span>
             ) : (
               <button
-                className="btn btn-sm btn-outline"
+                className="btn btn-sm btn-outline border-none bg-transparent text-white hover:text-white hover:bg-transparent"
                 onClick={async () => {
                   await query.refetch();
                   await client.invalidateQueries({
@@ -159,9 +159,9 @@ export function AccountTokens({ address }: { address: PublicKey }) {
           {query.data.length === 0 ? (
             <div>No token accounts found.</div>
           ) : (
-            <table className="table border-4 rounded-lg border-separate border-base-300">
+            <table className="table border-2 rounded-lg border-separate border-white bg-background">
               <thead>
-                <tr>
+                <tr className="text-white">
                   <th>Public Key</th>
                   <th>Mint</th>
                   <th className="text-right">Balance</th>
@@ -169,7 +169,7 @@ export function AccountTokens({ address }: { address: PublicKey }) {
               </thead>
               <tbody>
                 {items?.map(({ account, pubkey }) => (
-                  <tr key={pubkey.toString()}>
+                  <tr key={pubkey.toString()} className="text-white">
                     <td>
                       <div className="flex space-x-2">
                         <span className="font-mono">
@@ -202,7 +202,7 @@ export function AccountTokens({ address }: { address: PublicKey }) {
                   <tr>
                     <td colSpan={4} className="text-center">
                       <button
-                        className="btn btn-xs btn-outline"
+                        className="btn btn-xs btn-solid border-none bg-tertiary text-white hover:bg-tertiary"
                         onClick={() => setShowAll(!showAll)}
                       >
                         {showAll ? 'Show Less' : 'Show All'}
@@ -237,7 +237,7 @@ export function AccountTransactions({ address }: { address: PublicKey }) {
             <span className="loading loading-spinner"></span>
           ) : (
             <button
-              className="btn btn-sm btn-outline"
+              className="btn btn-sm btn-outline border-none bg-transparent text-white hover:text-white hover:bg-transparent"
               onClick={() => query.refetch()}
             >
               <IconRefresh size={16} />
@@ -255,9 +255,9 @@ export function AccountTransactions({ address }: { address: PublicKey }) {
           {query.data.length === 0 ? (
             <div>No transactions found.</div>
           ) : (
-            <table className="table border-4 rounded-lg border-separate border-base-300">
+            <table className="table border-2 rounded-lg border-separate border-white bg-background">
               <thead>
-                <tr>
+                <tr className="text-white">
                   <th>Signature</th>
                   <th className="text-right">Slot</th>
                   <th>Block Time</th>
@@ -300,7 +300,7 @@ export function AccountTransactions({ address }: { address: PublicKey }) {
                   <tr>
                     <td colSpan={4} className="text-center">
                       <button
-                        className="btn btn-xs btn-outline"
+                        className="btn btn-xs btn-solid border-none bg-tertiary text-white hover:bg-tertiary"
                         onClick={() => setShowAll(!showAll)}
                       >
                         {showAll ? 'Show Less' : 'Show All'}
@@ -370,6 +370,7 @@ function ModalAirdrop({
         className="input input-bordered w-full"
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
+        style={{ backgroundColor: 'bg-primary' }}
       />
     </AppModal>
   );

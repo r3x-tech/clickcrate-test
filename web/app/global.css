@@ -2,15 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 
 html, body {
   height: 100%;
-  @apply text-white font-body;
+  /* @apply text-white font-heading; */
+  font-family: 'Montserrat', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  @apply text-white font-heading;
+  @apply text-white font-body;
 }
 
 p {
@@ -26,4 +30,25 @@ p {
 
 .wallet-adapter-dropdown-list, .wallet-adapter-button {
   font-family: inherit !important;
+}
+
+/* .btn:not(.btn-ghost):not(.btn-outline) {
+  @apply bg-primary text-white border-none rounded-full tracking-wide text-sm;
+}
+
+.btn:not(.btn-ghost):not(.btn-outline):hover {
+  @apply bg-secondary;
+} */
+
+.btn:not(.btn-ghost):not(.btn-outline) {
+  @apply bg-primary text-white border-none rounded-full;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600 !important;
+  font-size: var(--btn-text-size) !important;
+  letter-spacing: var(--btn-tracking) !important;
+  height: auto;
+}
+
+.btn:not(.btn-ghost):not(.btn-outline):hover {
+  @apply bg-secondary !important;
 }

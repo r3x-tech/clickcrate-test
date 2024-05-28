@@ -13,18 +13,10 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { Origin, PlacementType, ProductCategory } from '@/types';
 import { BN } from '@coral-xyz/anchor';
 
-export function ClickcrateTestRegister() {
+export function TestClickCrateRegister() {
   const { registerClickCrate, registerProductListing } =
     useClickcrateTestProgram();
   const { publicKey } = useWallet();
-
-  const [productId, setProductId] = useState('');
-  const [productOrigin, setProductOrigin] = useState<Origin | null>(null);
-  const [productPlacementType, setProductPlacementType] =
-    useState<PlacementType | null>(null);
-  const [productCategory, setProductCategory] =
-    useState<ProductCategory | null>(null);
-  const [productInStock, setProductInStock] = useState<BN>(new BN(0));
 
   const [clickcrateId, setClickcrateId] = useState('');
   const [clickcratePlacementType, setClickcratePlacementType] =
@@ -32,29 +24,10 @@ export function ClickcrateTestRegister() {
   const [clickcrateProductCategory, setClickcrateProductCategory] =
     useState<ProductCategory>();
 
-  const isProductFormValid =
-    productId.trim() !== '' &&
-    productOrigin !== null &&
-    productPlacementType !== null &&
-    productCategory !== null;
-
   const isClickcrateFormValid =
     clickcrateId.trim() !== '' &&
     clickcratePlacementType !== undefined &&
     clickcrateProductCategory !== undefined;
-
-  const handleProductRegistration = () => {
-    if (publicKey && isProductFormValid) {
-      registerProductListing.mutateAsync([
-        new PublicKey(productId),
-        productOrigin,
-        productPlacementType,
-        productCategory!,
-        productInStock.toNumber(),
-        publicKey,
-      ]);
-    }
-  };
 
   const handleClickcrateRegistration = () => {
     if (publicKey && isClickcrateFormValid) {
@@ -72,20 +45,25 @@ export function ClickcrateTestRegister() {
   }
 
   return (
-    <>
-      <div>
-        <h3>Register ClickCrate</h3>
+    <div className="flex flex-col gap-y-8">
+      <div className="bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-4 min-w-[25rem]">
+        <h1 className="text-lg font-bold text-start">
+          Register ClickCrate POS
+        </h1>
         <input
           type="text"
-          placeholder="ClickCrate ID"
+          placeholder="pNFT Collection ID"
           value={clickcrateId}
           onChange={(e) => setClickcrateId(e.target.value)}
+          className="rounded-lg p-2 text-black"
         />
         <select
           value={clickcratePlacementType}
+          placeholder="Placement Type"
           onChange={(e) =>
             setClickcratePlacementType(e.target.value as PlacementType)
           }
+          className="rounded-lg p-2 text-black"
         >
           <option value="">Select a placement type</option>
           <option value="DigitalReplica">Digital Replica</option>
@@ -94,9 +72,11 @@ export function ClickcrateTestRegister() {
         </select>
         <select
           value={clickcrateProductCategory}
+          placeholder="Eligible Product Category"
           onChange={(e) =>
             setClickcrateProductCategory(e.target.value as ProductCategory)
           }
+          className="rounded-lg p-2 text-black"
         >
           <option value="">Select a product category</option>
           <option value="Clothing">Clothing</option>
@@ -110,32 +90,80 @@ export function ClickcrateTestRegister() {
           <option value="Grocery">Grocery</option>
           <option value="Health">Health</option>
         </select>
-        <button
-          className="btn btn-xs lg:btn-md btn-primary"
-          onClick={handleClickcrateRegistration}
-          disabled={registerClickCrate.isPending}
-        >
-          Register ClickCrate {registerClickCrate.isPending && '...'}
-        </button>
+        <div className="pt-2 w-full">
+          <button
+            className="btn btn-xs lg:btn-sm btn-primary w-full py-3"
+            onClick={handleClickcrateRegistration}
+            disabled={registerClickCrate.isPending}
+          >
+            Register POS {registerClickCrate.isPending && '...'}
+          </button>
+        </div>
       </div>
+    </div>
+  );
+}
 
-      <div>
-        <h3>Register Product Listing</h3>
+export function TestProductListingRegister() {
+  const { registerProductListing } = useClickcrateTestProgram();
+  const { publicKey } = useWallet();
+
+  const [productId, setProductId] = useState('');
+  const [productOrigin, setProductOrigin] = useState<Origin | null>(null);
+  const [productPlacementType, setProductPlacementType] =
+    useState<PlacementType | null>(null);
+  const [productCategory, setProductCategory] =
+    useState<ProductCategory | null>(null);
+  const [productInStock, setProductInStock] = useState<BN>(new BN(0));
+
+  const isProductFormValid =
+    productId.trim() !== '' &&
+    productOrigin !== null &&
+    productPlacementType !== null &&
+    productCategory !== null;
+
+  const handleProductRegistration = () => {
+    if (publicKey && isProductFormValid) {
+      registerProductListing.mutateAsync([
+        new PublicKey(productId),
+        productOrigin,
+        productPlacementType,
+        productCategory!,
+        productInStock.toNumber(),
+        publicKey,
+      ]);
+    }
+  };
+
+  if (!publicKey) {
+    return <p>Connect your wallet</p>;
+  }
+
+  return (
+    <div className="flex flex-col gap-y-8">
+      <div className="bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-4">
+        <h1 className="text-lg font-bold text-start font-heading">
+          Register Product Listing
+        </h1>
+
         <input
           type="text"
           placeholder="Product ID"
           value={productId}
           onChange={(e) => setProductId(e.target.value)}
+          className="rounded-lg p-2 text-black"
         />
         <input
           type="number"
           placeholder="Product Stock"
           value={productInStock.toString()}
           onChange={(e) => setProductInStock(new BN(parseInt(e.target.value)))}
+          className="rounded-lg p-2 text-black"
         />
         <select
           value={productOrigin || ''}
           onChange={(e) => setProductOrigin(e.target.value as Origin)}
+          className="rounded-lg p-2 text-black"
         >
           <option value="">Select an origin</option>
           <option value="Clickcrate">Clickcrate</option>
@@ -147,6 +175,7 @@ export function ClickcrateTestRegister() {
           onChange={(e) =>
             setProductPlacementType(e.target.value as PlacementType)
           }
+          className="rounded-lg p-2 text-black"
         >
           <option value="">Select a placement type</option>
           <option value="DigitalReplica">Digital Replica</option>
@@ -158,6 +187,7 @@ export function ClickcrateTestRegister() {
           onChange={(e) =>
             setProductCategory(e.target.value as ProductCategory)
           }
+          className="rounded-lg p-2 text-black"
         >
           <option value="">Select a product category</option>
           <option value="Clothing">Clothing</option>
@@ -171,19 +201,21 @@ export function ClickcrateTestRegister() {
           <option value="Grocery">Grocery</option>
           <option value="Health">Health</option>
         </select>
-        <button
-          className="btn btn-xs lg:btn-md btn-primary"
-          onClick={handleProductRegistration}
-          disabled={registerProductListing.isPending}
-        >
-          Register Product Listing {registerProductListing.isPending && '...'}
-        </button>
+        <div className="pt-2 w-full">
+          <button
+            className="btn btn-xs sm:btn-sm btn-primary w-full h-full py-3 justify-center items-center"
+            onClick={handleProductRegistration}
+            disabled={registerProductListing.isPending}
+          >
+            Register Listing {registerProductListing.isPending && '...'}
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
-export function ClickcrateTestList() {
+export function ClickCrateTestList() {
   const { accounts, getProgramAccount } = useClickcrateTestProgram();
 
   if (getProgramAccount.isLoading) {
@@ -193,14 +225,14 @@ export function ClickcrateTestList() {
     return (
       <div className="alert alert-info flex justify-center">
         <span>
-          Program account not found. Make sure you have deployed the program and
-          are on the correct cluster.
+          Program account not found. Make sure the registry is deployed and are
+          on the correct cluster.
         </span>
       </div>
     );
   }
   return (
-    <div className={'space-y-6'}>
+    <div className={'space-y-6 mb-20'}>
       {accounts.isLoading ? (
         <span className="loading loading-spinner loading-lg"></span>
       ) : accounts.data?.length ? (
@@ -214,8 +246,47 @@ export function ClickcrateTestList() {
         </div>
       ) : (
         <div className="text-center">
-          <h2 className={'text-2xl'}>No accounts</h2>
-          No accounts found. Create one above to get started.
+          <h2 className={'text-2xl mt-4'}>My ClickCrates</h2>
+          No ClickCrates found. Create one above to get started.
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function ProductListingsTestList() {
+  const { accounts, getProgramAccount } = useClickcrateTestProgram();
+
+  if (getProgramAccount.isLoading) {
+    return <span className="loading loading-spinner loading-lg"></span>;
+  }
+  if (!getProgramAccount.data?.value) {
+    return (
+      <div className="alert alert-info flex justify-center">
+        <span>
+          Program account not found. Make sure the registry is deployed and are
+          on the correct cluster.
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className={'space-y-6 mb-20'}>
+      {accounts.isLoading ? (
+        <span className="loading loading-spinner loading-lg"></span>
+      ) : accounts.data?.length ? (
+        <div className="grid md:grid-cols-2 gap-4">
+          {accounts.data?.map((account: { publicKey: PublicKey }) => (
+            <ProductListingCard
+              key={account.publicKey.toString()}
+              account={account.publicKey}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center">
+          <h2 className={'text-2xl mt-4'}>My Product Listings</h2>
+          No Product Listings found. Create one above to get started.
         </div>
       )}
     </div>
@@ -351,6 +422,7 @@ function ClickCrateCard({ account }: { account: PublicKey }) {
                 placeholder="Product ID"
                 value={productId}
                 onChange={(e) => setProductId(e.target.value)}
+                className="rounded-lg p-2 text-lightGray"
               />
               <button
                 className="btn btn-xs btn-secondary btn-outline"

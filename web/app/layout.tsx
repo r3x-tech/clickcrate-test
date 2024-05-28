@@ -11,8 +11,10 @@ export const metadata = {
 
 const links: { label: string; path: string }[] = [
   { label: 'Account', path: '/account' },
-  { label: 'Cluster', path: '/clusters' },
-  { label: 'Create', path: '/clickcrate-test' },
+  // { label: 'Cluster', path: '/clusters' },
+  // { label: 'Create', path: '/clickcrate-test' },
+  { label: 'ClickCrates (POS)', path: '/clickcrate-pos' },
+  { label: 'Product Listings', path: '/product-listing' },
 ];
 
 export default function RootLayout({

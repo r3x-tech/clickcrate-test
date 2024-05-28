@@ -36,7 +36,7 @@ export function UiLayout({
         ></div>
         <div className="flex-1">
           <Link
-            className="btn btn-ghost normal-case text-xl"
+            className="btn btn-ghost normal-case text-xl bg-none"
             href="https://clickcrate.r3x.tech/"
             target="_blank"
             rel="noopener noreferrer"
@@ -49,12 +49,12 @@ export function UiLayout({
             /> */}
             <Image
               src="/clickcrate-logo-small.svg"
-              alt="solana icon"
-              width={150}
-              height={100}
+              alt="clickcrate icon"
+              width={120}
+              height={80}
             />
           </Link>
-          <ul className="menu menu-horizontal px-1 space-x-2">
+          <ul className="menu menu-horizontal px-2 space-x-4">
             {links.map(({ label, path }) => (
               <li key={path}>
                 <Link
@@ -137,7 +137,7 @@ export function AppModal({
 
   return (
     <dialog className="modal" ref={dialogRef}>
-      <div className="modal-box space-y-5">
+      <div className="modal-box space-y-5 bg-background border-2 border-white">
         <h3 className="font-bold text-lg">{title}</h3>
         {children}
         <div className="modal-action">

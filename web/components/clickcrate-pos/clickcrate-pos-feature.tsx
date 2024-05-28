@@ -4,17 +4,12 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletButton } from '../solana/solana-provider';
 import { AppHero, ellipsify } from '../ui/ui-layout';
 import { ExplorerLink } from '../cluster/cluster-ui';
-import { useClickcrateTestProgram } from './clickcrate-test-data-access';
-import {
-  ProductListingsTestList,
-  TestProductListingRegister,
-  TestClickCrateRegister,
-  ClickCrateTestList,
-} from './clickcrate-test-ui';
+import { useClickcratePosProgram } from './clickcrate-pos-data-access';
+import { ClickCratePosRegister, ClickCratePosList } from './clickcrate-pos-ui';
 
-export default function ClickcrateTestFeature() {
+export default function ClickcratePosFeature() {
   const { publicKey } = useWallet();
-  const { programId } = useClickcrateTestProgram();
+  const { programId } = useClickcratePosProgram();
 
   return publicKey ? (
     <div>
@@ -36,10 +31,8 @@ export default function ClickcrateTestFeature() {
           </p>
         </div>
 
-        <TestClickCrateRegister />
-        <ClickCrateTestList />
-        <ProductListingsTestList />
-        <TestProductListingRegister />
+        <ClickCratePosRegister />
+        <ClickCratePosList />
       </AppHero>
     </div>
   ) : (
