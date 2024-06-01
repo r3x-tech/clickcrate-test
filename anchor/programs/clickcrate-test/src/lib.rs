@@ -1,14 +1,12 @@
 use anchor_lang::prelude::*;
 
-declare_id!("RcGXdMiga83T527zSoCQDaWdMmU2qVQA3GCkfZyGrXc");
+declare_id!("ENmHn3TEBqzfvwi19xc9cYsTmKseBSbxhqqXETiEKgJ9");
 
 pub mod account;
-pub mod anchor;
 pub mod context;
 pub mod error;
 
 use crate::account::*;
-// use crate::anchor::*;
 use crate::context::*;
 use crate::error::*;
 
@@ -23,6 +21,7 @@ pub mod clickcrate_test {
         eligible_product_category: ProductCategory,
         manager: Pubkey,
     ) -> Result<()> {
+        msg!("ClickCrate Registration in progress");
         let clickcrate = &mut ctx.accounts.clickcrate;
         clickcrate.id = id;
         clickcrate.owner = ctx.accounts.owner.key();
@@ -31,6 +30,7 @@ pub mod clickcrate_test {
         clickcrate.eligible_product_category = eligible_product_category;
         clickcrate.product = None;
         clickcrate.is_active = false;
+        msg!("ClickCrate Registered");
         Ok(())
     }
 

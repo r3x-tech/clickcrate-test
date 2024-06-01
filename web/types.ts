@@ -1,80 +1,108 @@
 import { BN } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 
-export type PlacementType =
-  | 'DigitalReplica'
-  | 'RelatedPurchase'
-  | 'TargetedPlacement';
+export enum PlacementType {
+  DIGITALREPLICA,
+  RELATEDPURCHASE,
+  TARGETEDPLACEMENT,
+}
+
+export enum ProductCategory {
+  CLOTHING,
+  ELECTRONICS,
+  BOOKS,
+  HOME,
+  BEAUTY,
+  TOYS,
+  SPORTS,
+  AUTOMOTIVE,
+  GROCERY,
+  HEALTH,
+}
+
+export type PlacementTypee =
+  | 'DIGITALREPLICA'
+  | 'RELATEDPURCHASE'
+  | 'TARGETEDPLACEMENT';
 
 export const getPlacementTypeFromString = (
   placementType: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any => {
+): PlacementTypee => {
   switch (placementType) {
-    case 'DigitalReplica':
-      return { digitalReplica: {} };
-    case 'RelatedPurchase':
-      return { relatedPurchase: {} };
-    case 'TargetedPlacement':
-      return { targetedPlacement: {} };
+    case 'DIGITALREPLICA':
+      return 'DIGITALREPLICA';
+    case 'RELATEDPURCHASE':
+      return 'RELATEDPURCHASE';
+    case 'TARGETEDPLACEMENT':
+      return 'TARGETEDPLACEMENT';
     default:
       throw new Error(`Invalid placement type: ${placementType}`);
   }
 };
 
-export type ProductCategory =
-  | 'Clothing'
-  | 'Electronics'
-  | 'Books'
-  | 'Home'
-  | 'Beauty'
-  | 'Toys'
-  | 'Sports'
-  | 'Automotive'
-  | 'Grocery'
-  | 'Health';
+export type ProductCategoryy =
+  | 'CLOTHING'
+  | 'ELECTRONIC'
+  | 'BOOKS'
+  | 'HOME'
+  | 'BEAUTY'
+  | 'TOYS'
+  | 'SPORTS'
+  | 'AUTOMOTIVE'
+  | 'GROCERY'
+  | 'HEALTH';
 
 export const getProductCategoryFromString = (
   productCategory: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any => {
+):
+  | { CLOTHING: Record<string, never> }
+  | { ELECTRONICS: Record<string, never> }
+  | { BOOKS: Record<string, never> }
+  | { HOME: Record<string, never> }
+  | { BEAUTY: Record<string, never> }
+  | { TOYS: Record<string, never> }
+  | { SPORTS: Record<string, never> }
+  | { AUTOMOTIVE: Record<string, never> }
+  | { GROCERY: Record<string, never> }
+  | { HEALTH: Record<string, never> } => {
   switch (productCategory) {
-    case 'Clothing':
-      return { clothing: {} };
-    case 'Electronics':
-      return { electronics: {} };
-    case 'Books':
-      return { books: {} };
-    case 'Home':
-      return { home: {} };
-    case 'Beauty':
-      return { beauty: {} };
-    case 'Toys':
-      return { toys: {} };
-    case 'Sports':
-      return { sports: {} };
-    case 'Automotive':
-      return { automotive: {} };
-    case 'Grocery':
-      return { grocery: {} };
-    case 'Health':
-      return { health: {} };
+    case 'CLOTHING':
+      return { CLOTHING: {} as Record<string, never> };
+    case 'ELECTRONICS':
+      return { ELECTRONICS: {} as Record<string, never> };
+    case 'BOOKS':
+      return { BOOKS: {} as Record<string, never> };
+    case 'HOME':
+      return { HOME: {} as Record<string, never> };
+    case 'BEAUTY':
+      return { BEAUTY: {} as Record<string, never> };
+    case 'TOYS':
+      return { TOYS: {} as Record<string, never> };
+    case 'SPORTS':
+      return { SPORTS: {} as Record<string, never> };
+    case 'AUTOMOTIVE':
+      return { AUTOMOTIVE: {} as Record<string, never> };
+    case 'GROCERY':
+      return { GROCERY: {} as Record<string, never> };
+    case 'HEALTH':
+      return { HEALTH: {} as Record<string, never> };
     default:
       throw new Error(`Invalid product category: ${productCategory}`);
   }
 };
 
-export type Origin = 'Clickcrate' | 'Shopify' | 'Square';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getOriginFromString = (origin: string): any => {
+export type Origin = 'CLICKCRATE' | 'SHOPIFY' | 'SQUARE';
+export const getOriginFromString = (
+  origin: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): any => {
   switch (origin) {
-    case 'Clickcrate':
-      return { clickcrate: {} };
-    case 'Shopify':
-      return { shopify: {} };
-    case 'Square':
-      return { square: {} };
+    case 'CLICKCRATE':
+      return { cLICKCRATE: {} };
+    case 'SHOPIFY':
+      return { sHOPIFY: {} };
+    case 'SQUARE':
+      return { sQUARE: {} };
     default:
       throw new Error(`Invalid origin: ${origin}`);
   }
@@ -116,3 +144,42 @@ export type PlaceProductListingArgs = {
 export type MakePurchaseArgs = {
   productId: PublicKey;
 };
+
+export interface NFT {
+  name: string;
+  symbol: string;
+  royalty: number;
+  image_uri: string;
+  cached_image_uri: string;
+  animation_url: string;
+  cached_animation_url: string;
+  metadata_uri: string;
+  description: string;
+  mint: string;
+  owner: string;
+  update_authority: string;
+  creators: {
+    address: string;
+    share: number;
+    verified: boolean;
+  }[];
+  collection: {
+    address: string;
+    verified: boolean;
+  };
+  attributes: unknown;
+  attributes_array: {
+    trait_type: string;
+    value: string;
+  }[];
+  files: {
+    uri: string;
+    type: string;
+  }[];
+  external_url: string;
+  primary_sale_happened: boolean;
+  is_mutable: boolean;
+  token_standard: string;
+  is_loaded_metadata: boolean;
+  is_compressed?: boolean;
+}

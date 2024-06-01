@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.17.0",
   "name": "clickcrate_test",
   "instructions": [
     {
@@ -405,13 +405,13 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "DigitalReplica"
+            "name": "Digitalreplica"
           },
           {
-            "name": "RelatedPurchase"
+            "name": "Relatedpurchase"
           },
           {
-            "name": "TargetedPlacement"
+            "name": "Targetedplacement"
           }
         ]
       }
@@ -521,12 +521,15 @@
     {
       "code": 6009,
       "name": "InvalidProductListingRegistration",
-      "msg": "Invalid clickcrate registration"
+      "msg": "Invalid product listing registration"
     },
     {
       "code": 6010,
       "name": "PurchaseFailed",
       "msg": "Purchase did not go through"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "ENmHn3TEBqzfvwi19xc9cYsTmKseBSbxhqqXETiEKgJ9"
+  }
 }

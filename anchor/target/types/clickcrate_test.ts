@@ -1,5 +1,5 @@
 export type ClickcrateTest = {
-  "version": "0.3.0",
+  "version": "0.17.0",
   "name": "clickcrate_test",
   "instructions": [
     {
@@ -405,13 +405,13 @@ export type ClickcrateTest = {
         "kind": "enum",
         "variants": [
           {
-            "name": "DigitalReplica"
+            "name": "Digitalreplica"
           },
           {
-            "name": "RelatedPurchase"
+            "name": "Relatedpurchase"
           },
           {
-            "name": "TargetedPlacement"
+            "name": "Targetedplacement"
           }
         ]
       }
@@ -521,7 +521,7 @@ export type ClickcrateTest = {
     {
       "code": 6009,
       "name": "InvalidProductListingRegistration",
-      "msg": "Invalid clickcrate registration"
+      "msg": "Invalid product listing registration"
     },
     {
       "code": 6010,
@@ -532,7 +532,7 @@ export type ClickcrateTest = {
 };
 
 export const IDL: ClickcrateTest = {
-  "version": "0.3.0",
+  "version": "0.17.0",
   "name": "clickcrate_test",
   "instructions": [
     {
@@ -938,13 +938,13 @@ export const IDL: ClickcrateTest = {
         "kind": "enum",
         "variants": [
           {
-            "name": "DigitalReplica"
+            "name": "Digitalreplica"
           },
           {
-            "name": "RelatedPurchase"
+            "name": "Relatedpurchase"
           },
           {
-            "name": "TargetedPlacement"
+            "name": "Targetedplacement"
           }
         ]
       }
@@ -1054,7 +1054,7 @@ export const IDL: ClickcrateTest = {
     {
       "code": 6009,
       "name": "InvalidProductListingRegistration",
-      "msg": "Invalid clickcrate registration"
+      "msg": "Invalid product listing registration"
     },
     {
       "code": 6010,

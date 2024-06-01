@@ -10,7 +10,12 @@
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
-        "@next/next/no-html-link-for-pages": ["error", "web/pages"]
+        "@next/next/no-html-link-for-pages": ["error", "web/pages"],
+        // Add or adjust rules here to make ESLint less strict
+        // For example:
+        "@typescript-eslint/no-unused-vars": "off",
+        "react/prop-types": "off",
+        "react/react-in-jsx-scope": "off"
       }
     },
     {

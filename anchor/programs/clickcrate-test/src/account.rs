@@ -38,9 +38,9 @@ impl MaxSize for ProductListingState {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
 pub enum PlacementType {
-    DigitalReplica,
-    RelatedPurchase,
-    TargetedPlacement,
+    Digitalreplica,
+    Relatedpurchase,
+    Targetedplacement,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]

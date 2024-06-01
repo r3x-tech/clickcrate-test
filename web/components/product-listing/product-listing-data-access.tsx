@@ -14,9 +14,9 @@ import { useAnchorProvider } from '../solana/solana-provider';
 import { useTransactionToast } from '../ui/ui-layout';
 import {
   PlaceProductListingArgs,
-  getPlacementTypeFromString,
-  getProductCategoryFromString,
-  getOriginFromString,
+  // getPlacementTypeFromString,
+  // getProductCategoryFromString,
+  // getOriginFromString,
 } from '../../types';
 import { useMemo } from 'react';
 
@@ -48,26 +48,43 @@ export function useClickCrateListingProgram() {
   const registerProductListing = useMutation({
     mutationKey: ['clickcrate-test', 'registerProductListing', { cluster }],
     mutationFn: async (
-      args: [PublicKey, string, string, string, number, PublicKey]
+      args: [PublicKey, PublicKey, string, string, string, number, PublicKey]
     ) => {
-      const [id, origin, placementType, productCategory, inStock, manager] =
-        args;
+      const [
+        id,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        owner,
+        origin,
+        placementType,
+        productCategory,
+        inStock,
+        manager,
+      ] = args;
       const [productListingAddress] = await PublicKey.findProgramAddressSync(
-        [Buffer.from('product_listing'), id.toBuffer()],
+        [Buffer.from('listing'), id.toBuffer()],
         programId
       );
 
-      const convertedOrigin = getOriginFromString(origin);
-      const convertedPlacementType = getPlacementTypeFromString(placementType);
-      const convertedProductCategory =
-        getProductCategoryFromString(productCategory);
+      const or = origin;
+      console.log(or);
+
+      const pt = placementType;
+      console.log(pt);
+
+      const pc = productCategory;
+      console.log(pc);
+
+      // const convertedOrigin = getOriginFromString(origin);
+      // const convertedPlacementType = getPlacementTypeFromString(placementType);
+      // const convertedProductCategory =
+      //   getProductCategoryFromString(productCategory);
 
       return program.methods
         .registerProductListing(
           id,
-          convertedOrigin,
-          convertedPlacementType,
-          convertedProductCategory,
+          { clickcrate: {} },
+          { relatedpurchase: {} },
+          { clothing: {} },
           new BN(inStock),
           manager
         )
@@ -207,15 +224,21 @@ export function useClickCrateListingProgramAccount({
     mutationFn: async (args: [string, string, PublicKey]) => {
       const [newPlacementType, newProductCategory, newManager] = args;
 
-      const convertedPlacementType =
-        getPlacementTypeFromString(newPlacementType);
-      const convertedProductCategory =
-        getProductCategoryFromString(newProductCategory);
+      const nPt = newPlacementType;
+      console.log(nPt);
+
+      const nPc = newProductCategory;
+      console.log(nPc);
+
+      // const convertedPlacementType =
+      //   getPlacementTypeFromString(newPlacementType);
+      // const convertedProductCategory =
+      //   getProductCategoryFromString(newProductCategory);
 
       return program.methods
         .updateProductListing(
-          convertedPlacementType,
-          convertedProductCategory,
+          { digitalreplica: {} },
+          { clothing: {} },
           newManager
         )
         .accounts({

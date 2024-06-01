@@ -3,11 +3,12 @@ use anchor_lang::prelude::*;
 use crate::account::*;
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, eligible_placement_type: PlacementType, eligible_product_category: ProductCategory)]
+#[instruction(id: Pubkey, eligible_placement_type: PlacementType, eligible_product_category: ProductCategory, manager: Pubkey,
+)]
 pub struct RegisterClickCrate<'info> {
     #[account(
         init,
-        seeds = [b"clickcrate", id.key().as_ref()],
+        seeds = [b"clickcrate".as_ref(), id.key().as_ref()],
         bump,
         payer = owner,
         space = 8 + ClickCrateState::get_max_size(),
@@ -19,11 +20,11 @@ pub struct RegisterClickCrate<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, eligible_placement_type: PlacementType, eligible_product_category: ProductCategory)]
+#[instruction(id: Pubkey, eligible_placement_type: PlacementType, eligible_product_category: ProductCategory, manager: Pubkey)]
 pub struct UpdateClickCrate<'info> {
     #[account(
         mut,
-        seeds = [b"clickcrate", id.key().as_ref()],
+        seeds = [b"clickcrate".as_ref(), id.key().as_ref()],
         bump,
         realloc = 8 + ClickCrateState::get_max_size(),
         realloc::payer = owner,
@@ -36,11 +37,11 @@ pub struct UpdateClickCrate<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, in_stock: u64)]
+#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, in_stock: u64, manager: Pubkey)]
 pub struct RegisterProductListing<'info> {
     #[account(
         init,
-        seeds = [b"product_listing", id.key().as_ref()],
+        seeds = [b"listing".as_ref(), id.key().as_ref()],
         bump,
         payer = owner,
         space = 8 + ProductListingState::get_max_size(),
@@ -52,11 +53,11 @@ pub struct RegisterProductListing<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, in_stock: u64)]
+#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, in_stock: u64, manager: Pubkey)]
 pub struct UpdateProductListing<'info> {
     #[account(
         mut,
-        seeds = [b"product_listing", id.key().as_ref()],
+        seeds = [b"listing".as_ref(), id.key().as_ref()],
         bump,
         realloc= 8 + ProductListingState::get_max_size(),
         realloc::payer = owner,

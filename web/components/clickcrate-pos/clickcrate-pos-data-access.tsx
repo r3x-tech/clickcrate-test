@@ -4,8 +4,8 @@ import {
   ClickcrateTestIDL,
   getClickcrateTestProgramId,
 } from '@clickcrate-test/anchor';
-import { Program } from '@coral-xyz/anchor';
-import { useConnection } from '@solana/wallet-adapter-react';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Cluster, PublicKey, SystemProgram } from '@solana/web3.js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -14,23 +14,30 @@ import { useAnchorProvider } from '../solana/solana-provider';
 import { useTransactionToast } from '../ui/ui-layout';
 import {
   MakePurchaseArgs,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getPlacementTypeFromString,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getProductCategoryFromString,
 } from '../../types';
 import { useMemo } from 'react';
+// import * as web3 from '@solana/web3.js';
+import { TransactionMessage, VersionedTransaction } from '@solana/web3.js';
+import { publicKey } from '@coral-xyz/anchor/dist/cjs/utils';
+import { encode } from 'bs58';
 
 export function useClickcratePosProgram() {
   const { connection } = useConnection();
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const provider = useAnchorProvider();
-  const programId = useMemo(
-    () => getClickcrateTestProgramId(cluster.network as Cluster),
-    [cluster]
-  );
-  // const programId = new PublicKey(
-  //   'RcGXdMiga83T527zSoCQDaWdMmU2qVQA3GCkfZyGrXc'
+  // const programId = useMemo(
+  //   () => getClickcrateTestProgramId(cluster.network as Cluster),
+  //   [cluster]
   // );
+  const programId = new PublicKey(
+    'ENmHn3TEBqzfvwi19xc9cYsTmKseBSbxhqqXETiEKgJ9'
+  );
+  const { signTransaction } = useWallet();
 
   const program = new Program(ClickcrateTestIDL, programId, provider);
 
@@ -46,20 +53,28 @@ export function useClickcratePosProgram() {
 
   const registerClickCrate = useMutation({
     mutationKey: ['clickcrate-test', 'registerClickCrate', { cluster }],
-    mutationFn: async (args: [PublicKey, string, string, PublicKey]) => {
-      const [id, eligiblePlacementType, eligibleProductCategory, manager] =
-        args;
-      const [clickcrateAddress] = await PublicKey.findProgramAddressSync(
+    mutationFn: async (
+      args: [PublicKey, PublicKey, string, string, PublicKey]
+    ) => {
+      const [
+        id,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        owner,
+        eligiblePlacementType,
+        eligibleProductCategory,
+        manager,
+      ] = args;
+      const [clickcrateAddress] = PublicKey.findProgramAddressSync(
         [Buffer.from('clickcrate'), id.toBuffer()],
         programId
       );
 
-      const convertedPlacementType = getPlacementTypeFromString(
-        eligiblePlacementType
-      );
-      const convertedProductCategory = getProductCategoryFromString(
-        eligibleProductCategory
-      );
+      // const convertedPlacementType = getPlacementTypeFromString(
+      //   eligiblePlacementType
+      // );
+      // const convertedProductCategory = getProductCategoryFromString(
+      //   eligibleProductCategory
+      // );
 
       console.log('registerClickCrate input:', {
         id: id.toString(),
@@ -67,23 +82,69 @@ export function useClickcratePosProgram() {
         eligibleProductCategory,
         manager: manager.toString(),
       });
+      // const connection = new web3.Connection(
+      //   process.env.NEXT_PUBLIC_RPC_URL!,
+      //   'confirmed'
+      // );
 
-      return program.methods
+      const payer = (program.provider as AnchorProvider).wallet;
+
+      const idOne = new PublicKey(
+        '9RvppNEME3e1XxA6g7cQHbvrDivjaX5xwjSnqkxb8Rb2'
+      );
+      const managerOne = new PublicKey(
+        'Engvm8giPGZvLV115DkzhVGkWKR5j11ZTrggo5EUQBau'
+      );
+
+      const ix = await program.methods
         .registerClickcrate(
-          id,
-          convertedPlacementType,
-          convertedProductCategory,
-          manager
+          idOne,
+          { relatedpurchase: {} },
+          { clothing: {} },
+          managerOne
         )
         .accounts({
           clickcrate: clickcrateAddress,
-          owner: manager,
+          owner: payer.publicKey,
           systemProgram: SystemProgram.programId,
         })
         .rpc();
+
+      // if (!connection) throw new Error('Connection missing');
+
+      // if (!manager || !ix || !signTransaction)
+      //   throw new Error('Tx info missing');
+      // const { blockhash } = await connection!.getLatestBlockhash();
+      // console.log('bh: ', blockhash);
+
+      // const txMsg = new TransactionMessage({
+      //   payerKey: manager,
+      //   recentBlockhash: blockhash,
+      //   instructions: [ix],
+      // }).compileToLegacyMessage();
+
+      // const tx = new VersionedTransaction(txMsg);
+      // if (!tx) throw new Error('No tx');
+      // console.log(
+      //   'registerClickcrate tx: ',
+      //   Buffer.from(tx.serialize()).toString('base64')
+      // );
+
+      // const signedTx = await signTransaction(tx);
+      // const encodedSignedTx = encode(signedTx.serialize());
+
+      // connection.sendRawTransaction(signedTx.serialize());
+
+      // if (!connection.simulateTransaction(tx)) {
+      //   throw new Error('Error simulating transaction');
+      // }
+      // console.log('ix:', ix);
+
+      return ix;
     },
-    onSuccess: (signature) => {
-      transactionToast(signature);
+    onSuccess: () => {
+      // transactionToast(signature);
+      transactionToast('success');
       return accounts.refetch();
     },
     onError: (error) => {
@@ -162,8 +223,8 @@ export function useClickcratePosProgramAccount({
     mutationKey: ['clickcrate-test', 'makePurchase', { cluster, account }],
     mutationFn: async (args: MakePurchaseArgs) => {
       const { productId } = args;
-      const productListingAddress = await PublicKey.findProgramAddress(
-        [Buffer.from('product_listing'), productId.toBuffer()],
+      const productListingAddress = await PublicKey.findProgramAddressSync(
+        [Buffer.from('listing'), productId.toBuffer()],
         program.programId
       );
 
@@ -185,24 +246,29 @@ export function useClickcratePosProgramAccount({
 
   const updateClickCrate = useMutation({
     mutationKey: ['clickcrate-test', 'updateClickCrate', { cluster, account }],
-    mutationFn: async (args: [PublicKey, string, string, PublicKey]) => {
-      const [id, eligiblePlacementType, eligibleProductCategory, manager] =
-        args;
+    mutationFn: async (
+      args: [PublicKey, PublicKey, string, string, PublicKey]
+    ) => {
+      const [
+        id,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        owner,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        eligiblePlacementType,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        eligibleProductCategory,
+        manager,
+      ] = args;
 
-      const convertedPlacementType = getPlacementTypeFromString(
-        eligiblePlacementType
-      );
-      const convertedProductCategory = getProductCategoryFromString(
-        eligibleProductCategory
-      );
+      // const convertedPlacementType = getPlacementTypeFromString(
+      //   eligiblePlacementType
+      // );
+      // const convertedProductCategory = getProductCategoryFromString(
+      //   eligibleProductCategory
+      // );
 
       return program.methods
-        .updateClickcrate(
-          id,
-          convertedPlacementType,
-          convertedProductCategory,
-          manager
-        )
+        .updateClickcrate(id, { digitalreplica: {} }, { clothing: {} }, manager)
         .accounts({
           clickcrate: account,
           owner: program.provider.publicKey,

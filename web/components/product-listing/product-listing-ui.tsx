@@ -10,7 +10,13 @@ import {
   useClickCrateListingProgramAccount,
 } from './product-listing-data-access';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { Origin, PlacementType, ProductCategory } from '@/types';
+import {
+  Origin,
+  PlacementType,
+  PlacementTypee,
+  ProductCategory,
+  ProductCategoryy,
+} from '@/types';
 import { BN } from '@coral-xyz/anchor';
 
 export function ProductListingRegister() {
@@ -20,9 +26,9 @@ export function ProductListingRegister() {
   const [productId, setProductId] = useState('');
   const [productOrigin, setProductOrigin] = useState<Origin | null>(null);
   const [productPlacementType, setProductPlacementType] =
-    useState<PlacementType | null>(null);
+    useState<PlacementTypee | null>(null);
   const [productCategory, setProductCategory] =
-    useState<ProductCategory | null>(null);
+    useState<ProductCategoryy | null>(null);
   const [productInStock, setProductInStock] = useState<BN>(new BN(0));
 
   const isProductFormValid =
@@ -35,6 +41,7 @@ export function ProductListingRegister() {
     if (publicKey && isProductFormValid) {
       registerProductListing.mutateAsync([
         new PublicKey(productId),
+        publicKey,
         productOrigin,
         productPlacementType,
         productCategory!,
@@ -75,40 +82,40 @@ export function ProductListingRegister() {
           className="rounded-lg p-2 text-black"
         >
           <option value="">Select an origin</option>
-          <option value="Clickcrate">Clickcrate</option>
-          <option value="Shopify">Shopify</option>
-          <option value="Square">Square</option>
+          <option value="CLICKCRATE">Clickcrate</option>
+          <option value="SHOPIFY">Shopify</option>
+          <option value="SQUARE">Square</option>
         </select>
         <select
           value={productPlacementType || ''}
           onChange={(e) =>
-            setProductPlacementType(e.target.value as PlacementType)
+            setProductPlacementType(e.target.value as PlacementTypee)
           }
           className="rounded-lg p-2 text-black"
         >
           <option value="">Select a placement type</option>
-          <option value="DigitalReplica">Digital Replica</option>
-          <option value="RelatedPurchase">Related Purchase</option>
-          <option value="TargetedPlacement">Targeted Placement</option>
+          <option value="RELATEDPURCHASE">Related Purchase</option>
+          <option value="DIGITALREPLICA">Digital Replica</option>
+          <option value="TARGETEDPLACEMENT">Targeted Placement</option>
         </select>
         <select
           value={productCategory || ''}
           onChange={(e) =>
-            setProductCategory(e.target.value as ProductCategory)
+            setProductCategory(e.target.value as ProductCategoryy)
           }
           className="rounded-lg p-2 text-black"
         >
           <option value="">Select a product category</option>
-          <option value="Clothing">Clothing</option>
-          <option value="Electronics">Electronics</option>
-          <option value="Books">Books</option>
-          <option value="Home">Home</option>
-          <option value="Beauty">Beauty</option>
-          <option value="Toys">Toys</option>
-          <option value="Sports">Sports</option>
-          <option value="Automotive">Automotive</option>
-          <option value="Grocery">Grocery</option>
-          <option value="Health">Health</option>
+          <option value="CLOTHING">Clothing</option>
+          <option value="ELECTRONICS">Electronics</option>
+          <option value="BOOKS">Books</option>
+          <option value="HOME">Home</option>
+          <option value="BEAUTY">Beauty</option>
+          <option value="TOYS">Toys</option>
+          <option value="SPORTS">Sports</option>
+          <option value="AUTOMOTIVE">Automotive</option>
+          <option value="GROCERY">Grocery</option>
+          <option value="HEALTH">Health</option>
         </select>
         <div className="pt-2 w-full">
           <button
@@ -178,11 +185,11 @@ function ProductListingCard({ account }: { account: PublicKey }) {
   } = useClickCrateListingProgramAccount({ account });
 
   const { publicKey } = useWallet();
-  const [placementType, setPlacementType] = useState<PlacementType | null>(
+  const [placementType, setPlacementType] = useState<PlacementTypee | null>(
     null
   );
   const [productCategory, setProductCategory] =
-    useState<ProductCategory | null>(null);
+    useState<ProductCategoryy | null>(null);
   const [manager, setManager] = useState<PublicKey | null>(null);
   const [productId, setProductId] = useState('');
 
@@ -223,23 +230,31 @@ function ProductListingCard({ account }: { account: PublicKey }) {
               <select
                 value={placementType || ''}
                 onChange={(e) =>
-                  setPlacementType(e.target.value as PlacementType)
+                  setPlacementType(e.target.value as PlacementTypee)
                 }
               >
                 <option value="">Select a placement type</option>
-                <option value="RelatedPurchase">Related Purchase</option>
-                <option value="DigitalReplica">Digital Replica</option>
-                <option value="TargetedPlacement">Targeted Placement</option>
+                <option value="RELATEDPURCHASE">Related Purchase</option>
+                <option value="DIGITALREPLICA">Digital Replica</option>
+                <option value="TARGETEDPLACEMENT">Targeted Placement</option>
               </select>
               <select
                 value={productCategory || ''}
                 onChange={(e) =>
-                  setProductCategory(e.target.value as ProductCategory)
+                  setProductCategory(e.target.value as ProductCategoryy)
                 }
               >
                 <option value="">Select a product category</option>
-                <option value="Clothing">Clothing</option>
-                <option value="Electronics">Electronics</option>
+                <option value="CLOTHING">Clothing</option>
+                <option value="ELECTRONICS">Electronics</option>
+                <option value="BOOKS">Books</option>
+                <option value="HOME">Home</option>
+                <option value="BEAUTY">Beauty</option>
+                <option value="TOYS">Toys</option>
+                <option value="SPORTS">Sports</option>
+                <option value="AUTOMOTIVE">Automotive</option>
+                <option value="GROCERY">Grocery</option>
+                <option value="HEALTH">Health</option>
               </select>
               <input
                 type="text"
