@@ -151,6 +151,7 @@ export function ClickCratePosList({
       setIsLoading(true);
     } else {
       const timer = setTimeout(() => setIsLoading(false), 3000);
+
       return () => clearTimeout(timer);
     }
   }, [accounts.isLoading]);
