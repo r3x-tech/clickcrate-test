@@ -328,7 +328,7 @@ function ClickCratePosCard({
   isLast: boolean;
   allSelected: boolean;
 }) {
-  const { accountQuery, makePurchase } = useClickcratePosProgramAccount({
+  const { accountQuery } = useClickcratePosProgramAccount({
     account,
   });
 
@@ -358,12 +358,6 @@ function ClickCratePosCard({
       accountQuery.data?.product !== undefined
     ) {
       setShowPurchaseModal(!showPurchaseModal);
-    }
-  };
-
-  const handleMakePurchase = () => {
-    if (publicKey && isMakePurchaseFormValid) {
-      makePurchase.mutateAsync({ productId: new PublicKey(productId) });
     }
   };
 

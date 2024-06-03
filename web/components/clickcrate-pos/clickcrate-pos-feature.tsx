@@ -23,6 +23,9 @@ export default function ClickcratePosFeature() {
   const deactivateClickCrates = useDeactivateClickCrates();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [selectedClickCrates, setSelectedClickCrates] = useState<PublicKey[]>(
+    []
+  );
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -56,10 +59,6 @@ export default function ClickcratePosFeature() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showActionsMenu]);
-
-  const [selectedClickCrates, setSelectedClickCrates] = useState<PublicKey[]>(
-    []
-  );
 
   const handleClickCrateSelect = (account: PublicKey, selected: boolean) => {
     if (selected) {

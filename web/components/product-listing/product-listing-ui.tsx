@@ -189,7 +189,9 @@ export function ProductListingsList({
     setIsLoading(false);
   };
 
-  const handleAllSelectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAllListingsSelectChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const isSelected = e.target.checked;
     setAllListingsSelected(isSelected);
     accounts.data?.forEach((account: { publicKey: PublicKey }) => {
@@ -235,7 +237,7 @@ export function ProductListingsList({
               <input
                 type="checkbox"
                 checked={allListingsSelected}
-                onChange={handleAllSelectChange}
+                onChange={handleAllListingsSelectChange}
                 className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
               />
             </div>
@@ -270,6 +272,7 @@ export function ProductListingsList({
               <ProductListingCard
                 key={account.publicKey.toString()}
                 account={account.publicKey}
+                onSelect={onSelect}
                 isFirst={index === 0}
                 isLast={index === accounts.data.length - 1}
                 allListingsSelected={allListingsSelected}
@@ -334,21 +337,18 @@ function getDisplayText(
 
 function ProductListingCard({
   account,
+  onSelect,
   isFirst,
   isLast,
   allListingsSelected,
 }: {
   account: PublicKey;
+  onSelect: (account: PublicKey, selected: boolean) => void;
   isFirst: boolean;
   isLast: boolean;
   allListingsSelected: boolean;
 }) {
-  const {
-    accountQuery,
-    updateProductListing,
-    activateProductListing,
-    deactivateProductListing,
-  } = useClickCrateListingProgramAccount({ account });
+  const { accountQuery } = useClickCrateListingProgramAccount({ account });
 
   const { publicKey } = useWallet();
   const [placementType, setPlacementType] = useState<PlacementTypee | null>(
@@ -357,7 +357,6 @@ function ProductListingCard({
   const [productCategory, setProductCategory] =
     useState<ProductCategoryy | null>(null);
   const [manager, setManager] = useState<PublicKey | null>(null);
-  const [productId, setProductId] = useState('');
   const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   const isUpdateProductListingFormValid =
@@ -372,6 +371,7 @@ function ProductListingCard({
   const handleSelectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isSelected = e.target.checked;
     setSelected(isSelected);
+    onSelect(account, isSelected);
   };
 
   useEffect(() => {

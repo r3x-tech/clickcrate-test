@@ -26,10 +26,8 @@ export default function ClickcrateTestFeature() {
   const activateProductListings = useActivateProductListings();
   const deactivateProductListings = useDeactivateProductListings();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [selectedProductListings, setSelectedProductListings] = useState<
-    PublicKey[]
-  >([]);
   const dropdownListingRef = useRef<HTMLDivElement>(null);
+  const [selectedListings, setSelectedListings] = useState<PublicKey[]>([]);
 
   const toggleListingModal = () => {
     setShowRegisterListingModal(!showRegisterListingModal);
@@ -66,30 +64,28 @@ export default function ClickcrateTestFeature() {
 
   const handleListingSelect = (account: PublicKey, selected: boolean) => {
     if (selected) {
-      setSelectedProductListings([...selectedProductListings, account]);
+      setSelectedListings([...selectedListings, account]);
     } else {
-      setSelectedProductListings(
-        selectedProductListings.filter(
-          (productListing) => !productListing.equals(account)
-        )
+      setSelectedListings(
+        selectedListings.filter((listing) => !listing.equals(account))
       );
     }
   };
 
   const handleActivateListings = () => {
-    if (selectedProductListings.length > 0) {
-      activateProductListings.mutateAsync(selectedProductListings);
+    if (selectedListings.length > 0) {
+      activateProductListings.mutateAsync(selectedListings);
     } else {
-      toast.error('No ClickCrate(s) selected');
+      toast.error('No Listing(s) selected');
     }
     setShowListingActionsMenu(false);
   };
 
   const handleDeactivateListings = () => {
-    if (selectedProductListings.length > 0) {
-      deactivateProductListings.mutateAsync(selectedProductListings);
+    if (selectedListings.length > 0) {
+      deactivateProductListings.mutateAsync(selectedListings);
     } else {
-      toast.error('No ClickCrate(s) selected');
+      toast.error('No Listing(s) selected');
     }
     setShowListingActionsMenu(false);
   };
