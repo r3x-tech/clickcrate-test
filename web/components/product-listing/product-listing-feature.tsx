@@ -25,7 +25,9 @@ export default function ClickcrateTestFeature() {
         subtitle=""
       >
         <div className="flex flex-row">
-          <p className="mb-6 text-start font-bold">Current Registry: </p>
+          <p className="mb-6 text-start font-semibold tracking-wide">
+            Current Registry:{' '}
+          </p>
           <p className="pl-2 text-start font-normal">
             <ExplorerLink
               path={`account/${programId}`}

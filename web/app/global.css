@@ -99,3 +99,16 @@ html, body {
 .btn-ghost:hover {
   @apply bg-[#202020] text-white border-2 border-[#202020] rounded-full !important;
 } */
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+.spin-animation {
+  animation: spin 0.25s linear !important;
+}

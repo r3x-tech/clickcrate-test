@@ -22,7 +22,7 @@ export function AccountBalance({ address }: { address: PublicKey }) {
   return (
     <div>
       <h1
-        className="text-5xl font-bold cursor-pointer"
+        className="text-5xl font-bold cursor-pointer pt-24"
         onClick={() => query.refetch()}
       >
         {query.data ? <BalanceSol balance={query.data} /> : '...'} SOL
@@ -129,13 +129,13 @@ export function AccountTokens({ address }: { address: PublicKey }) {
     <div className="space-y-2">
       <div className="justify-between">
         <div className="flex justify-between">
-          <h2 className="text-2xl font-bold">Token Accounts</h2>
+          <h2 className="font-bold text-xl tracking-wide">Token Accounts</h2>
           <div className="space-x-2">
             {query.isLoading ? (
               <span className="loading loading-spinner"></span>
             ) : (
               <button
-                className="btn btn-sm btn-outline border-none bg-transparent text-white hover:text-white hover:bg-transparent"
+                className="btn btn-sm btn-ghost border-none bg-transparent hover:bg-transparent text-white hover:text-white"
                 onClick={async () => {
                   await query.refetch();
                   await client.invalidateQueries({
@@ -143,7 +143,7 @@ export function AccountTokens({ address }: { address: PublicKey }) {
                   });
                 }}
               >
-                <IconRefresh size={16} />
+                <IconRefresh size={21} />
               </button>
             )}
           </div>
@@ -231,16 +231,16 @@ export function AccountTransactions({ address }: { address: PublicKey }) {
   return (
     <div className="space-y-2">
       <div className="flex justify-between">
-        <h2 className="text-2xl font-bold">Transaction History</h2>
+        <h2 className="font-bold text-xl tracking-wide">Transaction History</h2>
         <div className="space-x-2">
           {query.isLoading ? (
             <span className="loading loading-spinner"></span>
           ) : (
             <button
-              className="btn btn-sm btn-outline border-none bg-transparent text-white hover:text-white hover:bg-transparent"
+              className="btn btn-sm btn-ghost border-none bg-transparent hover:bg-transparent text-white hover:text-white"
               onClick={() => query.refetch()}
             >
-              <IconRefresh size={16} />
+              <IconRefresh size={21} />
             </button>
           )}
         </div>

@@ -43,23 +43,22 @@ export function UiLayout({
             rel="noopener noreferrer"
             passHref
           >
-            {/* <img
-              className="h-4 md:h-6"
-              alt="Solana Logo"
-              src="/solana-logo.png"
-            /> */}
             <Image
               src="/clickcrate-logo-small.svg"
-              alt="clickcrate icon"
+              alt="clickcrate logo"
               width={120}
               height={80}
             />
           </Link>
-          <ul className="menu menu-horizontal px-2 space-x-4 font-semibold">
+          <ul className="menu menu-vertical sm:menu-horizontal px-2 space-x-4 font-semibold">
             {links.map(({ label, path }) => (
               <li key={path}>
                 <Link
-                  className={pathname.startsWith(path) ? 'active' : ''}
+                  className={`${
+                    pathname.startsWith(path)
+                      ? 'active underline decoration-4 underline-offset-8 decoration-primary'
+                      : ''
+                  }`}
                   href={path}
                 >
                   {label}
@@ -68,6 +67,7 @@ export function UiLayout({
             ))}
           </ul>
         </div>
+
         <div className="flex-none space-x-2">
           <WalletButton />
           <ClusterUiSelect />
