@@ -22,7 +22,6 @@ export default function ClickcratePosFeature() {
   const activateClickCrates = useActivateClickCrates();
   const deactivateClickCrates = useDeactivateClickCrates();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const { programId } = useClickCrateListingProgram();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleModal = () => {

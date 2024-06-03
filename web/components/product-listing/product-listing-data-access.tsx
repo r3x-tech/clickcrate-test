@@ -37,7 +37,7 @@ export function useClickCrateListingProgram() {
 
   const accounts = useQuery({
     queryKey: ['clickcrate-test', 'all', { cluster }],
-    queryFn: () => program.account.clickCrateState.all(),
+    queryFn: () => program.account.productListingState.all(),
   });
 
   const getProgramAccount = useQuery({
@@ -122,7 +122,7 @@ export function useClickCrateListingProgramAccount({
 
   const accountQuery = useQuery({
     queryKey: ['clickcrate-test', 'fetch', { cluster, account }],
-    queryFn: () => program.account.clickCrateState.fetch(account),
+    queryFn: () => program.account.productListingState.fetch(account),
   });
 
   const activateProductListing = useMutation({
@@ -263,4 +263,62 @@ export function useClickCrateListingProgramAccount({
     removeProductListing,
     updateProductListing,
   };
+}
+
+export function useActivateProductListings() {
+  const { program, accounts } = useClickCrateListingProgram();
+  const transactionToast = useTransactionToast();
+
+  return useMutation({
+    mutationKey: ['clickcrate-test', 'activateProductListings'],
+    mutationFn: async (productListingAccounts: PublicKey[]) => {
+      const txSigs = await Promise.all(
+        productListingAccounts.map((account) =>
+          program.methods
+            .activateProductListing()
+            .accounts({
+              productListing: account,
+              owner: program.provider.publicKey,
+            })
+            .rpc()
+        )
+      );
+
+      return txSigs;
+    },
+    onSuccess: () => {
+      transactionToast('Product Listings activated successfully');
+      return accounts.refetch();
+    },
+    onError: () => toast.error('Failed to activate Product Listings'),
+  });
+}
+
+export function useDeactivateProductListings() {
+  const { program, accounts } = useClickCrateListingProgram();
+  const transactionToast = useTransactionToast();
+
+  return useMutation({
+    mutationKey: ['clickcrate-test', 'deactivateProductListings'],
+    mutationFn: async (productListingAccounts: PublicKey[]) => {
+      const txSigs = await Promise.all(
+        productListingAccounts.map((account) =>
+          program.methods
+            .deactivateProductListing()
+            .accounts({
+              productListing: account,
+              owner: program.provider.publicKey,
+            })
+            .rpc()
+        )
+      );
+
+      return txSigs;
+    },
+    onSuccess: () => {
+      transactionToast('Product Listings deactivated successfully');
+      return accounts.refetch();
+    },
+    onError: () => toast.error('Failed to deactivate Product Listings'),
+  });
 }

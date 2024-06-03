@@ -230,16 +230,19 @@ export function ClickCratePosList({
             <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">ID </p>
             </div>
-            <div className="flex flex-row w-[20%]">
+            <div className="flex flex-row w-[15%]">
               <p className="text-start font-bold text-xs">NAME </p>
             </div>
             <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">STATUS </p>
             </div>
-            <div className="flex flex-row w-[25%]">
+            <div className="flex flex-row items-center w-[10%]">
+              <p className="text-start font-bold text-xs">CATEGORY</p>
+            </div>
+            <div className="flex flex-row w-[15%]">
               <p className="text-start font-bold text-xs">PLACEMENT TYPE(S) </p>
             </div>
-            <div className="flex flex-row items-center w-[10%]">
+            <div className="flex flex-row items-center w-[15%]">
               <p className="text-start font-bold text-xs">PRODUCT</p>
             </div>
             <div className="flex flex-row w-[10%] justify-end">
@@ -272,6 +275,44 @@ export function ClickCratePosList({
       )}
     </div>
   );
+}
+const placementTypeMapping: { [key: string]: string } = {
+  relatedpurchase: 'Related Purchase',
+  digitalreplica: 'Digital Replica',
+  targetedplacement: 'Targeted Placement',
+};
+
+const originMapping: { [key: string]: string } = {
+  clickcrate: 'Clickcrate',
+  shopify: 'Shopify',
+  square: 'Square',
+};
+
+const productCategoryMapping: { [key: string]: string } = {
+  clothing: 'Clothing',
+  electronics: 'Electronics',
+  books: 'Books',
+  home: 'Home',
+  beauty: 'Beauty',
+  toys: 'Toys',
+  sports: 'Sports',
+  automotive: 'Automotive',
+  grocery: 'Grocery',
+  health: 'Health',
+};
+
+function getDisplayText(
+  mapping: { [key: string]: string },
+  value: unknown
+): string {
+  if (!value || typeof value !== 'object') {
+    return 'NA';
+  }
+  const keys = Object.keys(value);
+  if (keys.length === 0) {
+    return 'NA';
+  }
+  return mapping[keys[0].toLowerCase()] || 'NA';
 }
 
 function ClickCratePosCard({
@@ -312,7 +353,12 @@ function ClickCratePosCard({
   };
 
   const togglePurchaseModal = () => {
-    setShowPurchaseModal(!showPurchaseModal);
+    if (
+      accountQuery.data?.product &&
+      accountQuery.data?.product !== undefined
+    ) {
+      setShowPurchaseModal(!showPurchaseModal);
+    }
   };
 
   const handleMakePurchase = () => {
@@ -365,7 +411,7 @@ function ClickCratePosCard({
             />
           </p>
         </div>
-        <div className="flex flex-row w-[20%]">
+        <div className="flex flex-row w-[15%]">
           <p className="text-start font-extralight text-xs">
             <ExplorerLink
               label={ellipsify(accountQuery.data?.id.toBase58())}
@@ -375,23 +421,41 @@ function ClickCratePosCard({
           </p>
         </div>
         <div className="flex flex-row w-[10%]">
-          <p className="text-start font-extralight text-xs">Status </p>
-        </div>
-        <div className="flex flex-row w-[25%]">
           <p className="text-start font-extralight text-xs">
-            Placement Type(s){' '}
+            {' '}
+            {accountQuery.data?.isActive ? 'Active' : 'Inactive'}{' '}
           </p>
         </div>
         <div className="flex flex-row w-[10%]">
+          <p className="text-start font-extralight text-xs">
+            {accountQuery.data?.eligibleProductCategory
+              ? getDisplayText(
+                  productCategoryMapping,
+                  accountQuery.data?.eligibleProductCategory
+                )
+              : 'NA'}
+          </p>
+        </div>
+        <div className="flex flex-row w-[15%]">
+          <p className="text-start font-extralight text-xs">
+            {accountQuery.data?.eligiblePlacementType
+              ? getDisplayText(
+                  placementTypeMapping,
+                  accountQuery.data?.eligiblePlacementType
+                )
+              : 'NA'}
+          </p>
+        </div>
+        <div className="flex flex-row w-[15%]">
           <p
             className={`text-start font-extralight text-xs  ${
               accountQuery.data?.product !== null && 'underline'
             }  ${accountQuery.data?.product !== null && 'cursor-pointer'}`}
             onClick={togglePurchaseModal}
           >
-            {!accountQuery.data?.product
-              ? 'None'
-              : ellipsify(accountQuery.data?.product?.toString())}
+            {accountQuery.data?.product
+              ? ellipsify(accountQuery.data?.product?.toString())
+              : 'None'}
           </p>
         </div>
         <div className="flex flex-row w-[10%] justify-end">
