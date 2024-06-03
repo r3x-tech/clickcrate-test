@@ -8,7 +8,7 @@ import {
   useDeactivateClickCrates,
 } from './clickcrate-pos-data-access';
 import { ClickCratePosList, ClickCratePosRegister } from './clickcrate-pos-ui';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { IconCaretDownFilled, IconRefresh } from '@tabler/icons-react';
 import toast from 'react-hot-toast';
@@ -23,6 +23,7 @@ export default function ClickcratePosFeature() {
   const deactivateClickCrates = useDeactivateClickCrates();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { programId } = useClickCrateListingProgram();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -31,6 +32,31 @@ export default function ClickcratePosFeature() {
   const toggleActionsMenu = () => {
     setShowActionsMenu(!showActionsMenu);
   };
+
+  const closeActionsMenu = () => {
+    setShowActionsMenu(false);
+  };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      closeActionsMenu();
+    }
+  };
+
+  useEffect(() => {
+    if (showActionsMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showActionsMenu]);
 
   const [selectedClickCrates, setSelectedClickCrates] = useState<PublicKey[]>(
     []
@@ -99,14 +125,17 @@ export default function ClickcratePosFeature() {
             </button>
           </div>
           <div className="flex flex-row flex-1 justify-end items-start gap-4">
-            <div className="dropdown dropdown-end">
+            <div className="dropdown dropdown-end" ref={dropdownRef}>
               <label
                 tabIndex={0}
                 className="btn btn-xs lg:btn-sm btn-outline w-[10rem] py-3 font-light"
                 onClick={toggleActionsMenu}
               >
                 More Actions
-                <IconCaretDownFilled className="m-0 p-0" size={12} />
+                <IconCaretDownFilled
+                  className={`m-0 p-0 ${showActionsMenu ? 'icon-flip' : ''}`}
+                  size={12}
+                />
               </label>
               {showActionsMenu && (
                 <ul
@@ -116,7 +145,7 @@ export default function ClickcratePosFeature() {
                 >
                   <li>
                     <button
-                      className="btn btn-sm btn-ghost hover:bg-tertiary"
+                      className="btn btn-sm btn-ghost hover:bg-quaternary"
                       onClick={handleActivate}
                     >
                       Activate
@@ -124,7 +153,7 @@ export default function ClickcratePosFeature() {
                   </li>
                   <li>
                     <button
-                      className="btn btn-sm btn-ghost hover:bg-tertiary"
+                      className="btn btn-sm btn-ghost hover:bg-quaternary"
                       onClick={handleDeactivate}
                     >
                       Deactivate

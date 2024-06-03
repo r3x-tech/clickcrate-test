@@ -160,6 +160,7 @@ export function ClickCratePosList({
 }) {
   const { accounts, getProgramAccount } = useClickcratePosProgram();
   const [isLoading, setIsLoading] = useState(false);
+  const [allSelected, setAllSelected] = useState(false);
 
   useEffect(() => {
     if (accounts.isLoading) {
@@ -174,6 +175,14 @@ export function ClickCratePosList({
     setIsLoading(true);
     await accounts.refetch();
     setIsLoading(false);
+  };
+
+  const handleAllSelectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isSelected = e.target.checked;
+    setAllSelected(isSelected);
+    accounts.data?.forEach((account: { publicKey: PublicKey }) => {
+      onSelect(account.publicKey, isSelected);
+    });
   };
 
   if (getProgramAccount.isLoading) {
@@ -209,13 +218,13 @@ export function ClickCratePosList({
           >
             Refresh
           </button>
-          <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-4 border-b-2 border-quaternary">
+          <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-2 border-b-2 border-quaternary">
             <div className="flex flex-row w-[5%]">
               <input
                 type="checkbox"
-                // checked={selected}
-                // onChange={handleSelectChange}
-                className="checkbox checkbox-xs bg-tertiary border-quaternary rounded-sm"
+                checked={allSelected}
+                onChange={handleAllSelectChange}
+                className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
               />
             </div>
             <div className="flex flex-row w-[10%]">
@@ -246,6 +255,7 @@ export function ClickCratePosList({
                 onSelect={onSelect}
                 isFirst={index === 0}
                 isLast={index === accounts.data.length - 1}
+                allSelected={allSelected}
               />
             )
           )}
@@ -269,11 +279,13 @@ function ClickCratePosCard({
   onSelect,
   isFirst,
   isLast,
+  allSelected,
 }: {
   account: PublicKey;
   onSelect: (account: PublicKey, selected: boolean) => void;
   isFirst: boolean;
   isLast: boolean;
+  allSelected: boolean;
 }) {
   const { accountQuery, makePurchase } = useClickcratePosProgramAccount({
     account,
@@ -317,6 +329,10 @@ function ClickCratePosCard({
     onSelect(account, isSelected);
   };
 
+  useEffect(() => {
+    setSelected(allSelected);
+  }, [allSelected]);
+
   if (!publicKey) {
     return <p>Connect your wallet</p>;
   }
@@ -337,7 +353,7 @@ function ClickCratePosCard({
             type="checkbox"
             checked={selected}
             onChange={handleSelectChange}
-            className="checkbox checkbox-xs bg-tertiary border-quaternary rounded-sm"
+            className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
           />
         </div>
         <div className="flex flex-row w-[10%]">

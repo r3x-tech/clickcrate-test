@@ -70,7 +70,7 @@ html, body {
 
 .btn-mini:hover {
   @apply text-white border-2 border-white rounded-full !important;
-  background-color: #121212 !important;
+  background-color: #1c1c1c !important;
   color: white !important;
 }
 
@@ -84,7 +84,7 @@ html, body {
 
 .btn-outline:hover {
   @apply text-white border-2 border-white rounded-full !important;
-  background-color: #121212 !important;
+  background-color: #1c1c1c !important;
   color: white !important;
   backdrop-filter: blur(0.05rem) !important;
   -webkit-backdrop-filter: blur(0.05rem) !important;
@@ -113,4 +113,8 @@ html, body {
 
 .spin-animation {
   animation: spin 0.25s linear !important;
+}
+
+.icon-flip {
+  transform: rotate(180deg);
 }
