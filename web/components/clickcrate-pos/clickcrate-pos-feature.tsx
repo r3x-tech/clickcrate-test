@@ -2,18 +2,23 @@
 
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletButton } from '../solana/solana-provider';
-import { AppHero, ellipsify } from '../ui/ui-layout';
-import { ExplorerLink } from '../cluster/cluster-ui';
-import { useClickcratePosProgram } from './clickcrate-pos-data-access';
+import { AppHero } from '../ui/ui-layout';
+import {
+  useActivateClickCrates,
+  useDeactivateClickCrates,
+} from './clickcrate-pos-data-access';
 import { ClickCratePosList, ClickCratePosRegister } from './clickcrate-pos-ui';
 import { useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
+import { IconRefresh } from '@tabler/icons-react';
 
 export default function ClickcratePosFeature() {
   const { publicKey } = useWallet();
-  // const { programId } = useClickcratePosProgram();
   const [showModal, setShowModal] = useState(false);
   const [showActionsMenu, setShowActionsMenu] = useState(false);
+  const activateClickCrates = useActivateClickCrates();
+  const deactivateClickCrates = useDeactivateClickCrates();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -38,15 +43,19 @@ export default function ClickcratePosFeature() {
   };
 
   const handleActivate = () => {
-    // Handle activate action for selected ClickCrates
-    console.log('Activate action for:', selectedClickCrates);
+    activateClickCrates.mutateAsync(selectedClickCrates);
     setShowActionsMenu(false);
   };
 
   const handleDeactivate = () => {
-    // Handle deactivate action for selected ClickCrates
-    console.log('Deactivate action for:', selectedClickCrates);
+    deactivateClickCrates.mutateAsync(selectedClickCrates);
     setShowActionsMenu(false);
+  };
+
+  const handleRefetch = async () => {
+    setIsRefreshing(true);
+    await document.getElementById('refresh-clickcrates')?.click();
+    setIsRefreshing(false);
   };
 
   return publicKey ? (
@@ -54,25 +63,17 @@ export default function ClickcratePosFeature() {
       <div
         className={`transition-all duration-300 ${showModal ? 'blur-sm' : ''}`}
       >
-        <AppHero
-          // title="ClickcrateTest"
-          // subtitle={
-          //   'Create a new ClickCrate POS or product listing by clicking the "Register" button. The state of a account is stored on-chain and can be manipulated by calling the program\'s methods (update, place, etc.).'
-          // }
-          title=""
-          subtitle=""
-        >
+        <AppHero title="" subtitle="">
           <div className="flex flex-row items-end w-[100%] h-[3rem] mb-4">
             <div className="flex flex-row flex-1 justify-start items-end">
-              <p
-                className="text-start font-bold text-xl text-white tracking-wide"
-                // style={{
-                //   fontFamily: 'Montserrat, sans-serif',
-                //   fontWeight: '600',
-                // }}
-              >
+              <p className="text-start font-bold text-xl text-white tracking-wide">
                 My ClickCrates (POS)
               </p>
+              <button className="ml-2 text-white" onClick={handleRefetch}>
+                <IconRefresh
+                  className={`h-6 w-6 ${isRefreshing ? 'animate-spin' : ''}`}
+                />
+              </button>
             </div>
             <div className="flex flex-row flex-1 justify-end items-start gap-4">
               <div className="dropdown dropdown-end">
@@ -86,7 +87,7 @@ export default function ClickcratePosFeature() {
                 {showActionsMenu && (
                   <ul
                     tabIndex={0}
-                    className="menu dropdown-content z-[1] p-2 shadow bg-base-100 rounded-box w-52 mt-4 gap-2"
+                    className="menu dropdown-content z-[1] p-2 shadow bg-base-100 rounded-box w-[10rem] mt-4 gap-2"
                     style={{ border: '2px solid white' }}
                   >
                     <li>
@@ -124,7 +125,7 @@ export default function ClickcratePosFeature() {
       </div>
       {showModal && (
         <ClickCratePosRegister show={showModal} onClose={toggleModal} />
-      )}{' '}
+      )}
     </div>
   ) : (
     <div className="max-w-4xl mx-auto">

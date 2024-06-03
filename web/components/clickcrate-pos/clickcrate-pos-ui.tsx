@@ -2,7 +2,7 @@
 'use client';
 
 import { PublicKey } from '@solana/web3.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ellipsify } from '../ui/ui-layout';
 import { ExplorerLink } from '../cluster/cluster-ui';
 import {
@@ -19,6 +19,7 @@ import {
 } from '@/types';
 import { BN } from '@coral-xyz/anchor';
 import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function ClickCratePosRegister({
   show,
@@ -143,6 +144,22 @@ export function ClickCratePosList({
   onSelect: (account: PublicKey, selected: boolean) => void;
 }) {
   const { accounts, getProgramAccount } = useClickcratePosProgram();
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (accounts.isLoading) {
+      setIsLoading(true);
+    } else {
+      const timer = setTimeout(() => setIsLoading(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [accounts.isLoading]);
+
+  const handleRefetch = async () => {
+    setIsLoading(true);
+    await accounts.refetch();
+    setIsLoading(false);
+  };
 
   if (getProgramAccount.isLoading) {
     return <span className="loading loading-spinner loading-lg"></span>;
@@ -151,52 +168,66 @@ export function ClickCratePosList({
     return (
       <div className="alert alert-info flex justify-center">
         <span>
-          Program account not found. Make sure the registry is deployed and are
-          on the correct cluster.
+          Program account not found. Make sure the registry is deployed and you
+          are on the correct cluster.
         </span>
       </div>
     );
   }
+
   return (
-    <div className={'space-y-6 mb-20 w-[100%]'}>
-      {accounts.isLoading ? (
+    <div className="space-y-6 mb-20 w-[100%]">
+      {isLoading ? (
         <span className="loading loading-spinner loading-lg"></span>
       ) : accounts.data?.length ? (
-        <div className="space-y-4">
-          {accounts.data?.map((account: { publicKey: PublicKey }) => (
-            <ClickCratePosCard
-              key={account.publicKey.toString()}
-              account={account.publicKey}
-              onSelect={onSelect}
-            />
-          ))}
+        <div className="w-[100%] bg-background border-2 border-white rounded-lg">
+          <button
+            id="refresh-clickcrates"
+            className="hidden"
+            onClick={handleRefetch}
+          >
+            Refresh
+          </button>
+          {accounts.data?.map(
+            (account: { publicKey: PublicKey }, index: number) => (
+              <ClickCratePosCard
+                key={account.publicKey.toString()}
+                account={account.publicKey}
+                onSelect={onSelect}
+                isFirst={index === 0}
+                isLast={index === accounts.data.length - 1}
+              />
+            )
+          )}
         </div>
       ) : (
         <div className="text-start">
-          <h3 className={'text-lg mt-8 mb-2 font-semibold'}>My ClickCrates</h3>
-          <p className={'text-sm font-normal'}>
-            No ClickCrates found. Create one above to get started.
-          </p>
+          <h3 className="text-lg mt-8 mb-2 font-semibold">My ClickCrates</h3>
+          <div className="mb-20 w-[100%] bg-background border-2 border-white rounded-lg p-4">
+            <p className="text-sm font-normal">
+              No ClickCrates found. Create one above to get started.
+            </p>
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-// ClickCratePosCard component
 function ClickCratePosCard({
   account,
   onSelect,
+  isFirst,
+  isLast,
 }: {
   account: PublicKey;
   onSelect: (account: PublicKey, selected: boolean) => void;
+  isFirst: boolean;
+  isLast: boolean;
 }) {
-  const {
-    accountQuery,
-    activateClickCrate,
-    deactivateClickCrate,
-    makePurchase,
-  } = useClickcratePosProgramAccount({ account });
+  const { accountQuery, makePurchase } = useClickcratePosProgramAccount({
+    account,
+  });
 
   const { publicKey } = useWallet();
   const [placementType, setPlacementType] = useState<PlacementTypee | null>(
@@ -207,6 +238,7 @@ function ClickCratePosCard({
   const [manager, setManager] = useState<PublicKey | null>(null);
   const [productId, setProductId] = useState('');
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
   const isUpdateClickCrateFormValid =
     placementType !== null && productCategory !== null && manager !== null;
@@ -217,17 +249,9 @@ function ClickCratePosCard({
     setShowUpdateModal(!showUpdateModal);
   };
 
-  // const handleUpdateClickCrate = () => {
-  //   if (publicKey && isUpdateClickCrateFormValid) {
-  //     updateClickCrate.mutateAsync([
-  //       account,
-  //       manager,
-  //       placementType!,
-  //       productCategory!,
-  //       manager!,
-  //     ]);
-  //   }
-  // };
+  const togglePurchaseModal = () => {
+    setShowPurchaseModal(!showPurchaseModal);
+  };
 
   const handleMakePurchase = () => {
     if (publicKey && isMakePurchaseFormValid) {
@@ -250,117 +274,81 @@ function ClickCratePosCard({
   return accountQuery.isLoading ? (
     <span className="loading loading-spinner loading-lg"></span>
   ) : (
-    <div className="flex flex-col gap-y-8 w-[100%]">
-      <div className="bg-background p-6 flex flex-col border-2 border-tertiary rounded-lg space-y-4 w-[92vw]">
-        <div className="flex flex-row  justify-between items-center w-[100%]">
-          <div className="flex flex-row">
-            <input
-              type="checkbox"
-              checked={selected}
-              onChange={handleSelectChange}
-              className="checkbox checkbox-xs"
-            />
-          </div>
-          {/* <div className="flex flex-row">
-            <p className="text-start font-normal text-xs">IMG </p>
-          </div> */}
-          <div className="flex flex-row">
-            <p className="text-start font-semibold text-xs">ID: </p>
-            <p className="pl-2 text-start font-normal text-xs">
-              <p>
-                <ExplorerLink
-                  path={`account/${account}`}
-                  label={ellipsify(account.toString())}
-                />
-              </p>
-            </p>
-          </div>
-          <div className="flex flex-row">
-            <p className="text-start font-semibold text-xs">NAME: </p>
-            <p className="pl-2 text-start font-normal text-xs">
-              <p>
-                <ExplorerLink
-                  path={`account/${account}`}
-                  label={ellipsify(account.toString())}
-                />
-              </p>
-            </p>
-          </div>
-          <div className="flex flex-row">
-            <p className="text-start font-normal text-xs">Status </p>
-          </div>
-          <div className="flex flex-row">
-            <p className="text-start font-normal text-xs">Place Type(s) </p>
-          </div>
-          <div className="flex flex-row items-center gap-2">
-            <p className="text-start font-normal text-xs">Product</p>
-            <button
-              className="btn btn-xs btn-mini"
-              onClick={toggleUpdateModal}
-              style={{ fontSize: '12px' }}
-            >
-              Purchase
-            </button>
-          </div>
-          <div className="flex flex-row">
-            <p className="text-start font-normal text-xs">Inventory </p>
-          </div>
-
-          <div className="flex flex-row">
-            <button
-              className="btn btn-xs btn-mini w-full"
-              onClick={toggleUpdateModal}
-              style={{ fontSize: '12px' }}
-            >
-              Update
-            </button>
-            {/* Update ClickCrate form */}
-            {showUpdateModal && (
-              <ClickCratePosUpdateModal
-                show={showUpdateModal}
-                onClose={toggleUpdateModal}
-                account={account}
-                isUpdateClickCrateFormValid={isUpdateClickCrateFormValid}
-              />
-            )}
-          </div>
+    <div
+      className={`p-4 ${!isFirst ? 'border-t-2' : ''} ${
+        !isLast ? 'border-b-2' : ''
+      } border-tertiary `}
+    >
+      <div className="flex flex-row justify-between items-center w-[100%]">
+        <div className="flex flex-row">
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={handleSelectChange}
+            className="checkbox checkbox-xs"
+          />
         </div>
-        <div className="flex flex-col gap-4 w-[100%]">
-          <button
-            className="btn btn-xs lg:btn-sm btn-primary w-full py-3"
-            onClick={() => activateClickCrate.mutateAsync()}
-            disabled={activateClickCrate.isPending}
-          >
-            Activate
-          </button>
-          <button
-            className="btn btn-xs lg:btn-sm btn-primary w-full py-3"
-            onClick={() => deactivateClickCrate.mutateAsync()}
-            disabled={deactivateClickCrate.isPending}
-          >
-            Deactivate
-          </button>
-        </div>
-        <div className="text-start space-y-4">
-          {/* Make Purchase form */}
-          <div className="flex flex-col gap-4 w-[100%]">
-            <input
-              type="text"
-              placeholder="Product ID"
-              value={productId}
-              onChange={(e) => setProductId(e.target.value)}
-              className="rounded-lg p-2 text-black"
+        <div className="flex flex-row">
+          <p className="text-start font-semibold text-xs">ID: </p>
+          <p className="pl-2 text-start font-normal text-xs">
+            <ExplorerLink
+              path={`account/${account}`}
+              label={ellipsify(account.toString())}
             />
-            <button
-              className="btn btn-xs btn-primary"
-              onClick={handleMakePurchase}
-              disabled={makePurchase.isPending || !isMakePurchaseFormValid}
-            >
-              Make Purchase {makePurchase.isPending && '...'}
-            </button>
-          </div>
+          </p>
+        </div>
+        <div className="flex flex-row">
+          <p className="text-start font-semibold text-xs">NAME: </p>
+          <p className="pl-2 text-start font-normal text-xs">
+            <ExplorerLink
+              path={`account/${account}`}
+              label={ellipsify(account.toString())}
+            />
+          </p>
+        </div>
+        <div className="flex flex-row">
+          <p className="text-start font-normal text-xs">Status </p>
+        </div>
+        <div className="flex flex-row">
+          <p className="text-start font-normal text-xs">Placement Type(s) </p>
+        </div>
+        <div className="flex flex-row items-center gap-2">
+          <p
+            className="text-start font-normal text-xs underline cursor-pointer"
+            onClick={togglePurchaseModal}
+          >
+            Product
+          </p>
+        </div>
+        <div className="flex flex-row">
+          <p className="text-start font-normal text-xs">Inventory </p>
+        </div>
+        <div className="flex flex-row">
+          <button
+            className="btn btn-xs btn-mini w-full"
+            onClick={toggleUpdateModal}
+            style={{ fontSize: '12px' }}
+          >
+            Update
+          </button>
+          {showUpdateModal && (
+            <ClickCratePosUpdateModal
+              show={showUpdateModal}
+              onClose={toggleUpdateModal}
+              account={account}
+              isUpdateClickCrateFormValid={isUpdateClickCrateFormValid}
+            />
+          )}
         </div>
       </div>
+      {showPurchaseModal && (
+        <ClickCratePosPurchaseModal
+          show={showPurchaseModal}
+          onClose={togglePurchaseModal}
+          account={account}
+          isMakePurchaseFormValid={isMakePurchaseFormValid}
+        />
+      )}
     </div>
   );
 }
@@ -459,6 +447,65 @@ function ClickCratePosUpdateModal({
             disabled={updateClickCrate.isPending}
           >
             {updateClickCrate.isPending ? 'Updating...' : 'Update ClickCrate'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ClickCratePosPurchaseModal({
+  show,
+  onClose,
+  account,
+  isMakePurchaseFormValid,
+}: {
+  show: boolean;
+  onClose: () => void;
+  account: PublicKey;
+  isMakePurchaseFormValid: boolean;
+}) {
+  const { makePurchase } = useClickcratePosProgramAccount({ account });
+
+  const { publicKey } = useWallet();
+  const [productId, setProductId] = useState('');
+
+  const handleMakePurchase = () => {
+    if (publicKey && isMakePurchaseFormValid) {
+      makePurchase.mutateAsync({ productId: new PublicKey(productId) });
+      onClose();
+    }
+  };
+
+  return (
+    <div
+      className={`modal ${
+        show ? 'modal-open' : ''
+      } absolute top-0 left-0 right-0 bottom-0`}
+    >
+      <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-6 w-[92vw]">
+        <h1 className="text-lg font-bold text-start">Make Purchase</h1>
+        <input
+          type="text"
+          placeholder="Product ID"
+          value={productId}
+          onChange={(e) => setProductId(e.target.value)}
+          className="rounded-lg p-2 text-black"
+        />
+        <div className="flex flex-row gap-[4%] py-2">
+          <button
+            className="btn btn-xs lg:btn-sm btn-outline w-[48%] py-3"
+            onClick={onClose}
+            disabled={makePurchase.isPending}
+          >
+            Cancel
+          </button>
+          <button
+            className="btn btn-xs lg:btn-sm btn-primary w-[48%] py-3"
+            onClick={handleMakePurchase}
+            disabled={makePurchase.isPending || !isMakePurchaseFormValid}
+          >
+            {makePurchase.isPending ? 'Purchasing...' : 'Make Purchase'}
           </button>
         </div>
       </div>

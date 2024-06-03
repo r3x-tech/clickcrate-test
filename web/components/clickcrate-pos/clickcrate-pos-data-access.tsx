@@ -219,6 +219,7 @@ export function useClickcratePosProgramAccount({
     },
     onError: () => toast.error('Failed to deactivate ClickCrate'),
   });
+
   const makePurchase = useMutation({
     mutationKey: ['clickcrate-test', 'makePurchase', { cluster, account }],
     mutationFn: async (args: MakePurchaseArgs) => {
@@ -290,4 +291,62 @@ export function useClickcratePosProgramAccount({
     makePurchase,
     updateClickCrate,
   };
+}
+
+export function useActivateClickCrates() {
+  const { program, accounts } = useClickcratePosProgram();
+  const transactionToast = useTransactionToast();
+
+  return useMutation({
+    mutationKey: ['clickcrate-test', 'activateClickCrates'],
+    mutationFn: async (clickCrateAccounts: PublicKey[]) => {
+      const txSigs = await Promise.all(
+        clickCrateAccounts.map((account) =>
+          program.methods
+            .activateClickcrate()
+            .accounts({
+              clickcrate: account,
+              owner: program.provider.publicKey,
+            })
+            .rpc()
+        )
+      );
+
+      return txSigs;
+    },
+    onSuccess: () => {
+      transactionToast('ClickCrates activated successfully');
+      return accounts.refetch();
+    },
+    onError: () => toast.error('Failed to activate ClickCrates'),
+  });
+}
+
+export function useDeactivateClickCrates() {
+  const { program, accounts } = useClickcratePosProgram();
+  const transactionToast = useTransactionToast();
+
+  return useMutation({
+    mutationKey: ['clickcrate-test', 'deactivateClickCrates'],
+    mutationFn: async (clickCrateAccounts: PublicKey[]) => {
+      const txSigs = await Promise.all(
+        clickCrateAccounts.map((account) =>
+          program.methods
+            .deactivateClickcrate()
+            .accounts({
+              clickcrate: account,
+              owner: program.provider.publicKey,
+            })
+            .rpc()
+        )
+      );
+
+      return txSigs;
+    },
+    onSuccess: () => {
+      transactionToast('ClickCrates deactivated successfully');
+      return accounts.refetch();
+    },
+    onError: () => toast.error('Failed to deactivate ClickCrates'),
+  });
 }
