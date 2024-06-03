@@ -20,6 +20,7 @@ import {
 import { BN } from '@coral-xyz/anchor';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { IconEdit } from '@tabler/icons-react';
 
 export function ClickCratePosRegister({
   show,
@@ -74,20 +75,22 @@ export function ClickCratePosRegister({
       } absolute top-0 left-0 right-0 bottom-0`}
     >
       <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-4 w-[92vw]">
-        <div className="flex flex-row justify-end items-center m-0 p-0">
-          <p className="text-start font-semibold tracking-wide text-xs">
-            Current Registry:{' '}
-          </p>
-          <p className="pl-2 text-start font-normal text-xs">
-            <ExplorerLink
-              path={`account/${programId}`}
-              label={ellipsify(programId.toString())}
-            />
-          </p>
+        <div className="flex flex-row justify-between items-end">
+          <h1 className="text-lg font-bold text-start trackign-wide">
+            Register ClickCrate POS
+          </h1>
+          <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+            <p className="text-start font-semibold tracking-wide text-xs">
+              Registry:{' '}
+            </p>
+            <p className="pl-2 text-start font-normal text-xs">
+              <ExplorerLink
+                path={`account/${programId}`}
+                label={ellipsify(programId.toString())}
+              />
+            </p>
+          </div>
         </div>
-        <h1 className="text-lg font-bold text-start">
-          Register ClickCrate POS
-        </h1>
 
         <input
           type="text"
@@ -198,7 +201,7 @@ export function ClickCratePosList({
           <span className="loading loading-spinner loading-md"></span>
         </div>
       ) : accounts.data?.length ? (
-        <div className="w-[100%] bg-background border-2 border-white rounded-lg">
+        <div className="w-[100%] bg-background border-2 border-quaternary rounded-lg">
           <button
             id="refresh-clickcrates"
             className="hidden"
@@ -206,42 +209,34 @@ export function ClickCratePosList({
           >
             Refresh
           </button>
-          <div className="flex flex-row justify-between items-center w-[100%] p-4">
-            <div className="flex flex-row">
+          <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-4 border-b-2 border-quaternary">
+            <div className="flex flex-row w-[5%]">
               <input
                 type="checkbox"
                 // checked={selected}
                 // onChange={handleSelectChange}
-                className="checkbox checkbox-xs"
+                className="checkbox checkbox-xs bg-tertiary border-quaternary rounded-sm"
               />
             </div>
-            <div className="flex flex-row">
+            <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">ID </p>
             </div>
-            <div className="flex flex-row">
+            <div className="flex flex-row w-[20%]">
               <p className="text-start font-bold text-xs">NAME </p>
             </div>
-            <div className="flex flex-row">
+            <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">STATUS </p>
             </div>
-            <div className="flex flex-row">
+            <div className="flex flex-row w-[25%]">
               <p className="text-start font-bold text-xs">PLACEMENT TYPE(S) </p>
             </div>
-            <div className="flex flex-row items-center">
+            <div className="flex flex-row items-center w-[10%]">
               <p className="text-start font-bold text-xs">PRODUCT</p>
             </div>
-            <div className="flex flex-row">
-              <p className="text-start font-bold text-xs">INVENTORY </p>
+            <div className="flex flex-row w-[10%] justify-end">
+              <p className="text-end font-bold text-xs">INVENTORY </p>
             </div>
-            <div className="flex flex-row">
-              <button
-                className="btn btn-xs btn-mini w-full"
-                onClick={() => {}}
-                style={{ fontSize: '12px' }}
-              >
-                Update
-              </button>
-            </div>
+            <div className="flex flex-row w-[10%]"></div>
           </div>
           {accounts.data?.map(
             (account: { publicKey: PublicKey }, index: number) => (
@@ -332,44 +327,48 @@ function ClickCratePosCard({
     </div>
   ) : (
     <div
-      className={`p-4 ${!isFirst ? 'border-t-2' : ''} ${
+      className={`px-4 py-2 ${!isFirst ? 'border-t-2' : ''} ${
         !isLast ? 'border-b-2' : ''
-      } border-tertiary`}
+      } border-quaternary`}
     >
-      <div className="flex flex-row justify-between items-center w-[100%]">
-        <div className="flex flex-row">
+      <div className="flex flex-row justify-start items-center w-[100%]">
+        <div className="flex flex-row w-[5%]">
           <input
             type="checkbox"
             checked={selected}
             onChange={handleSelectChange}
-            className="checkbox checkbox-xs"
+            className="checkbox checkbox-xs bg-tertiary border-quaternary rounded-sm"
           />
         </div>
-        <div className="flex flex-row">
-          <p className="text-start font-normal text-xs">
+        <div className="flex flex-row w-[10%]">
+          <p className="text-start font-extralight text-xs">
             <ExplorerLink
               path={`account/${account}`}
               label={ellipsify(account.toString())}
+              className="font-extralight underline cursor-pointer"
             />
           </p>
         </div>
-        <div className="flex flex-row ">
-          <p className="text-start font-normal text-xs">
+        <div className="flex flex-row w-[20%]">
+          <p className="text-start font-extralight text-xs">
             <ExplorerLink
               label={ellipsify(accountQuery.data?.id.toBase58())}
               path={`mint/${accountQuery.data?.id}`}
+              className="font-extralight underline cursor-pointer"
             />
           </p>
         </div>
-        <div className="flex flex-row ">
-          <p className="text-start font-normal text-xs">Status </p>
+        <div className="flex flex-row w-[10%]">
+          <p className="text-start font-extralight text-xs">Status </p>
         </div>
-        <div className="flex flex-row  ">
-          <p className="text-start font-normal text-xs">Placement Type(s) </p>
+        <div className="flex flex-row w-[25%]">
+          <p className="text-start font-extralight text-xs">
+            Placement Type(s){' '}
+          </p>
         </div>
-        <div className="flex flex-row ">
+        <div className="flex flex-row w-[10%]">
           <p
-            className={`text-start font-normal text-xs  ${
+            className={`text-start font-extralight text-xs  ${
               accountQuery.data?.product !== null && 'underline'
             }  ${accountQuery.data?.product !== null && 'cursor-pointer'}`}
             onClick={togglePurchaseModal}
@@ -379,18 +378,27 @@ function ClickCratePosCard({
               : ellipsify(accountQuery.data?.product?.toString())}
           </p>
         </div>
-        <div className="flex flex-row ">
-          <p className="text-start font-normal text-xs">0 </p>
+        <div className="flex flex-row w-[10%] justify-end">
+          <p className="text-end font-extralight text-xs">0</p>
         </div>
-        <div className="flex flex-row">
+        <div className="flex flex-row w-[5%] ml-[5%] ">
           <button
-            className="btn btn-xs btn-mini w-full"
-            onClick={() => {}}
-            style={{ fontSize: '12px' }}
+            className="btn btn-xs btn-mini w-full flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
+            onClick={toggleUpdateModal}
+            style={{ fontSize: '12px', border: 'none' }}
             hidden={true}
           >
-            Update
+            <IconEdit className="m-0 p-0" size={12} />
+            Edit
           </button>
+          {showUpdateModal && (
+            <ClickCratePosUpdateModal
+              show={showUpdateModal}
+              onClose={toggleUpdateModal}
+              account={account}
+              isUpdateClickCrateFormValid={isUpdateClickCrateFormValid}
+            />
+          )}
         </div>
       </div>
       {showPurchaseModal && (
@@ -450,7 +458,23 @@ function ClickCratePosUpdateModal({
       } absolute top-0 left-0 right-0 bottom-0`}
     >
       <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-6 w-[92vw]">
-        <h1 className="text-lg font-bold text-start">Update ClickCrate POS</h1>
+        <div className="flex flex-row justify-between items-end">
+          <h1 className="text-lg font-bold text-start">
+            Update ClickCrate POS
+          </h1>
+          <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+            <p className="text-start font-semibold tracking-wide text-xs">
+              ID:{' '}
+            </p>
+            <p className="pl-2 text-start font-normal text-xs">
+              <ExplorerLink
+                path={`account/${account}`}
+                label={ellipsify(account.toString())}
+              />
+            </p>
+          </div>
+        </div>
+
         <select
           value={placementType || ''}
           onChange={(e) => setPlacementType(e.target.value as PlacementTypee)}

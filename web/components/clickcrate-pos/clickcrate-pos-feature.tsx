@@ -10,7 +10,7 @@ import {
 import { ClickCratePosList, ClickCratePosRegister } from './clickcrate-pos-ui';
 import { useState } from 'react';
 import { PublicKey } from '@solana/web3.js';
-import { IconRefresh } from '@tabler/icons-react';
+import { IconCaretDownFilled, IconRefresh } from '@tabler/icons-react';
 import toast from 'react-hot-toast';
 import { ExplorerLink } from '../cluster/cluster-ui';
 import { useClickCrateListingProgram } from '../product-listing/product-listing-data-access';
@@ -47,12 +47,20 @@ export default function ClickcratePosFeature() {
   };
 
   const handleActivate = () => {
-    activateClickCrates.mutateAsync(selectedClickCrates);
+    if (selectedClickCrates.length > 0) {
+      activateClickCrates.mutateAsync(selectedClickCrates);
+    } else {
+      toast.error('No ClickCrate(s) selected');
+    }
     setShowActionsMenu(false);
   };
 
   const handleDeactivate = () => {
-    deactivateClickCrates.mutateAsync(selectedClickCrates);
+    if (selectedClickCrates.length > 0) {
+      deactivateClickCrates.mutateAsync(selectedClickCrates);
+    } else {
+      toast.error('No ClickCrate(s) selected');
+    }
     setShowActionsMenu(false);
   };
 
@@ -98,6 +106,7 @@ export default function ClickcratePosFeature() {
                 onClick={toggleActionsMenu}
               >
                 More Actions
+                <IconCaretDownFilled className="m-0 p-0" size={12} />
               </label>
               {showActionsMenu && (
                 <ul
@@ -107,7 +116,7 @@ export default function ClickcratePosFeature() {
                 >
                   <li>
                     <button
-                      className="btn btn-sm btn-ghost"
+                      className="btn btn-sm btn-ghost hover:bg-tertiary"
                       onClick={handleActivate}
                     >
                       Activate
@@ -115,7 +124,7 @@ export default function ClickcratePosFeature() {
                   </li>
                   <li>
                     <button
-                      className="btn btn-sm btn-ghost"
+                      className="btn btn-sm btn-ghost hover:bg-tertiary"
                       onClick={handleDeactivate}
                     >
                       Deactivate

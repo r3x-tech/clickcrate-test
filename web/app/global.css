@@ -20,6 +20,10 @@ html, body {
   font-family: var(--font-montserrat);
 } */
 
+.active {
+  background-color: #1c1c1c;
+}
+
 
 .wallet-adapter-button-trigger {
    background: #000000 !important;
@@ -68,8 +72,6 @@ html, body {
   @apply text-white border-2 border-white rounded-full !important;
   background-color: #121212 !important;
   color: white !important;
-  backdrop-filter: blur(0.05rem) !important;
-  -webkit-backdrop-filter: blur(0.05rem) !important;
 }
 
 .btn-outline {

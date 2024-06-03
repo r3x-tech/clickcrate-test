@@ -86,7 +86,7 @@ export function UiLayout({
         >
           {children}
         </Suspense>
-        <Toaster position="bottom-right" />
+        <Toaster position="top-center" />
       </div>
 
       {/* <footer className="footer footer-center p-4 bg-background text-base-content">
@@ -195,7 +195,9 @@ export function AppHero({
 export function ellipsify(str = '', len = 4) {
   if (str.length > 30) {
     return (
-      str.substring(0, len) + '..' + str.substring(str.length - len, str.length)
+      str.substring(0, len) +
+      '...' +
+      str.substring(str.length - len, str.length)
     );
   }
   return str;
@@ -203,15 +205,28 @@ export function ellipsify(str = '', len = 4) {
 
 export function useTransactionToast() {
   return (signature: string) => {
-    toast.success(
-      <div className={'text-center'}>
-        <div className="text-lg">Transaction sent</div>
-        <ExplorerLink
-          path={`tx/${signature}`}
-          label={'View Transaction'}
-          className="btn btn-xs btn-primary"
-        />
-      </div>
+    const toastId = toast.success(
+      <div className=" flex flex-row">
+        <div className="flex flex-row justify-end">
+          <button
+            className="btn btn-xs btn-ghost p-0 mb-2"
+            onClick={() => toast.dismiss(toastId)}
+          >
+            DISMISS
+          </button>
+        </div>
+        <div>
+          <div className="text-sm">Transaction sent!</div>
+          <ExplorerLink
+            path={`tx/${signature}`}
+            label={'View Transaction'}
+            className="btn btn-xs btn-primary"
+          />
+        </div>
+      </div>,
+      {
+        duration: Infinity,
+      }
     );
   };
 }
