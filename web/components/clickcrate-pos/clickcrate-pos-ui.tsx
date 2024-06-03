@@ -77,7 +77,7 @@ export function ClickCratePosRegister({
       <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-4 w-[92vw]">
         <div className="flex flex-row justify-between items-end">
           <h1 className="text-lg font-bold text-start trackign-wide">
-            Register ClickCrate POS
+            Register ClickCrate
           </h1>
           <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
             <p className="text-start font-semibold tracking-wide text-xs">
