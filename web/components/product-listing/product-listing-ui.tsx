@@ -366,16 +366,16 @@ function ProductListingCard({
     setShowUpdateModal(!showUpdateModal);
   };
 
-  const [selected, setSelected] = useState(false);
+  const [selected, setListingSelected] = useState(false);
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isSelected = e.target.checked;
-    setSelected(isSelected);
-    onSelect(account, isSelected);
+    const isListingSelected = e.target.checked;
+    setListingSelected(isListingSelected);
+    onSelect(account, isListingSelected);
   };
 
   useEffect(() => {
-    setSelected(allListingsSelected);
+    setListingSelected(allListingsSelected);
   }, [allListingsSelected]);
 
   if (!publicKey) {
