@@ -1,54 +1,108 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @import url('https://fonts.googleapis.com/css2?family=Anton:wght@400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-montserrat: 'Montserrat', sans-serif;
+  --font-anton: 'Anton', sans-serif;
+}
 
 html, body {
   height: 100%;
-  /* @apply text-white font-heading; */
-  font-family: 'Montserrat', sans-serif;
+  /* font-family: var(--font-montserrat); */
 }
 
-h1, h2, h3, h4, h5, h6 {
-  @apply text-white font-body;
-}
-
-p {
-  @apply text-white font-body;
-}
-
-.wallet-adapter-button-trigger {
-  background: rgb(100, 26, 230) !important;
-  border-radius: 8px !important;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
-}
-
-.wallet-adapter-dropdown-list, .wallet-adapter-button {
-  font-family: inherit !important;
-}
-
-/* .btn:not(.btn-ghost):not(.btn-outline) {
-  @apply bg-primary text-white border-none rounded-full tracking-wide text-sm;
-}
-
-.btn:not(.btn-ghost):not(.btn-outline):hover {
-  @apply bg-secondary;
+/* * {
+  font-family: var(--font-montserrat);
 } */
 
-.btn:not(.btn-ghost):not(.btn-outline) {
-  @apply bg-primary text-white border-none rounded-full;
-  font-family: 'Montserrat', sans-serif;
+
+.wallet-adapter-button-trigger {
+  background: #000000 !important;
+  border: 2px solid white !important;
+  border-radius: 9999px !important;
+  padding-left: 22px !important;
+  padding-right: 22px !important;
+  font-size: 14px !important;
+}
+
+.wallet-adapter-button {
+  background: #000000 !important;
+  /* border: 2px solid white !important; */
+  font-family: inherit !important;
+  border: 2px solid white !important;
+  border-radius: 9999px !important;
+  font-size: 14px !important;
+  padding-left: 22px !important;
+  padding-right: 22px !important;
+}
+
+.wallet-adapter-dropdown-list {
+  background: #000000 !important;
+  /* border: 2px solid white !important; */
+  font-family: inherit !important;
+  border: 2px solid white !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+}
+
+.btn-primary {
+  @apply bg-primary text-white border-2 border-primary rounded-full !important;
+  font-family: 'Montserrat', sans-serif !important;
   font-weight: 600 !important;
   font-size: var(--btn-text-size) !important;
   letter-spacing: var(--btn-tracking) !important;
-  height: auto;
+  height: auto !important;
 }
 
-.btn:not(.btn-ghost):not(.btn-outline):hover {
-  @apply bg-secondary !important;
+.btn-primary:hover {
+  @apply bg-secondary border-2 border-secondary !important;
 }
+
+.btn-mini {
+  @apply bg-background text-white border-2 border-white rounded-full !important;
+  height: 2rem !important;
+  font-weight: 600 !important;
+  border-width: 2px !important;
+  color: white !important;
+}
+
+.btn-mini:hover {
+  @apply text-white border-2 border-white rounded-full !important;
+  background-color: #121212 !important;
+  color: white !important;
+  backdrop-filter: blur(0.05rem) !important;
+  -webkit-backdrop-filter: blur(0.05rem) !important;
+}
+
+.btn-outline {
+  @apply bg-background text-white border-2 border-white rounded-full !important;
+  height: auto !important;
+  font-weight: 600 !important;
+  border-width: 2px !important;
+  color: white !important;
+}
+
+.btn-outline:hover {
+  @apply text-white border-2 border-white rounded-full !important;
+  background-color: #121212 !important;
+  color: white !important;
+  backdrop-filter: blur(0.05rem) !important;
+  -webkit-backdrop-filter: blur(0.05rem) !important;
+}
+
+/* .btn-ghost {
+  @apply bg-[#1c1c1c] text-white border-2 border-[#1c1c1c] rounded-full !important;
+  height: auto !important;
+  font-weight: 600 !important;
+  border-width: 2px !important;
+  color: white !important;
+}
+
+.btn-ghost:hover {
+  @apply bg-[#202020] text-white border-2 border-[#202020] rounded-full !important;
+} */

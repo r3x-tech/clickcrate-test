@@ -26,7 +26,7 @@ export function UiLayout({
 
   return (
     <div className="h-full flex flex-col">
-      <div className="navbar bg-background text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0">
+      <div className="navbar bg-background text-neutral-content flex-col md:flex-row space-y-2 md:space-y-0 px-[4vw]">
         <div
           style={{
             backgroundImage: "url('/background.svg')",
@@ -36,7 +36,8 @@ export function UiLayout({
         ></div>
         <div className="flex-1">
           <Link
-            className="btn btn-ghost normal-case text-xl bg-none"
+            className="btn btn-ghost text-xl bg-none ml-[-1vw] bg-[#000000] hover:bg-[#000000]"
+            style={{ backgroundColor: '#000000' }}
             href="https://clickcrate.r3x.tech/"
             target="_blank"
             rel="noopener noreferrer"
@@ -54,7 +55,7 @@ export function UiLayout({
               height={80}
             />
           </Link>
-          <ul className="menu menu-horizontal px-2 space-x-4">
+          <ul className="menu menu-horizontal px-2 space-x-4 font-semibold">
             {links.map(({ label, path }) => (
               <li key={path}>
                 <Link
@@ -75,7 +76,7 @@ export function UiLayout({
       <ClusterChecker>
         <AccountChecker />
       </ClusterChecker>
-      <div className="flex-grow mx-4 lg:mx-auto relative  overflow-y-auto">
+      <div className="flex-grow mx-4 lg:mx-auto relative overflow-y-auto">
         <Suspense
           fallback={
             <div className="text-center my-32 bg-transparent">
@@ -171,9 +172,9 @@ export function AppHero({
   subtitle: ReactNode;
 }) {
   return (
-    <div className="hero py-[20px]">
-      <div className="hero-content text-center">
-        <div className="max-w-2xl">
+    <div className="py-[20px] w-[100%] flex flex-row items-center align-center justify-center ">
+      <div className="flex flex-row items-center align-center justify-center text-center w-[92vw] p-0 gap-[1rem]">
+        <div className="w-[100%]">
           {typeof title === 'string' ? (
             <h1 className="text-5xl font-bold">{title}</h1>
           ) : (

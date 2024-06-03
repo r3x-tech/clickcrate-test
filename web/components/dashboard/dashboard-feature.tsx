@@ -15,14 +15,16 @@ export default function DashboardFeature() {
   return (
     <div>
       <AppHero title="gm" subtitle="Connect your wallet to start selling" />
-      <div className="max-w-xl mx-auto py-6 sm:px-6 lg:px-8 text-center">
+      <div
+        className="max-w-xl mx-auto py-6 sm:px-6 lg:px-8 text-center"
+        style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: '600' }}
+      >
         <div className="space-y-2">
-          {/* <p>Resources:</p> */}
           {links.map((link, index) => (
             <div key={index}>
               <a
                 href={link.href}
-                className="link"
+                className="link font-normal"
                 target="_blank"
                 rel="noopener noreferrer"
               >
