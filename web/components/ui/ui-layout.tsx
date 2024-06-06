@@ -227,7 +227,7 @@ export function useTransactionToast() {
         </div>
       </div>,
       {
-        duration: Infinity,
+        duration: 10000,
       }
     );
   };
