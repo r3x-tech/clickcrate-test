@@ -39,23 +39,14 @@ export function ClickCratePosRegister({
 
   const handleClickcrateRegistration = () => {
     if (publicKey && isClickcrateFormValid) {
-      // const eligiblePlacementType: PlacementType = 'RelatedPurchase';
-      // const eligibleProductCategory: ProductCategory = 'Clothing';
-
-      // registerClickCrate.mutate([
-      //   new PublicKey(clickcrateId),
-      //   publicKey,
-      //   'RelatedPurchase',
-      //   'Clothing',
-      //   publicKey,
-      // ]);
       registerClickCrate.mutate([
         new PublicKey(clickcrateId),
         publicKey,
-        clickcratePlacementType!,
+        clickcratePlacementType,
         clickcrateProductCategory!,
         publicKey,
       ]);
+      onClose();
     }
   };
 
@@ -116,16 +107,16 @@ export function ClickCratePosRegister({
           className="rounded-lg p-2 text-black"
         >
           <option value="">Select a product category</option>
-          <option value="CLOTHING">Clothing</option>
-          <option value="ELECTRONICS">Electronics</option>
-          <option value="BOOKS">Books</option>
-          <option value="HOME">Home</option>
-          <option value="BEAUTY">Beauty</option>
-          <option value="TOYS">Toys</option>
-          <option value="SPORTS">Sports</option>
-          <option value="AUTOMOTIVE">Automotive</option>
-          <option value="GROCERY">Grocery</option>
-          <option value="HEALTH">Health</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Books">Books</option>
+          <option value="Home">Home</option>
+          <option value="Beauty">Beauty</option>
+          <option value="Toys">Toys</option>
+          <option value="Sports">Sports</option>
+          <option value="Automotive">Automotive</option>
+          <option value="Grocery">Grocery</option>
+          <option value="Health">Health</option>
         </select>
         <div className="flex flex-row gap-[4%] py-2">
           <button
@@ -168,6 +159,12 @@ export function ClickCratePosList({
       return () => clearTimeout(timer);
     }
   }, [accounts.isLoading]);
+
+  useEffect(() => {
+    if (selectedClickCrates.length == 0) {
+      setAllSelected(false);
+    }
+  }, [selectedClickCrates.length]);
 
   const handleRefetch = async () => {
     setIsLoading(true);

@@ -46,10 +46,11 @@ export function ProductListingRegister({
         publicKey,
         productOrigin,
         productPlacementType,
-        productCategory!,
+        productCategory,
         productInStock.toNumber(),
         publicKey,
       ]);
+      onClose();
     } else {
       toast.error('Invalid input');
     }
@@ -159,21 +160,6 @@ export function ProductListingRegister({
       </div>
     </div>
   );
-}
-
-interface ProductListingAccount {
-  publicKey: PublicKey;
-  account: {
-    id: PublicKey;
-    origin: Origin;
-    owner: PublicKey;
-    manager: PublicKey;
-    placementType: PlacementType;
-    productCategory: ProductCategory;
-    inStock: BN;
-    sold: BN;
-    isActive: boolean;
-  };
 }
 
 export function ProductListingsList({

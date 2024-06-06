@@ -30,14 +30,13 @@ export function useClickcratePosProgram() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const provider = useAnchorProvider();
-  // const programId = useMemo(
-  //   () => getClickcrateTestProgramId(cluster.network as Cluster),
-  //   [cluster]
-  // );
-  const programId = new PublicKey(
-    'ENmHn3TEBqzfvwi19xc9cYsTmKseBSbxhqqXETiEKgJ9'
+  const programId = useMemo(
+    () => getClickcrateTestProgramId(cluster.network as Cluster),
+    [cluster]
   );
-  const { signTransaction } = useWallet();
+  // const programId = new PublicKey(
+  //   'ENmHn3TEBqzfvwi19xc9cYsTmKseBSbxhqqXETiEKgJ9'
+  // );
 
   const program = new Program(ClickcrateTestIDL, programId, provider);
 
@@ -77,26 +76,26 @@ export function useClickcratePosProgram() {
       );
 
       const payer = (program.provider as AnchorProvider).wallet;
-      const idOne = new PublicKey(
-        '9RvppNEME3e1XxA6g7cQHbvrDivjaX5xwjSnqkxb8Rb2'
-      );
-      const managerOne = new PublicKey(
-        'Engvm8giPGZvLV115DkzhVGkWKR5j11ZTrggo5EUQBau'
-      );
+      // const idOne = new PublicKey(
+      //   '9RvppNEME3e1XxA6g7cQHbvrDivjaX5xwjSnqkxb8Rb2'
+      // );
+      // const managerOne = new PublicKey(
+      //   'Engvm8giPGZvLV115DkzhVGkWKR5j11ZTrggo5EUQBau'
+      // );
 
       console.log('registerClickCrate input:', {
-        id: idOne.toString(),
+        id: id.toString(),
         convertedPlacementType,
         convertedProductCategory,
-        manager: managerOne.toString(),
+        manager: manager.toString(),
       });
 
       const ix = await program.methods
         .registerClickcrate(
-          idOne,
+          id,
           convertedPlacementType,
           convertedProductCategory,
-          managerOne
+          manager
         )
         .accounts({
           clickcrate: clickcrateAddress,

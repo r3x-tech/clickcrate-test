@@ -13,6 +13,9 @@ import { useCluster } from '../cluster/cluster-data-access';
 import { useAnchorProvider } from '../solana/solana-provider';
 import { useTransactionToast } from '../ui/ui-layout';
 import {
+  getOriginFromString,
+  getPlacementTypeFromString,
+  getProductCategoryFromString,
   PlaceProductListingArgs,
   // getPlacementTypeFromString,
   // getProductCategoryFromString,
@@ -60,7 +63,7 @@ export function useClickCrateListingProgram() {
         inStock,
         manager,
       ] = args;
-      const [productListingAddress] = await PublicKey.findProgramAddressSync(
+      const [productListingAddress] = PublicKey.findProgramAddressSync(
         [Buffer.from('listing'), id.toBuffer()],
         programId
       );
@@ -74,17 +77,17 @@ export function useClickCrateListingProgram() {
       const pc = productCategory;
       console.log(pc);
 
-      // const convertedOrigin = getOriginFromString(origin);
-      // const convertedPlacementType = getPlacementTypeFromString(placementType);
-      // const convertedProductCategory =
-      //   getProductCategoryFromString(productCategory);
+      const convertedOrigin = getOriginFromString(origin);
+      const convertedPlacementType = getPlacementTypeFromString(placementType);
+      const convertedProductCategory =
+        getProductCategoryFromString(productCategory);
 
       return program.methods
         .registerProductListing(
           id,
-          { clickcrate: {} },
-          { relatedpurchase: {} },
-          { clothing: {} },
+          convertedOrigin,
+          convertedPlacementType,
+          convertedProductCategory,
           new BN(inStock),
           manager
         )

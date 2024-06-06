@@ -28,11 +28,11 @@ export type PlacementType =
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getPlacementTypeFromString = (placementType: string): any => {
   switch (placementType) {
-    case 'DigitalReplica':
+    case 'Digitalreplica':
       return { digitalreplica: {} };
-    case 'RelatedPurchase':
+    case 'Relatedpurchase':
       return { relatedpurchase: {} };
-    case 'TargetedPlacement':
+    case 'Targetedplacement':
       return { targetedplacement: {} };
     default:
       throw new Error(`Invalid placement type: ${placementType}`);
