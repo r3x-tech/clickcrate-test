@@ -273,7 +273,7 @@ export function ClickCratePosList({
       ) : (
         <div>
           <div className="mb-20 w-[100%] bg-background border-2 border-white rounded-lg">
-            <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-2 border-b-2 border-quaternary">
+            {/* <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-2 border-b-2 border-quaternary">
               <div className="flex flex-row w-[5%]">
                 <input
                   type="checkbox"
@@ -306,9 +306,9 @@ export function ClickCratePosList({
                 <p className="text-end font-bold text-xs">INVENTORY </p>
               </div>
               <div className="flex flex-row w-[10%]"></div>
-            </div>
+            </div> */}
             <p className="text-sm font-light text-center p-4">
-              No ClickCrates found. Register one above to get started!
+              No ClickCrates found. Register one to get started!
             </p>
           </div>
         </div>
