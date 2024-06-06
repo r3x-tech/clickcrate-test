@@ -12,7 +12,7 @@ import {
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Origin, PlacementType, ProductCategory } from '@/types';
 import { BN } from '@coral-xyz/anchor';
-import { IconEdit } from '@tabler/icons-react';
+import { IconEdit, IconBuildingStore } from '@tabler/icons-react';
 import toast from 'react-hot-toast';
 
 export function ProductListingRegister({
@@ -256,7 +256,7 @@ export function ProductListingsList({
             <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">ID </p>
             </div>
-            <div className="flex flex-row w-[15%]">
+            <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">NAME </p>
             </div>
             <div className="flex flex-row w-[10%]">
@@ -277,7 +277,7 @@ export function ProductListingsList({
             <div className="flex flex-row w-[10%] justify-end">
               <p className="text-end font-bold text-xs">STOCK </p>
             </div>
-            <div className="flex flex-row w-[7%]"></div>
+            <div className="flex flex-row w-[10%]"></div>
           </div>
 
           {userAccounts?.map(
@@ -299,43 +299,6 @@ export function ProductListingsList({
       ) : (
         <div>
           <div className="mb-20 w-[100%] bg-background border-2 border-white rounded-lg p-4">
-            {/* <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-2 border-b-2 border-quaternary">
-              <div className="flex flex-row w-[5%]">
-                <input
-                  type="checkbox"
-                  checked={allListingsSelected}
-                  onChange={handleAllListingsSelectChange}
-                  className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
-                />
-              </div>
-              <div className="flex flex-row w-[10%]">
-                <p className="text-start font-bold text-xs">ID </p>
-              </div>
-              <div className="flex flex-row w-[15%]">
-                <p className="text-start font-bold text-xs">NAME </p>
-              </div>
-              <div className="flex flex-row w-[10%]">
-                <p className="text-start font-bold text-xs">STATUS </p>
-              </div>
-              <div className="flex flex-row items-center w-[10%]">
-                <p className="text-start font-bold text-xs">CATEGORY</p>
-              </div>
-              <div className="flex flex-row w-[10%]">
-                <p className="text-start font-bold text-xs">ORIGIN</p>
-              </div>
-              <div className="flex flex-row w-[13%]">
-                <p className="text-start font-bold text-xs">
-                  PLACEMENT TYPE(S){' '}
-                </p>
-              </div>
-              <div className="flex flex-row w-[10%] justify-end">
-                <p className="text-end font-bold text-xs">UNIT PRICE </p>
-              </div>
-              <div className="flex flex-row w-[10%] justify-end">
-                <p className="text-end font-bold text-xs">STOCK </p>
-              </div>
-              <div className="flex flex-row w-[7%]"></div>
-            </div> */}
             <p className="text-sm font-light text-center p-4">
               No Product Listings found. Register one to get started.
             </p>
@@ -468,7 +431,7 @@ function ProductListingCard({
             />
           </p>
         </div>
-        <div className="flex flex-row w-[15%]">
+        <div className="flex flex-row w-[10%]">
           <p className="text-start font-extralight text-xs">
             <ExplorerLink
               label={ellipsify(accountQuery.data?.id.toBase58())}
@@ -519,15 +482,25 @@ function ProductListingCard({
               : 'NA'}
           </p>
         </div>
-        <div className="flex flex-row w-[5%] ml-[2%]">
+        <div className="flex flex-row w-[10%] ml-[2%]">
           <button
-            className="btn btn-xs btn-mini w-full flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
+            className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
             onClick={toggleUpdateModal}
             style={{ fontSize: '12px', border: 'none' }}
-            hidden={true}
+            // hidden={true}
           >
             <IconEdit className="m-0 p-0" size={12} />
             Edit
+          </button>
+
+          <button
+            className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
+            onClick={toggleUpdateModal}
+            style={{ fontSize: '12px', border: 'none' }}
+            // hidden={true}
+          >
+            <IconBuildingStore className="m-0 p-0" size={12} />
+            Place
           </button>
           {showUpdateModal && (
             <ProductListingUpdateModal

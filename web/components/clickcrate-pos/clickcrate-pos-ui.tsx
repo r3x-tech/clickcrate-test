@@ -14,7 +14,7 @@ import { Origin, PlacementType, ProductCategory } from '@/types';
 import { BN } from '@coral-xyz/anchor';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
-import { IconEdit } from '@tabler/icons-react';
+import { IconEdit, IconShoppingCartFilled } from '@tabler/icons-react';
 
 export function ClickCratePosRegister({
   show,
@@ -243,7 +243,7 @@ export function ClickCratePosList({
             <div className="flex flex-row w-[15%]">
               <p className="text-start font-bold text-xs">PLACEMENT TYPE(S) </p>
             </div>
-            <div className="flex flex-row items-center w-[15%]">
+            <div className="flex flex-row items-center w-[10%]">
               <p className="text-start font-bold text-xs">PRODUCT</p>
             </div>
             <div className="flex flex-row w-[10%] justify-end">
@@ -270,40 +270,6 @@ export function ClickCratePosList({
       ) : (
         <div>
           <div className="mb-20 w-[100%] bg-background border-2 border-white rounded-lg">
-            {/* <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-2 border-b-2 border-quaternary">
-              <div className="flex flex-row w-[5%]">
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  onChange={handleAllSelectChange}
-                  className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
-                />
-              </div>
-              <div className="flex flex-row w-[10%]">
-                <p className="text-start font-bold text-xs">ID </p>
-              </div>
-              <div className="flex flex-row w-[15%]">
-                <p className="text-start font-bold text-xs">NAME </p>
-              </div>
-              <div className="flex flex-row w-[10%]">
-                <p className="text-start font-bold text-xs">STATUS </p>
-              </div>
-              <div className="flex flex-row items-center w-[10%]">
-                <p className="text-start font-bold text-xs">CATEGORY</p>
-              </div>
-              <div className="flex flex-row w-[15%]">
-                <p className="text-start font-bold text-xs">
-                  PLACEMENT TYPE(S){' '}
-                </p>
-              </div>
-              <div className="flex flex-row items-center w-[15%]">
-                <p className="text-start font-bold text-xs">PRODUCT</p>
-              </div>
-              <div className="flex flex-row w-[10%] justify-end">
-                <p className="text-end font-bold text-xs">INVENTORY </p>
-              </div>
-              <div className="flex flex-row w-[10%]"></div>
-            </div> */}
             <p className="text-sm font-light text-center p-4">
               No ClickCrates found. Register one to get started!
             </p>
@@ -391,6 +357,8 @@ function ClickCratePosCard({
       accountQuery.data?.product !== undefined
     ) {
       setShowPurchaseModal(!showPurchaseModal);
+    } else {
+      toast.error('No product to purchase');
     }
   };
 
@@ -479,7 +447,7 @@ function ClickCratePosCard({
               : 'NA'}
           </p>
         </div>
-        <div className="flex flex-row w-[15%]">
+        <div className="flex flex-row w-[10%]">
           <p
             className={`text-start font-extralight text-xs  ${
               accountQuery.data?.product !== null && 'underline'
@@ -499,10 +467,19 @@ function ClickCratePosCard({
             className="btn btn-xs btn-mini w-full flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
             onClick={toggleUpdateModal}
             style={{ fontSize: '12px', border: 'none' }}
-            hidden={true}
+            // hidden={true}
           >
             <IconEdit className="m-0 p-0" size={12} />
             Edit
+          </button>
+          <button
+            className="btn btn-xs btn-mini w-full flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
+            onClick={togglePurchaseModal}
+            style={{ fontSize: '12px', border: 'none' }}
+            // hidden={true}
+          >
+            <IconShoppingCartFilled className="m-0 p-0" size={12} />
+            Buy
           </button>
           {showUpdateModal && (
             <ClickCratePosUpdateModal
