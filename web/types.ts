@@ -1,108 +1,98 @@
 import { BN } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 
-export enum PlacementType {
-  DIGITALREPLICA,
-  RELATEDPURCHASE,
-  TARGETEDPLACEMENT,
-}
+// export enum PlacementType {
+//   DIGITALREPLICA,
+//   RELATEDPURCHASE,
+//   TARGETEDPLACEMENT,
+// }
 
-export enum ProductCategory {
-  CLOTHING,
-  ELECTRONICS,
-  BOOKS,
-  HOME,
-  BEAUTY,
-  TOYS,
-  SPORTS,
-  AUTOMOTIVE,
-  GROCERY,
-  HEALTH,
-}
+// export enum ProductCategory {
+//   CLOTHING,
+//   ELECTRONICS,
+//   BOOKS,
+//   HOME,
+//   BEAUTY,
+//   TOYS,
+//   SPORTS,
+//   AUTOMOTIVE,
+//   GROCERY,
+//   HEALTH,
+// }
 
-export type PlacementTypee =
-  | 'DIGITALREPLICA'
-  | 'RELATEDPURCHASE'
-  | 'TARGETEDPLACEMENT';
+export type PlacementType =
+  | 'Digitalreplica'
+  | 'Relatedpurchase'
+  | 'Targetedplacement';
 
-export const getPlacementTypeFromString = (
-  placementType: string
-): PlacementTypee => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getPlacementTypeFromString = (placementType: string): any => {
   switch (placementType) {
-    case 'DIGITALREPLICA':
-      return 'DIGITALREPLICA';
-    case 'RELATEDPURCHASE':
-      return 'RELATEDPURCHASE';
-    case 'TARGETEDPLACEMENT':
-      return 'TARGETEDPLACEMENT';
+    case 'DigitalReplica':
+      return { digitalreplica: {} };
+    case 'RelatedPurchase':
+      return { relatedpurchase: {} };
+    case 'TargetedPlacement':
+      return { targetedplacement: {} };
     default:
       throw new Error(`Invalid placement type: ${placementType}`);
   }
 };
 
-export type ProductCategoryy =
-  | 'CLOTHING'
-  | 'ELECTRONIC'
-  | 'BOOKS'
-  | 'HOME'
-  | 'BEAUTY'
-  | 'TOYS'
-  | 'SPORTS'
-  | 'AUTOMOTIVE'
-  | 'GROCERY'
-  | 'HEALTH';
+export type ProductCategory =
+  | 'Clothing'
+  | 'Electronics'
+  | 'Books'
+  | 'Home'
+  | 'Beauty'
+  | 'Toys'
+  | 'Sports'
+  | 'Automotive'
+  | 'Grocery'
+  | 'Health';
 
 export const getProductCategoryFromString = (
   productCategory: string
-):
-  | { CLOTHING: Record<string, never> }
-  | { ELECTRONICS: Record<string, never> }
-  | { BOOKS: Record<string, never> }
-  | { HOME: Record<string, never> }
-  | { BEAUTY: Record<string, never> }
-  | { TOYS: Record<string, never> }
-  | { SPORTS: Record<string, never> }
-  | { AUTOMOTIVE: Record<string, never> }
-  | { GROCERY: Record<string, never> }
-  | { HEALTH: Record<string, never> } => {
+): // eslint-disable-next-line @typescript-eslint/no-explicit-any
+any => {
   switch (productCategory) {
-    case 'CLOTHING':
-      return { CLOTHING: {} as Record<string, never> };
-    case 'ELECTRONICS':
-      return { ELECTRONICS: {} as Record<string, never> };
-    case 'BOOKS':
-      return { BOOKS: {} as Record<string, never> };
-    case 'HOME':
-      return { HOME: {} as Record<string, never> };
-    case 'BEAUTY':
-      return { BEAUTY: {} as Record<string, never> };
-    case 'TOYS':
-      return { TOYS: {} as Record<string, never> };
-    case 'SPORTS':
-      return { SPORTS: {} as Record<string, never> };
-    case 'AUTOMOTIVE':
-      return { AUTOMOTIVE: {} as Record<string, never> };
-    case 'GROCERY':
-      return { GROCERY: {} as Record<string, never> };
-    case 'HEALTH':
-      return { HEALTH: {} as Record<string, never> };
+    case 'Clothing':
+      return { clothing: {} };
+    case 'Electronics':
+      return { electronics: {} };
+    case 'Books':
+      return { boks: {} };
+    case 'Home':
+      return { home: {} };
+    case 'Beauty':
+      return { beauty: {} };
+    case 'Toys':
+      return { toys: {} };
+    case 'Sports':
+      return { sports: {} };
+    case 'Automotive':
+      return { automotive: {} };
+    case 'Grocery':
+      return { grocery: {} };
+    case 'Health':
+      return { health: {} };
     default:
       throw new Error(`Invalid product category: ${productCategory}`);
   }
 };
 
-export type Origin = 'CLICKCRATE' | 'SHOPIFY' | 'SQUARE';
+export type Origin = 'ClickCrate' | 'Shopify' | 'Square';
 export const getOriginFromString = (
   origin: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): any => {
   switch (origin) {
-    case 'CLICKCRATE':
-      return { cLICKCRATE: {} };
-    case 'SHOPIFY':
-      return { sHOPIFY: {} };
-    case 'SQUARE':
-      return { sQUARE: {} };
+    case 'Clickcrate':
+      return { clickcrate: {} };
+    case 'Shopify':
+      return { shopify: {} };
+    case 'Square':
+      return { square: {} };
     default:
       throw new Error(`Invalid origin: ${origin}`);
   }

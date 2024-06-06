@@ -74,7 +74,9 @@ export default function ClickcrateTestFeature() {
 
   const handleActivateListings = () => {
     if (selectedListings.length > 0) {
-      activateProductListings.mutateAsync(selectedListings);
+      activateProductListings.mutateAsync(selectedListings).then(() => {
+        setSelectedListings([]);
+      });
     } else {
       toast.error('No Listing(s) selected');
     }
@@ -83,7 +85,9 @@ export default function ClickcrateTestFeature() {
 
   const handleDeactivateListings = () => {
     if (selectedListings.length > 0) {
-      deactivateProductListings.mutateAsync(selectedListings);
+      deactivateProductListings.mutateAsync(selectedListings).then(() => {
+        setSelectedListings([]);
+      });
     } else {
       toast.error('No Listing(s) selected');
     }
@@ -175,7 +179,10 @@ export default function ClickcrateTestFeature() {
             </div>
           </div>
         </div>
-        <ProductListingsList onSelect={handleListingSelect} />
+        <ProductListingsList
+          onSelect={handleListingSelect}
+          selectedListings={selectedListings}
+        />{' '}
       </AppHero>
       {showRegisterListingModal && (
         <ProductListingRegister

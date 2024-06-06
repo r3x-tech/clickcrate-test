@@ -10,13 +10,7 @@ import {
   useClickcratePosProgramAccount,
 } from './clickcrate-pos-data-access';
 import { useWallet } from '@solana/wallet-adapter-react';
-import {
-  Origin,
-  PlacementType,
-  PlacementTypee,
-  ProductCategory,
-  ProductCategoryy,
-} from '@/types';
+import { Origin, PlacementType, ProductCategory } from '@/types';
 import { BN } from '@coral-xyz/anchor';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -34,9 +28,9 @@ export function ClickCratePosRegister({
 
   const [clickcrateId, setClickcrateId] = useState('');
   const [clickcratePlacementType, setClickcratePlacementType] =
-    useState<PlacementTypee>();
+    useState<PlacementType>();
   const [clickcrateProductCategory, setClickcrateProductCategory] =
-    useState<ProductCategoryy>();
+    useState<ProductCategory>();
 
   const isClickcrateFormValid =
     clickcrateId.trim() !== '' &&
@@ -48,19 +42,20 @@ export function ClickCratePosRegister({
       // const eligiblePlacementType: PlacementType = 'RelatedPurchase';
       // const eligibleProductCategory: ProductCategory = 'Clothing';
 
+      // registerClickCrate.mutate([
+      //   new PublicKey(clickcrateId),
+      //   publicKey,
+      //   'RelatedPurchase',
+      //   'Clothing',
+      //   publicKey,
+      // ]);
       registerClickCrate.mutate([
         new PublicKey(clickcrateId),
         publicKey,
-        'RelatedPurchase',
-        'Clothing',
+        clickcratePlacementType!,
+        clickcrateProductCategory!,
         publicKey,
       ]);
-      // registerClickCrate.mutateAsync([
-      //   new PublicKey(clickcrateId),
-      //   clickcratePlacementType!,
-      //   clickcrateProductCategory!,
-      //   publicKey,
-      // ]);
     }
   };
 
@@ -103,20 +98,20 @@ export function ClickCratePosRegister({
           value={clickcratePlacementType}
           placeholder="Placement Type"
           onChange={(e) =>
-            setClickcratePlacementType(e.target.value as PlacementTypee)
+            setClickcratePlacementType(e.target.value as PlacementType)
           }
           className="rounded-lg p-2 text-black"
         >
           <option value="">Select a placement type</option>
-          <option value="RELATEDPURCHASE">Related Purchase</option>
-          <option value="DIGITALREPLICA">Digital Replica</option>
-          <option value="TARGETEDPLACEMENT">Targeted Placement</option>
+          <option value="Relatedpurchase">Related Purchase</option>
+          <option value="Digitalreplica">Digital Replica</option>
+          <option value="Targetedplacement">Targeted Placement</option>
         </select>
         <select
           value={clickcrateProductCategory}
           placeholder="Eligible Product Category"
           onChange={(e) =>
-            setClickcrateProductCategory(e.target.value as ProductCategoryy)
+            setClickcrateProductCategory(e.target.value as ProductCategory)
           }
           className="rounded-lg p-2 text-black"
         >
@@ -155,9 +150,12 @@ export function ClickCratePosRegister({
 
 export function ClickCratePosList({
   onSelect,
+  selectedClickCrates,
 }: {
   onSelect: (account: PublicKey, selected: boolean) => void;
+  selectedClickCrates: PublicKey[];
 }) {
+  const { publicKey } = useWallet();
   const { accounts, getProgramAccount } = useClickcratePosProgram();
   const [isLoading, setIsLoading] = useState(false);
   const [allSelected, setAllSelected] = useState(false);
@@ -180,15 +178,21 @@ export function ClickCratePosList({
   const handleAllSelectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isSelected = e.target.checked;
     setAllSelected(isSelected);
-    accounts.data?.forEach((account: { publicKey: PublicKey }) => {
+    userAccounts?.forEach((account) => {
       onSelect(account.publicKey, isSelected);
     });
   };
 
+  const userAccounts = accounts.data?.filter((account) =>
+    account.account.owner.equals(publicKey!)
+  );
+
   if (getProgramAccount.isLoading) {
     return (
-      <div className="flex justify-centerw-[100%] p-6">
-        <span className="loading loading-spinner loading-md"></span>
+      <div className="space-y-6 mb-20 w-[100%]">
+        <div className="flex justify-centerw-[100%] p-6">
+          <span className="loading loading-spinner loading-md"></span>
+        </div>
       </div>
     );
   }
@@ -209,7 +213,7 @@ export function ClickCratePosList({
         <div className="flex justify-center w-[100%] p-6">
           <span className="loading loading-spinner loading-md"></span>
         </div>
-      ) : accounts.data?.length ? (
+      ) : userAccounts?.length !== undefined && userAccounts.length > 0 ? (
         <div className="w-[100%] bg-background border-2 border-quaternary rounded-lg">
           <button
             id="refresh-clickcrates"
@@ -250,25 +254,61 @@ export function ClickCratePosList({
             </div>
             <div className="flex flex-row w-[10%]"></div>
           </div>
-          {accounts.data?.map(
+          {userAccounts?.map(
             (account: { publicKey: PublicKey }, index: number) => (
               <ClickCratePosCard
                 key={account.publicKey.toString()}
                 account={account.publicKey}
                 onSelect={onSelect}
                 isFirst={index === 0}
-                isLast={index === accounts.data.length - 1}
+                isLast={index === userAccounts.length - 1}
                 allSelected={allSelected}
+                isSelected={selectedClickCrates.some((clickcrate) =>
+                  clickcrate.equals(account.publicKey)
+                )}
               />
             )
           )}
         </div>
       ) : (
-        <div className="text-start">
-          <h3 className="text-lg mt-8 mb-2 font-semibold">My ClickCrates</h3>
-          <div className="mb-20 w-[100%] bg-background border-2 border-white rounded-lg p-4">
-            <p className="text-sm font-normal">
-              No ClickCrates found. Create one above to get started.
+        <div>
+          <div className="mb-20 w-[100%] bg-background border-2 border-white rounded-lg">
+            <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-2 border-b-2 border-quaternary">
+              <div className="flex flex-row w-[5%]">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={handleAllSelectChange}
+                  className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
+                />
+              </div>
+              <div className="flex flex-row w-[10%]">
+                <p className="text-start font-bold text-xs">ID </p>
+              </div>
+              <div className="flex flex-row w-[15%]">
+                <p className="text-start font-bold text-xs">NAME </p>
+              </div>
+              <div className="flex flex-row w-[10%]">
+                <p className="text-start font-bold text-xs">STATUS </p>
+              </div>
+              <div className="flex flex-row items-center w-[10%]">
+                <p className="text-start font-bold text-xs">CATEGORY</p>
+              </div>
+              <div className="flex flex-row w-[15%]">
+                <p className="text-start font-bold text-xs">
+                  PLACEMENT TYPE(S){' '}
+                </p>
+              </div>
+              <div className="flex flex-row items-center w-[15%]">
+                <p className="text-start font-bold text-xs">PRODUCT</p>
+              </div>
+              <div className="flex flex-row w-[10%] justify-end">
+                <p className="text-end font-bold text-xs">INVENTORY </p>
+              </div>
+              <div className="flex flex-row w-[10%]"></div>
+            </div>
+            <p className="text-sm font-light text-center p-4">
+              No ClickCrates found. Register one above to get started!
             </p>
           </div>
         </div>
@@ -280,12 +320,6 @@ const placementTypeMapping: { [key: string]: string } = {
   relatedpurchase: 'Related Purchase',
   digitalreplica: 'Digital Replica',
   targetedplacement: 'Targeted Placement',
-};
-
-const originMapping: { [key: string]: string } = {
-  clickcrate: 'Clickcrate',
-  shopify: 'Shopify',
-  square: 'Square',
 };
 
 const productCategoryMapping: { [key: string]: string } = {
@@ -321,23 +355,25 @@ function ClickCratePosCard({
   isFirst,
   isLast,
   allSelected,
+  isSelected,
 }: {
   account: PublicKey;
   onSelect: (account: PublicKey, selected: boolean) => void;
   isFirst: boolean;
   isLast: boolean;
   allSelected: boolean;
+  isSelected: boolean;
 }) {
   const { accountQuery } = useClickcratePosProgramAccount({
     account,
   });
 
   const { publicKey } = useWallet();
-  const [placementType, setPlacementType] = useState<PlacementTypee | null>(
+  const [placementType, setPlacementType] = useState<PlacementType | null>(
     null
   );
   const [productCategory, setProductCategory] =
-    useState<ProductCategoryy | null>(null);
+    useState<ProductCategory | null>(null);
   const [manager, setManager] = useState<PublicKey | null>(null);
   const [productId, setProductId] = useState('');
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -371,7 +407,13 @@ function ClickCratePosCard({
 
   useEffect(() => {
     setSelected(allSelected);
+    accountQuery.refetch();
   }, [allSelected]);
+
+  useEffect(() => {
+    setSelected(isSelected);
+    accountQuery.refetch();
+  }, [isSelected]);
 
   if (!publicKey) {
     return <p>Connect your wallet</p>;
@@ -502,11 +544,11 @@ function ClickCratePosUpdateModal({
   const { updateClickCrate } = useClickcratePosProgramAccount({ account });
 
   const { publicKey } = useWallet();
-  const [placementType, setPlacementType] = useState<PlacementTypee | null>(
+  const [placementType, setPlacementType] = useState<PlacementType | null>(
     null
   );
   const [productCategory, setProductCategory] =
-    useState<ProductCategoryy | null>(null);
+    useState<ProductCategory | null>(null);
   const [manager, setManager] = useState<PublicKey | null>(null);
 
   const handleUpdateClickCrate = () => {
@@ -551,32 +593,32 @@ function ClickCratePosUpdateModal({
 
         <select
           value={placementType || ''}
-          onChange={(e) => setPlacementType(e.target.value as PlacementTypee)}
+          onChange={(e) => setPlacementType(e.target.value as PlacementType)}
           className="rounded-lg p-2 text-black"
         >
           <option value="">Select a placement type</option>
-          <option value="RELATEDPURCHASE">Related Purchase</option>
-          <option value="DIGITALREPLICA">Digital Replica</option>
-          <option value="TARGETEDPLACEMENT">Targeted Placement</option>
+          <option value="Relatedpurchase">Related Purchase</option>
+          <option value="Digitalreplica">Digital Replica</option>
+          <option value="Targetedplacement">Targeted Placement</option>
         </select>
         <select
           value={productCategory || ''}
           onChange={(e) =>
-            setProductCategory(e.target.value as ProductCategoryy)
+            setProductCategory(e.target.value as ProductCategory)
           }
           className="rounded-lg p-2 text-black"
         >
           <option value="">Select a product category</option>
-          <option value="CLOTHING">Clothing</option>
-          <option value="ELECTRONICS">Electronics</option>
-          <option value="BOOKS">Books</option>
-          <option value="HOME">Home</option>
-          <option value="BEAUTY">Beauty</option>
-          <option value="TOYS">Toys</option>
-          <option value="SPORTS">Sports</option>
-          <option value="AUTOMOTIVE">Automotive</option>
-          <option value="GROCERY">Grocery</option>
-          <option value="HEALTH">Health</option>
+          <option value="Clothing">Clothing</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Books">Books</option>
+          <option value="Home">Home</option>
+          <option value="Beauty">Beauty</option>
+          <option value="Toys">Toys</option>
+          <option value="Sports">Sports</option>
+          <option value="Automotive">Automotive</option>
+          <option value="Grocery">Grocery</option>
+          <option value="Health">Health</option>
         </select>
         <input
           type="text"

@@ -69,26 +69,14 @@ export function useClickcratePosProgram() {
         programId
       );
 
-      // const convertedPlacementType = getPlacementTypeFromString(
-      //   eligiblePlacementType
-      // );
-      // const convertedProductCategory = getProductCategoryFromString(
-      //   eligibleProductCategory
-      // );
-
-      console.log('registerClickCrate input:', {
-        id: id.toString(),
-        eligiblePlacementType,
-        eligibleProductCategory,
-        manager: manager.toString(),
-      });
-      // const connection = new web3.Connection(
-      //   process.env.NEXT_PUBLIC_RPC_URL!,
-      //   'confirmed'
-      // );
+      const convertedPlacementType = getPlacementTypeFromString(
+        eligiblePlacementType
+      );
+      const convertedProductCategory = getProductCategoryFromString(
+        eligibleProductCategory
+      );
 
       const payer = (program.provider as AnchorProvider).wallet;
-
       const idOne = new PublicKey(
         '9RvppNEME3e1XxA6g7cQHbvrDivjaX5xwjSnqkxb8Rb2'
       );
@@ -96,11 +84,18 @@ export function useClickcratePosProgram() {
         'Engvm8giPGZvLV115DkzhVGkWKR5j11ZTrggo5EUQBau'
       );
 
+      console.log('registerClickCrate input:', {
+        id: idOne.toString(),
+        convertedPlacementType,
+        convertedProductCategory,
+        manager: managerOne.toString(),
+      });
+
       const ix = await program.methods
         .registerClickcrate(
           idOne,
-          { relatedpurchase: {} },
-          { clothing: {} },
+          convertedPlacementType,
+          convertedProductCategory,
           managerOne
         )
         .accounts({

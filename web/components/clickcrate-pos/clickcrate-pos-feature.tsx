@@ -72,7 +72,9 @@ export default function ClickcratePosFeature() {
 
   const handleActivate = () => {
     if (selectedClickCrates.length > 0) {
-      activateClickCrates.mutateAsync(selectedClickCrates);
+      activateClickCrates.mutateAsync(selectedClickCrates).then(() => {
+        setSelectedClickCrates([]);
+      });
     } else {
       toast.error('No ClickCrate(s) selected');
     }
@@ -81,7 +83,9 @@ export default function ClickcratePosFeature() {
 
   const handleDeactivate = () => {
     if (selectedClickCrates.length > 0) {
-      deactivateClickCrates.mutateAsync(selectedClickCrates);
+      deactivateClickCrates.mutateAsync(selectedClickCrates).then(() => {
+        setSelectedClickCrates([]);
+      });
     } else {
       toast.error('No ClickCrate(s) selected');
     }
@@ -171,7 +175,10 @@ export default function ClickcratePosFeature() {
             </div>
           </div>
         </div>
-        <ClickCratePosList onSelect={handleClickCrateSelect} />
+        <ClickCratePosList
+          onSelect={handleClickCrateSelect}
+          selectedClickCrates={selectedClickCrates}
+        />
       </AppHero>
       {showModal && (
         <ClickCratePosRegister show={showModal} onClose={toggleModal} />
