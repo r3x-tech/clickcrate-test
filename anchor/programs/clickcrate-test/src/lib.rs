@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("ENmHn3TEBqzfvwi19xc9cYsTmKseBSbxhqqXETiEKgJ9");
+declare_id!("C4yby9W5umkhLyrqLsvLjFUhht92tYUALMnW47azMqKB");
 
 pub mod account;
 pub mod context;
@@ -111,9 +111,12 @@ pub mod clickcrate_test {
     pub fn place_product_listing(
         ctx: Context<PlaceProductListing>,
         product_id: Pubkey,
+        clickcrate_id: Pubkey,
     ) -> Result<()> {
         let clickcrate = &mut ctx.accounts.clickcrate;
+        let product_listing = &mut ctx.accounts.product_listing;
         clickcrate.product = Some(product_id);
+        product_listing.clickcrate_pos = Some(clickcrate_id);
         Ok(())
     }
 
@@ -123,7 +126,11 @@ pub mod clickcrate_test {
         Ok(())
     }
 
-    pub fn make_purchase(ctx: Context<MakePurchase>, product_id: Pubkey) -> Result<()> {
+    pub fn make_purchase(
+        ctx: Context<MakePurchase>,
+        product_id: Pubkey,
+        _clickcrate_id: Pubkey,
+    ) -> Result<()> {
         let clickcrate = &mut ctx.accounts.clickcrate;
         let product_listing = &mut ctx.accounts.product_listing;
 

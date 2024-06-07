@@ -17,9 +17,6 @@ import {
   getPlacementTypeFromString,
   getProductCategoryFromString,
   PlaceProductListingArgs,
-  // getPlacementTypeFromString,
-  // getProductCategoryFromString,
-  // getOriginFromString,
 } from '../../types';
 import { useMemo } from 'react';
 
@@ -121,7 +118,7 @@ export function useClickCrateListingProgramAccount({
 }) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
-  const { program, accounts } = useClickCrateListingProgram();
+  const { program, accounts, programId } = useClickCrateListingProgram();
 
   const accountQuery = useQuery({
     queryKey: ['clickcrate-test', 'fetch', { cluster, account }],
@@ -179,12 +176,18 @@ export function useClickCrateListingProgramAccount({
       { cluster, account },
     ],
     mutationFn: async (args: PlaceProductListingArgs) => {
-      const { productId } = args;
+      const { productId, clickcrateId } = args;
+
+      const [clickcrateAccount] = PublicKey.findProgramAddressSync(
+        [Buffer.from('clickcrate'), clickcrateId.toBuffer()],
+        programId
+      );
 
       return program.methods
-        .placeProductListing(productId)
+        .placeProductListing(productId, clickcrateId)
         .accounts({
-          clickcrate: account,
+          clickcrate: clickcrateAccount,
+          productListing: account,
           owner: program.provider.publicKey,
         })
         .rpc();

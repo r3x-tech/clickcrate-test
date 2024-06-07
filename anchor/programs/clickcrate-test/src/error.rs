@@ -10,6 +10,9 @@ pub enum ClickCrateErrors {
     #[msg("ClickCrate already deactived!")]
     ClickCrateDeactivated,
 
+    #[msg("ClickCrate not found")]
+    ClickCrateNotFound,
+
     #[msg("Invalid clickcrate registration")]
     InvalidClickCrateRegistration,
 

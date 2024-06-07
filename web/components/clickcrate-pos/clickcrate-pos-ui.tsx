@@ -15,6 +15,7 @@ import { BN } from '@coral-xyz/anchor';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { IconEdit, IconShoppingCartFilled } from '@tabler/icons-react';
+import { useClickCrateListingProgramAccount } from '../product-listing/product-listing-data-access';
 
 export function ClickCratePosRegister({
   show,
@@ -338,20 +339,51 @@ function ClickCratePosCard({
   const [productCategory, setProductCategory] =
     useState<ProductCategory | null>(null);
   const [manager, setManager] = useState<PublicKey | null>(null);
-  const [productId, setProductId] = useState('');
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showProductInfoModal, setShowProductInfoModal] = useState(false);
 
   const isUpdateClickCrateFormValid =
     placementType !== null && productCategory !== null && manager !== null;
 
-  const isMakePurchaseFormValid = productId.trim() !== '';
+  const isMakePurchaseFormValid =
+    accountQuery.data?.product !== null &&
+    accountQuery.data?.product !== undefined;
+
+  const isProductInfoFormValid =
+    accountQuery.data?.product !== null &&
+    accountQuery.data?.product !== undefined;
 
   const toggleUpdateModal = () => {
     setShowUpdateModal(!showUpdateModal);
   };
 
+  const toggleProductInfoModal = () => {
+    if (
+      accountQuery.data?.isActive == undefined ||
+      accountQuery.data?.isActive == false
+    ) {
+      toast.error('Clickcrate not active');
+      return;
+    }
+    if (
+      accountQuery.data?.product &&
+      accountQuery.data?.product !== undefined
+    ) {
+      setShowProductInfoModal(!showProductInfoModal);
+    } else {
+      toast.error('No product to purchase');
+    }
+  };
+
   const togglePurchaseModal = () => {
+    if (
+      accountQuery.data?.isActive == undefined ||
+      accountQuery.data?.isActive == false
+    ) {
+      toast.error('Clickcrate not active');
+      return;
+    }
     if (
       accountQuery.data?.product &&
       accountQuery.data?.product !== undefined
@@ -415,8 +447,8 @@ function ClickCratePosCard({
         <div className="flex flex-row w-[15%]">
           <p className="text-start font-extralight text-xs">
             <ExplorerLink
-              label={ellipsify(accountQuery.data?.id.toBase58())}
-              path={`mint/${accountQuery.data?.id}`}
+              label={ellipsify(accountQuery.data?.id.toString())}
+              path={`address/${accountQuery.data?.id}`}
               className="font-extralight underline cursor-pointer"
             />
           </p>
@@ -452,7 +484,7 @@ function ClickCratePosCard({
             className={`text-start font-extralight text-xs  ${
               accountQuery.data?.product !== null && 'underline'
             }  ${accountQuery.data?.product !== null && 'cursor-pointer'}`}
-            onClick={togglePurchaseModal}
+            onClick={toggleProductInfoModal}
           >
             {accountQuery.data?.product
               ? ellipsify(accountQuery.data?.product?.toString())
@@ -460,14 +492,13 @@ function ClickCratePosCard({
           </p>
         </div>
         <div className="flex flex-row w-[10%] justify-end">
-          <p className="text-end font-extralight text-xs">0</p>
+          <p className="text-end font-extralight text-xs">NA</p>
         </div>
         <div className="flex flex-row w-[5%] ml-[5%] ">
           <button
             className="btn btn-xs btn-mini w-full flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
             onClick={toggleUpdateModal}
             style={{ fontSize: '12px', border: 'none' }}
-            // hidden={true}
           >
             <IconEdit className="m-0 p-0" size={12} />
             Edit
@@ -476,7 +507,6 @@ function ClickCratePosCard({
             className="btn btn-xs btn-mini w-full flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
             onClick={togglePurchaseModal}
             style={{ fontSize: '12px', border: 'none' }}
-            // hidden={true}
           >
             <IconShoppingCartFilled className="m-0 p-0" size={12} />
             Buy
@@ -491,13 +521,23 @@ function ClickCratePosCard({
           )}
         </div>
       </div>
-      {showPurchaseModal && (
+      {showPurchaseModal && accountQuery.data?.product && (
         <ClickCratePosPurchaseModal
           show={showPurchaseModal}
           onClose={togglePurchaseModal}
           account={account}
-          currentProductId={productId}
+          currentClickcrateId={accountQuery.data?.id}
+          currentProductId={accountQuery.data?.product}
           isMakePurchaseFormValid={isMakePurchaseFormValid}
+        />
+      )}
+      {showProductInfoModal && accountQuery.data?.product && (
+        <ClickCratePosProductInfoModal
+          show={showProductInfoModal}
+          onClose={toggleProductInfoModal}
+          account={account}
+          currentProductId={accountQuery.data?.product}
+          isProductInfoFormValid={isProductInfoFormValid}
         />
       )}
     </div>
@@ -625,23 +665,30 @@ function ClickCratePosPurchaseModal({
   show,
   onClose,
   account,
+  currentClickcrateId,
   currentProductId,
   isMakePurchaseFormValid,
 }: {
   show: boolean;
   onClose: () => void;
   account: PublicKey;
-  currentProductId: string;
+  currentClickcrateId: PublicKey;
+  currentProductId: PublicKey;
   isMakePurchaseFormValid: boolean;
 }) {
   const { makePurchase } = useClickcratePosProgramAccount({ account });
+  const { accountQuery } = useClickCrateListingProgramAccount({
+    account: currentProductId,
+  });
 
   const { publicKey } = useWallet();
-  const [productId, setProductId] = useState('');
 
   const handleMakePurchase = () => {
     if (publicKey && isMakePurchaseFormValid) {
-      makePurchase.mutateAsync({ productId: new PublicKey(productId) });
+      makePurchase.mutateAsync({
+        productId: currentProductId,
+        clickcrateId: currentClickcrateId,
+      });
       onClose();
     }
   };
@@ -653,14 +700,32 @@ function ClickCratePosPurchaseModal({
       } absolute top-0 left-0 right-0 bottom-0`}
     >
       <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-6 w-[92vw]">
-        <h1 className="text-lg font-bold text-start">Make Purchase</h1>
-        <input
-          type="text"
-          placeholder="Product ID"
-          value={productId}
-          onChange={(e) => setProductId(e.target.value)}
-          className="rounded-lg p-2 text-black"
-        />
+        <div className="flex flex-row justify-between items-end">
+          <h1 className="text-lg font-bold text-start">Make Purchase</h1>
+          <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+            <p className="text-start font-semibold tracking-wide text-xs">
+              Product:{' '}
+            </p>
+            <p className="pl-2 text-start font-normal text-xs">
+              <ExplorerLink
+                path={`account/${currentProductId}`}
+                label={ellipsify(currentProductId.toString())}
+              />
+            </p>
+          </div>
+
+          <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+            <p className="text-start font-semibold tracking-wide text-xs">
+              Inventory:{' '}
+            </p>
+            <p className="pl-2 text-start font-normal text-xs">
+              {accountQuery.data?.inStock
+                ? `${accountQuery.data?.inStock}`
+                : 'NA'}
+            </p>
+          </div>
+        </div>
+
         <div className="flex flex-row gap-[4%] py-2">
           <button
             className="btn btn-xs lg:btn-sm btn-outline w-[48%] py-3"
@@ -674,7 +739,77 @@ function ClickCratePosPurchaseModal({
             onClick={handleMakePurchase}
             disabled={makePurchase.isPending || !isMakePurchaseFormValid}
           >
-            {makePurchase.isPending ? 'Purchasing...' : 'Make Purchase'}
+            {makePurchase.isPending ? 'Purchasing...' : 'Confirm Purchase'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ClickCratePosProductInfoModal({
+  show,
+  onClose,
+  account,
+  currentProductId,
+  isProductInfoFormValid,
+}: {
+  show: boolean;
+  onClose: () => void;
+  account: PublicKey;
+  currentProductId: PublicKey;
+  isProductInfoFormValid: boolean;
+}) {
+  const { accountQuery, removeProductListing } =
+    useClickCrateListingProgramAccount({
+      account,
+    });
+
+  const { publicKey } = useWallet();
+
+  const handleRemoveProduct = () => {
+    if (publicKey && isProductInfoFormValid) {
+      removeProductListing.mutateAsync();
+      onClose();
+    }
+  };
+
+  return (
+    <div
+      className={`modal ${
+        show ? 'modal-open' : ''
+      } absolute top-0 left-0 right-0 bottom-0`}
+    >
+      <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-6 w-[92vw]">
+        <div className="flex flex-row justify-between items-end">
+          <h1 className="text-lg font-bold text-start">Product Info</h1>
+          <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+            <p className="text-start font-semibold tracking-wide text-xs">
+              Product:{' '}
+            </p>
+            <p className="pl-2 text-start font-normal text-xs">
+              <ExplorerLink
+                path={`account/${currentProductId}`}
+                label={ellipsify(currentProductId.toString())}
+              />
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-row gap-[4%] py-2">
+          <button
+            className="btn btn-xs lg:btn-sm btn-outline w-[48%] py-3"
+            onClick={onClose}
+            disabled={removeProductListing.isPending}
+          >
+            Cancel
+          </button>
+          <button
+            className="btn btn-xs lg:btn-sm btn-primary w-[48%] py-3"
+            onClick={handleRemoveProduct}
+            disabled={removeProductListing.isPending || !isProductInfoFormValid}
+          >
+            {removeProductListing.isPending ? 'Removing...' : 'Remove Product'}
           </button>
         </div>
       </div>

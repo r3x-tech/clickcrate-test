@@ -1,5 +1,5 @@
 export type ClickcrateTest = {
-  "version": "0.17.0",
+  "version": "0.21.0",
   "name": "clickcrate_test",
   "instructions": [
     {
@@ -249,6 +249,11 @@ export type ClickcrateTest = {
           "isSigner": false
         },
         {
+          "name": "productListing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "owner",
           "isMut": false,
           "isSigner": true
@@ -257,6 +262,10 @@ export type ClickcrateTest = {
       "args": [
         {
           "name": "productId",
+          "type": "publicKey"
+        },
+        {
+          "name": "clickcrateId",
           "type": "publicKey"
         }
       ]
@@ -299,6 +308,10 @@ export type ClickcrateTest = {
       "args": [
         {
           "name": "productId",
+          "type": "publicKey"
+        },
+        {
+          "name": "clickcrateId",
           "type": "publicKey"
         }
       ]
@@ -389,6 +402,12 @@ export type ClickcrateTest = {
           {
             "name": "sold",
             "type": "u64"
+          },
+          {
+            "name": "clickcratePos",
+            "type": {
+              "option": "publicKey"
+            }
           },
           {
             "name": "isActive",
@@ -490,41 +509,46 @@ export type ClickcrateTest = {
     },
     {
       "code": 6003,
+      "name": "ClickCrateNotFound",
+      "msg": "ClickCrate not found"
+    },
+    {
+      "code": 6004,
       "name": "InvalidClickCrateRegistration",
       "msg": "Invalid clickcrate registration"
     },
     {
-      "code": 6004,
+      "code": 6005,
       "name": "ProductNotFound",
       "msg": "Product Listing was not found"
     },
     {
-      "code": 6005,
+      "code": 6006,
       "name": "ProductListingExists",
       "msg": "Product Listing has already been registered"
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "ProductListingActivated",
       "msg": "Product Listing already actived!"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "ProductListingDeactivated",
       "msg": "Product Listing already deactived!"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "ProductOutOfStock",
       "msg": "The product is out of stock"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "InvalidProductListingRegistration",
       "msg": "Invalid product listing registration"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "PurchaseFailed",
       "msg": "Purchase did not go through"
     }
@@ -532,7 +556,7 @@ export type ClickcrateTest = {
 };
 
 export const IDL: ClickcrateTest = {
-  "version": "0.17.0",
+  "version": "0.21.0",
   "name": "clickcrate_test",
   "instructions": [
     {
@@ -782,6 +806,11 @@ export const IDL: ClickcrateTest = {
           "isSigner": false
         },
         {
+          "name": "productListing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "owner",
           "isMut": false,
           "isSigner": true
@@ -790,6 +819,10 @@ export const IDL: ClickcrateTest = {
       "args": [
         {
           "name": "productId",
+          "type": "publicKey"
+        },
+        {
+          "name": "clickcrateId",
           "type": "publicKey"
         }
       ]
@@ -832,6 +865,10 @@ export const IDL: ClickcrateTest = {
       "args": [
         {
           "name": "productId",
+          "type": "publicKey"
+        },
+        {
+          "name": "clickcrateId",
           "type": "publicKey"
         }
       ]
@@ -922,6 +959,12 @@ export const IDL: ClickcrateTest = {
           {
             "name": "sold",
             "type": "u64"
+          },
+          {
+            "name": "clickcratePos",
+            "type": {
+              "option": "publicKey"
+            }
           },
           {
             "name": "isActive",
@@ -1023,41 +1066,46 @@ export const IDL: ClickcrateTest = {
     },
     {
       "code": 6003,
+      "name": "ClickCrateNotFound",
+      "msg": "ClickCrate not found"
+    },
+    {
+      "code": 6004,
       "name": "InvalidClickCrateRegistration",
       "msg": "Invalid clickcrate registration"
     },
     {
-      "code": 6004,
+      "code": 6005,
       "name": "ProductNotFound",
       "msg": "Product Listing was not found"
     },
     {
-      "code": 6005,
+      "code": 6006,
       "name": "ProductListingExists",
       "msg": "Product Listing has already been registered"
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "ProductListingActivated",
       "msg": "Product Listing already actived!"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "ProductListingDeactivated",
       "msg": "Product Listing already deactived!"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "ProductOutOfStock",
       "msg": "The product is out of stock"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "InvalidProductListingRegistration",
       "msg": "Invalid product listing registration"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "PurchaseFailed",
       "msg": "Purchase did not go through"
     }

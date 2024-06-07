@@ -13,7 +13,7 @@ pub struct ClickCrateState {
 
 impl MaxSize for ClickCrateState {
     fn get_max_size() -> usize {
-        return 8 + 32 + 32 + 32 + 1 + 1 + 1 + 1;
+        return 8 + 32 + 32 + 32 + 1 + 1 + (1 + 32) + 1;
     }
 }
 
@@ -27,12 +27,13 @@ pub struct ProductListingState {
     pub product_category: ProductCategory,
     pub in_stock: u64,
     pub sold: u64,
+    pub clickcrate_pos: Option<Pubkey>,
     pub is_active: bool,
 }
 
 impl MaxSize for ProductListingState {
     fn get_max_size() -> usize {
-        return 8 + 32 + 1 + 32 + 32 + 1 + 1 + 8 + 8 + 1;
+        return 8 + 32 + 1 + 32 + 32 + 1 + 1 + 8 + 8 + (1 + 32) + 1;
     }
 }
 

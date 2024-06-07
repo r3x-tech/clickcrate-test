@@ -298,7 +298,7 @@ export function ProductListingsList({
         </div>
       ) : (
         <div>
-          <div className="mb-20 w-[100%] bg-background border-2 border-white rounded-lg p-4">
+          <div className="mb-20 w-[100%] bg-background border-2 border-white rounded-lg">
             <p className="text-sm font-light text-center p-4">
               No Product Listings found. Register one to get started.
             </p>
@@ -373,12 +373,21 @@ function ProductListingCard({
     useState<ProductCategory | null>(null);
   const [manager, setManager] = useState<PublicKey | null>(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showPlaceModal, setShowPlaceModal] = useState(false);
 
   const isUpdateProductListingFormValid =
     placementType !== null && productCategory !== null && manager !== null;
 
   const toggleUpdateModal = () => {
     setShowUpdateModal(!showUpdateModal);
+  };
+
+  const togglePlaceModal = () => {
+    if (accountQuery.data?.isActive && accountQuery.data?.id) {
+      setShowPlaceModal(!showPlaceModal);
+    } else {
+      toast.error('Product not active');
+    }
   };
 
   const [selected, setListingSelected] = useState(false);
@@ -435,7 +444,7 @@ function ProductListingCard({
           <p className="text-start font-extralight text-xs">
             <ExplorerLink
               label={ellipsify(accountQuery.data?.id.toBase58())}
-              path={`mint/${accountQuery.data?.id}`}
+              path={`address/${accountQuery.data?.id}`}
               className="font-extralight underline cursor-pointer"
             />
           </p>
@@ -495,13 +504,23 @@ function ProductListingCard({
 
           <button
             className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
-            onClick={toggleUpdateModal}
+            onClick={togglePlaceModal}
             style={{ fontSize: '12px', border: 'none' }}
             // hidden={true}
           >
             <IconBuildingStore className="m-0 p-0" size={12} />
             Place
           </button>
+
+          {showPlaceModal && accountQuery.data?.id !== undefined && (
+            <ProductListingPlaceModal
+              show={showPlaceModal}
+              onClose={togglePlaceModal}
+              account={account}
+              currentProductId={accountQuery.data?.id}
+              isPlaceFormValid={accountQuery.data?.isActive}
+            />
+          )}
           {showUpdateModal && (
             <ProductListingUpdateModal
               show={showUpdateModal}
@@ -626,6 +645,89 @@ function ProductListingUpdateModal({
             disabled={updateProductListing.isPending}
           >
             {updateProductListing.isPending ? 'Updating...' : 'Update Listing'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProductListingPlaceModal({
+  show,
+  onClose,
+  account,
+  currentProductId,
+  isPlaceFormValid,
+}: {
+  show: boolean;
+  onClose: () => void;
+  account: PublicKey;
+  currentProductId: PublicKey;
+  isPlaceFormValid: boolean;
+}) {
+  const { placeProductListing } = useClickCrateListingProgramAccount({
+    account,
+  });
+
+  const { publicKey } = useWallet();
+  const [productId, setProductId] = useState('');
+  const [clickcrateId, setClickCrateId] = useState('');
+
+  const handlePlaceProduct = () => {
+    if (publicKey && isPlaceFormValid) {
+      placeProductListing.mutateAsync({
+        productId: currentProductId,
+        clickcrateId: new PublicKey(clickcrateId),
+      });
+      onClose();
+    }
+  };
+
+  return (
+    <div
+      className={`modal ${
+        show ? 'modal-open' : ''
+      } absolute top-0 left-0 right-0 bottom-0`}
+    >
+      <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-6 w-[92vw]">
+        <div className="flex flex-row justify-between items-end">
+          <h1 className="text-lg font-bold text-start">
+            Place Listing in Clickcrate
+          </h1>
+          <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+            <p className="text-start font-semibold tracking-wide text-xs">
+              Product:{' '}
+            </p>
+            <p className="pl-2 text-start font-normal text-xs">
+              <ExplorerLink
+                path={`account/${currentProductId}`}
+                label={ellipsify(currentProductId.toString())}
+              />
+            </p>
+          </div>
+        </div>
+
+        <input
+          type="text"
+          placeholder="ClickCrate Name"
+          value={clickcrateId}
+          onChange={(e) => setClickCrateId(e.target.value)}
+          className="rounded-lg p-2 text-black"
+        />
+        <div className="flex flex-row gap-[4%] py-2">
+          <button
+            className="btn btn-xs lg:btn-sm btn-outline w-[48%] py-3"
+            onClick={onClose}
+            disabled={placeProductListing.isPending}
+          >
+            Cancel
+          </button>
+          <button
+            className="btn btn-xs lg:btn-sm btn-primary w-[48%] py-3"
+            onClick={handlePlaceProduct}
+            disabled={placeProductListing.isPending || !isPlaceFormValid}
+          >
+            {placeProductListing.isPending ? 'Placing...' : 'Place'}
           </button>
         </div>
       </div>

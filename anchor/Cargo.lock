@@ -687,7 +687,7 @@ dependencies = [
 
 [[package]]
 name = "clickcrate-test"
-version = "0.17.0"
+version = "0.21.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -1446,9 +1446,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.84"
+version = "1.0.85"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec96c6a92621310b51366f1e28d05ef11489516e93be030060e5fc12024a49d6"
+checksum = "22244ce15aa966053a896d1accb3a6e68469b97c7f33f284b99f0d576879fc23"
 dependencies = [
  "unicode-ident",
 ]

@@ -14,16 +14,10 @@ import { useAnchorProvider } from '../solana/solana-provider';
 import { useTransactionToast } from '../ui/ui-layout';
 import {
   MakePurchaseArgs,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getPlacementTypeFromString,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getProductCategoryFromString,
 } from '../../types';
 import { useMemo } from 'react';
-// import * as web3 from '@solana/web3.js';
-import { TransactionMessage, VersionedTransaction } from '@solana/web3.js';
-import { publicKey } from '@coral-xyz/anchor/dist/cjs/utils';
-import { encode } from 'bs58';
 
 export function useClickcratePosProgram() {
   const { connection } = useConnection();
@@ -217,17 +211,17 @@ export function useClickcratePosProgramAccount({
   const makePurchase = useMutation({
     mutationKey: ['clickcrate-test', 'makePurchase', { cluster, account }],
     mutationFn: async (args: MakePurchaseArgs) => {
-      const { productId } = args;
-      const productListingAddress = await PublicKey.findProgramAddressSync(
+      const { productId, clickcrateId } = args;
+      const [productListingAccount] = PublicKey.findProgramAddressSync(
         [Buffer.from('listing'), productId.toBuffer()],
         program.programId
       );
 
       return program.methods
-        .makePurchase(productId)
+        .makePurchase(productId, clickcrateId)
         .accounts({
           clickcrate: account,
-          productListing: productListingAddress[0],
+          productListing: productListingAccount,
           owner: program.provider.publicKey,
         })
         .rpc();

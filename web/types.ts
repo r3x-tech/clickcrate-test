@@ -129,10 +129,12 @@ export type RegisterClickCrateArgs = {
 
 export type PlaceProductListingArgs = {
   productId: PublicKey;
+  clickcrateId: PublicKey;
 };
 
 export type MakePurchaseArgs = {
   productId: PublicKey;
+  clickcrateId: PublicKey;
 };
 
 export interface NFT {
