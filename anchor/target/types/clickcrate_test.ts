@@ -1,5 +1,5 @@
 export type ClickcrateTest = {
-  "version": "0.21.0",
+  "version": "0.23.0",
   "name": "clickcrate_test",
   "instructions": [
     {
@@ -279,12 +279,26 @@ export type ClickcrateTest = {
           "isSigner": false
         },
         {
+          "name": "productListing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "owner",
           "isMut": false,
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "productId",
+          "type": "publicKey"
+        },
+        {
+          "name": "clickcrateId",
+          "type": "publicKey"
+        }
+      ]
     },
     {
       "name": "makePurchase",
@@ -556,7 +570,7 @@ export type ClickcrateTest = {
 };
 
 export const IDL: ClickcrateTest = {
-  "version": "0.21.0",
+  "version": "0.23.0",
   "name": "clickcrate_test",
   "instructions": [
     {
@@ -836,12 +850,26 @@ export const IDL: ClickcrateTest = {
           "isSigner": false
         },
         {
+          "name": "productListing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "owner",
           "isMut": false,
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "productId",
+          "type": "publicKey"
+        },
+        {
+          "name": "clickcrateId",
+          "type": "publicKey"
+        }
+      ]
     },
     {
       "name": "makePurchase",

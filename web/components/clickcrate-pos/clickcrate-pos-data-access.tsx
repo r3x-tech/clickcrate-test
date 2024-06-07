@@ -242,26 +242,29 @@ export function useClickcratePosProgramAccount({
         id,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         owner,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        eligiblePlacementType,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        eligibleProductCategory,
-        manager,
+        newEligiblePlacementType,
+        newEligibleProductCategory,
+        newManager,
       ] = args;
 
-      // const convertedPlacementType = getPlacementTypeFromString(
-      //   eligiblePlacementType
-      // );
-      // const convertedProductCategory = getProductCategoryFromString(
-      //   eligibleProductCategory
-      // );
+      const convertedPlacementType = getPlacementTypeFromString(
+        newEligiblePlacementType
+      );
+      const convertedProductCategory = getProductCategoryFromString(
+        newEligibleProductCategory
+      );
 
       return program.methods
-        .updateClickcrate(id, { digitalreplica: {} }, { clothing: {} }, manager)
+        .updateClickcrate(
+          id,
+          convertedPlacementType,
+          convertedProductCategory,
+          newManager
+        )
         .accounts({
           clickcrate: account,
           owner: program.provider.publicKey,
-          systemProgram: program.programId,
+          systemProgram: SystemProgram.programId,
         })
         .rpc();
     },

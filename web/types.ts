@@ -127,6 +127,11 @@ export type RegisterClickCrateArgs = {
   manager: PublicKey;
 };
 
+export type RemoveProductListingArgs = {
+  productId: PublicKey;
+  clickcrateId: PublicKey;
+};
+
 export type PlaceProductListingArgs = {
   productId: PublicKey;
   clickcrateId: PublicKey;

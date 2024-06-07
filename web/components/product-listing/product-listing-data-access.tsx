@@ -17,6 +17,7 @@ import {
   getPlacementTypeFromString,
   getProductCategoryFromString,
   PlaceProductListingArgs,
+  RemoveProductListingArgs,
 } from '../../types';
 import { useMemo } from 'react';
 
@@ -205,11 +206,19 @@ export function useClickCrateListingProgramAccount({
       'removeProductListing',
       { cluster, account },
     ],
-    mutationFn: async () => {
+    mutationFn: async (args: RemoveProductListingArgs) => {
+      const { productId, clickcrateId } = args;
+
+      const [productListingAccount] = PublicKey.findProgramAddressSync(
+        [Buffer.from('listing'), productId.toBuffer()],
+        programId
+      );
+
       return program.methods
-        .removeProductListing()
+        .removeProductListing(productId, clickcrateId)
         .accounts({
           clickcrate: account,
+          productListing: productListingAccount,
           owner: program.provider.publicKey,
         })
         .rpc();
@@ -236,21 +245,21 @@ export function useClickCrateListingProgramAccount({
       const nPc = newProductCategory;
       console.log(nPc);
 
-      // const convertedPlacementType =
-      //   getPlacementTypeFromString(newPlacementType);
-      // const convertedProductCategory =
-      //   getProductCategoryFromString(newProductCategory);
+      const convertedPlacementType =
+        getPlacementTypeFromString(newPlacementType);
+      const convertedProductCategory =
+        getProductCategoryFromString(newProductCategory);
 
       return program.methods
         .updateProductListing(
-          { digitalreplica: {} },
-          { clothing: {} },
+          convertedPlacementType,
+          convertedProductCategory,
           newManager
         )
         .accounts({
           productListing: account,
           owner: program.provider.publicKey,
-          systemProgram: program.programId,
+          systemProgram: SystemProgram.programId,
         })
         .rpc();
     },

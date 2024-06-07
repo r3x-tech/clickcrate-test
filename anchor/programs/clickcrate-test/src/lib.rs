@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("C4yby9W5umkhLyrqLsvLjFUhht92tYUALMnW47azMqKB");
+declare_id!("9A14uKSX7DgPPH6Z8GumDewQ97Jn6riBxSKvnrJsM9vA");
 
 pub mod account;
 pub mod context;
@@ -120,9 +120,15 @@ pub mod clickcrate_test {
         Ok(())
     }
 
-    pub fn remove_product_listing(ctx: Context<RemoveProductListing>) -> Result<()> {
+    pub fn remove_product_listing(
+        ctx: Context<RemoveProductListing>,
+        _product_id: Pubkey,
+        _clickcrate_id: Pubkey,
+    ) -> Result<()> {
         let clickcrate = &mut ctx.accounts.clickcrate;
+        let product_listing = &mut ctx.accounts.product_listing;
         clickcrate.product = None;
+        product_listing.clickcrate_pos = None;
         Ok(())
     }
 

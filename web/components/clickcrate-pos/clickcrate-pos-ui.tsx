@@ -242,7 +242,7 @@ export function ClickCratePosList({
               <p className="text-start font-bold text-xs">CATEGORY</p>
             </div>
             <div className="flex flex-row w-[15%]">
-              <p className="text-start font-bold text-xs">PLACEMENT TYPE(S) </p>
+              <p className="text-start font-bold text-xs">PLACEMENT TYPE</p>
             </div>
             <div className="flex flex-row items-center w-[10%]">
               <p className="text-start font-bold text-xs">PRODUCT</p>
@@ -333,18 +333,14 @@ function ClickCratePosCard({
   });
 
   const { publicKey } = useWallet();
-  const [placementType, setPlacementType] = useState<PlacementType | null>(
-    null
-  );
-  const [productCategory, setProductCategory] =
-    useState<ProductCategory | null>(null);
-  const [manager, setManager] = useState<PublicKey | null>(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [showProductInfoModal, setShowProductInfoModal] = useState(false);
 
   const isUpdateClickCrateFormValid =
-    placementType !== null && productCategory !== null && manager !== null;
+    accountQuery.data?.eligiblePlacementType !== null &&
+    accountQuery.data?.eligibleProductCategory !== null &&
+    accountQuery.data?.manager !== null;
 
   const isMakePurchaseFormValid =
     accountQuery.data?.product !== null &&
@@ -352,7 +348,9 @@ function ClickCratePosCard({
 
   const isProductInfoFormValid =
     accountQuery.data?.product !== null &&
-    accountQuery.data?.product !== undefined;
+    accountQuery.data?.product !== undefined &&
+    accountQuery.data?.id &&
+    accountQuery.data?.id !== undefined;
 
   const toggleUpdateModal = () => {
     setShowUpdateModal(!showUpdateModal);
@@ -368,11 +366,13 @@ function ClickCratePosCard({
     }
     if (
       accountQuery.data?.product &&
-      accountQuery.data?.product !== undefined
+      accountQuery.data?.product !== undefined &&
+      accountQuery.data?.id &&
+      accountQuery.data?.id !== undefined
     ) {
       setShowProductInfoModal(!showProductInfoModal);
     } else {
-      toast.error('No product to purchase');
+      toast.error('Product info not found');
     }
   };
 
@@ -536,6 +536,7 @@ function ClickCratePosCard({
           show={showProductInfoModal}
           onClose={toggleProductInfoModal}
           account={account}
+          currentClickcrateId={accountQuery.data?.id}
           currentProductId={accountQuery.data?.product}
           isProductInfoFormValid={isProductInfoFormValid}
         />
@@ -566,18 +567,23 @@ function ClickCratePosUpdateModal({
   const [manager, setManager] = useState<PublicKey | null>(null);
 
   const handleUpdateClickCrate = () => {
-    if (!manager || !placementType || !productCategory) {
+    if (
+      manager === null ||
+      placementType === null ||
+      productCategory === null
+    ) {
       toast.error('All fields required');
-    }
-    if (publicKey && isUpdateClickCrateFormValid) {
+    } else if (publicKey && isUpdateClickCrateFormValid) {
       updateClickCrate.mutateAsync([
         account,
-        manager!,
-        placementType!,
-        productCategory!,
-        manager!,
+        manager,
+        placementType,
+        productCategory,
+        manager,
       ]);
       onClose();
+    } else {
+      toast.error('Update unavailable');
     }
   };
 
@@ -751,26 +757,37 @@ function ClickCratePosProductInfoModal({
   show,
   onClose,
   account,
+  currentClickcrateId,
   currentProductId,
   isProductInfoFormValid,
 }: {
   show: boolean;
   onClose: () => void;
   account: PublicKey;
+  currentClickcrateId: PublicKey;
   currentProductId: PublicKey;
   isProductInfoFormValid: boolean;
 }) {
-  const { accountQuery, removeProductListing } =
-    useClickCrateListingProgramAccount({
-      account,
-    });
+  const { removeProductListing } = useClickCrateListingProgramAccount({
+    account,
+  });
 
   const { publicKey } = useWallet();
 
   const handleRemoveProduct = () => {
-    if (publicKey && isProductInfoFormValid) {
-      removeProductListing.mutateAsync();
+    if (
+      publicKey &&
+      isProductInfoFormValid &&
+      currentClickcrateId &&
+      currentProductId
+    ) {
+      removeProductListing.mutateAsync({
+        productId: currentProductId,
+        clickcrateId: currentClickcrateId,
+      });
       onClose();
+    } else {
+      toast.error('Failed to remove product');
     }
   };
 

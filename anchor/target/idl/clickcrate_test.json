@@ -1,5 +1,5 @@
 {
-  "version": "0.21.0",
+  "version": "0.23.0",
   "name": "clickcrate_test",
   "instructions": [
     {
@@ -279,12 +279,26 @@
           "isSigner": false
         },
         {
+          "name": "productListing",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "owner",
           "isMut": false,
           "isSigner": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "productId",
+          "type": "publicKey"
+        },
+        {
+          "name": "clickcrateId",
+          "type": "publicKey"
+        }
+      ]
     },
     {
       "name": "makePurchase",
@@ -554,6 +568,6 @@
     }
   ],
   "metadata": {
-    "address": "C4yby9W5umkhLyrqLsvLjFUhht92tYUALMnW47azMqKB"
+    "address": "9A14uKSX7DgPPH6Z8GumDewQ97Jn6riBxSKvnrJsM9vA"
   }
 }

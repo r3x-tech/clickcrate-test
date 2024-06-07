@@ -5,7 +5,7 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-clickcrate_test = "C4yby9W5umkhLyrqLsvLjFUhht92tYUALMnW47azMqKB"
+clickcrate_test = "9A14uKSX7DgPPH6Z8GumDewQ97Jn6riBxSKvnrJsM9vA"
 
 [registry]
 url = "https://api.apr.dev"

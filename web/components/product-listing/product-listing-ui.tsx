@@ -269,7 +269,7 @@ export function ProductListingsList({
               <p className="text-start font-bold text-xs">ORIGIN</p>
             </div>
             <div className="flex flex-row w-[13%]">
-              <p className="text-start font-bold text-xs">PLACEMENT TYPE(S) </p>
+              <p className="text-start font-bold text-xs">CURRENT PLACEMENT</p>
             </div>
             <div className="flex flex-row w-[10%] justify-end">
               <p className="text-end font-bold text-xs">UNIT PRICE </p>
@@ -366,17 +366,13 @@ function ProductListingCard({
   const { accountQuery } = useClickCrateListingProgramAccount({ account });
 
   const { publicKey } = useWallet();
-  const [placementType, setPlacementType] = useState<PlacementType | null>(
-    null
-  );
-  const [productCategory, setProductCategory] =
-    useState<ProductCategory | null>(null);
-  const [manager, setManager] = useState<PublicKey | null>(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showPlaceModal, setShowPlaceModal] = useState(false);
 
   const isUpdateProductListingFormValid =
-    placementType !== null && productCategory !== null && manager !== null;
+    accountQuery.data?.placementType !== null &&
+    accountQuery.data?.productCategory !== null &&
+    accountQuery.data?.manager !== null;
 
   const toggleUpdateModal = () => {
     setShowUpdateModal(!showUpdateModal);
@@ -473,12 +469,15 @@ function ProductListingCard({
         </div>
         <div className="flex flex-row w-[13%]">
           <p className="text-start font-extralight text-xs">
-            {accountQuery.data?.placementType
-              ? getDisplayText(
-                  placementTypeMapping,
-                  accountQuery.data?.placementType
-                )
-              : 'NA'}
+            {accountQuery.data?.clickcratePos ? (
+              <ExplorerLink
+                label={ellipsify(accountQuery.data?.clickcratePos.toBase58())}
+                path={`address/${accountQuery.data?.clickcratePos}`}
+                className="font-extralight underline cursor-pointer"
+              />
+            ) : (
+              'Not placed'
+            )}
           </p>
         </div>
         <div className="flex flex-row w-[10%] justify-end">
@@ -559,16 +558,21 @@ function ProductListingUpdateModal({
   const [manager, setManager] = useState<PublicKey | null>(null);
 
   const handleUpdateProductListing = () => {
-    if (!manager || !placementType || !productCategory) {
+    if (
+      manager === null ||
+      placementType === null ||
+      productCategory === null
+    ) {
       toast.error('All fields required');
-    }
-    if (publicKey && isUpdateProductListingFormValid) {
+    } else if (publicKey && isUpdateProductListingFormValid) {
       updateProductListing.mutateAsync([
-        placementType!,
-        productCategory!,
-        manager!,
+        placementType,
+        productCategory,
+        manager,
       ]);
       onClose();
+    } else {
+      toast.error('Update unavailable');
     }
   };
 

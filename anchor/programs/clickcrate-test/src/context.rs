@@ -118,9 +118,21 @@ pub struct PlaceProductListing<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(product_id: Pubkey, clickcrate_id: Pubkey)]
 pub struct RemoveProductListing<'info> {
-    #[account(mut, has_one = owner)]
+    #[account(
+        mut,
+        has_one = owner,
+        seeds = [b"clickcrate".as_ref(), clickcrate_id.key().as_ref()],
+        bump,
+    )]
     pub clickcrate: Account<'info, ClickCrateState>,
+    #[account(
+        mut,
+        seeds = [b"listing".as_ref(), product_id.key().as_ref()],
+        bump,
+    )]
+    pub product_listing: Account<'info, ProductListingState>,
     pub owner: Signer<'info>,
 }
 
