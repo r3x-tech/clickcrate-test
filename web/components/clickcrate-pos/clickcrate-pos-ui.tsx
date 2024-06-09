@@ -187,7 +187,7 @@ export function ClickCratePosList({
 
   if (getProgramAccount.isLoading) {
     return (
-      <div className="flex justify-centerw-[100%] p-6">
+      <div className="flex justify-center w-[100%] p-6">
         <span className="loading loading-spinner loading-md"></span>
       </div>
     );

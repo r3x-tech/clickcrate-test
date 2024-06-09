@@ -201,7 +201,7 @@ export function ProductListingsList({
 
   if (getProgramAccount.isLoading) {
     return (
-      <div className="flex justify-centerw-[100%] p-6">
+      <div className="flex justify-center w-[100%] p-6">
         <span className="loading loading-spinner loading-md"></span>
       </div>
     );
@@ -218,81 +218,87 @@ export function ProductListingsList({
   }
 
   return (
-    <div className="space-y-6 mb-20 w-[100%]">
+    <>
       {isLoading ? (
         <div className="flex justify-center w-[100%] p-6">
           <span className="loading loading-spinner loading-md"></span>
         </div>
       ) : accounts.data?.length ? (
-        <div className="w-[100%] bg-background border-2 border-quaternary rounded-lg">
-          <button
-            id="refresh-listings"
-            className="hidden"
-            onClick={handleRefetch}
-          >
-            Refresh
-          </button>
-          <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-2 border-b-2 border-quaternary">
-            <div className="flex flex-row w-[5%]">
-              <input
-                type="checkbox"
-                checked={allListingsSelected}
-                onChange={handleAllListingsSelectChange}
-                className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
-              />
+        <div className="space-y-6 mb-20 w-[100%]">
+          <div className="w-[100%] bg-background border-2 border-quaternary rounded-lg">
+            <button
+              id="refresh-listings"
+              className="hidden"
+              onClick={handleRefetch}
+            >
+              Refresh
+            </button>
+            <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-2 border-b-2 border-quaternary">
+              <div className="flex flex-row w-[5%]">
+                <input
+                  type="checkbox"
+                  checked={allListingsSelected}
+                  onChange={handleAllListingsSelectChange}
+                  className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
+                />
+              </div>
+              <div className="flex flex-row w-[10%]">
+                <p className="text-start font-bold text-xs">ID </p>
+              </div>
+              <div className="flex flex-row w-[15%]">
+                <p className="text-start font-bold text-xs">NAME </p>
+              </div>
+              <div className="flex flex-row w-[10%]">
+                <p className="text-start font-bold text-xs">STATUS </p>
+              </div>
+              <div className="flex flex-row items-center w-[10%]">
+                <p className="text-start font-bold text-xs">CATEGORY</p>
+              </div>
+              <div className="flex flex-row w-[10%]">
+                <p className="text-start font-bold text-xs">ORIGIN</p>
+              </div>
+              <div className="flex flex-row w-[13%]">
+                <p className="text-start font-bold text-xs">
+                  PLACEMENT TYPE(S){' '}
+                </p>
+              </div>
+              <div className="flex flex-row w-[10%] justify-end">
+                <p className="text-end font-bold text-xs">UNIT PRICE </p>
+              </div>
+              <div className="flex flex-row w-[10%] justify-end">
+                <p className="text-end font-bold text-xs">STOCK </p>
+              </div>
+              <div className="flex flex-row w-[7%]"></div>
             </div>
-            <div className="flex flex-row w-[10%]">
-              <p className="text-start font-bold text-xs">ID </p>
-            </div>
-            <div className="flex flex-row w-[15%]">
-              <p className="text-start font-bold text-xs">NAME </p>
-            </div>
-            <div className="flex flex-row w-[10%]">
-              <p className="text-start font-bold text-xs">STATUS </p>
-            </div>
-            <div className="flex flex-row items-center w-[10%]">
-              <p className="text-start font-bold text-xs">CATEGORY</p>
-            </div>
-            <div className="flex flex-row w-[10%]">
-              <p className="text-start font-bold text-xs">ORIGIN</p>
-            </div>
-            <div className="flex flex-row w-[13%]">
-              <p className="text-start font-bold text-xs">PLACEMENT TYPE(S) </p>
-            </div>
-            <div className="flex flex-row w-[10%] justify-end">
-              <p className="text-end font-bold text-xs">UNIT PRICE </p>
-            </div>
-            <div className="flex flex-row w-[10%] justify-end">
-              <p className="text-end font-bold text-xs">STOCK </p>
-            </div>
-            <div className="flex flex-row w-[7%]"></div>
+            {accounts.data?.map(
+              (account: { publicKey: PublicKey }, index: number) => (
+                <ProductListingCard
+                  key={account.publicKey.toString()}
+                  account={account.publicKey}
+                  onSelect={onSelect}
+                  isFirst={index === 0}
+                  isLast={index === accounts.data.length - 1}
+                  allListingsSelected={allListingsSelected}
+                />
+              )
+            )}
           </div>
-          {accounts.data?.map(
-            (account: { publicKey: PublicKey }, index: number) => (
-              <ProductListingCard
-                key={account.publicKey.toString()}
-                account={account.publicKey}
-                onSelect={onSelect}
-                isFirst={index === 0}
-                isLast={index === accounts.data.length - 1}
-                allListingsSelected={allListingsSelected}
-              />
-            )
-          )}
         </div>
       ) : (
-        <div className="text-start">
-          <h3 className="text-lg mt-8 mb-2 font-semibold">
-            My Product Listings
-          </h3>
-          <div className="mb-20 w-[100%] bg-background border-2 border-white rounded-lg p-4">
-            <p className="text-sm font-normal">
-              No Product Listings found. Create one above to get started.
-            </p>
+        <div className="space-y-6 mb-20 w-[100%]">
+          <div className="text-start">
+            <h3 className="text-lg mt-8 mb-2 font-semibold">
+              My Product Listings
+            </h3>
+            <div className="mb-20 w-[100%] bg-background border-2 border-white rounded-lg p-4">
+              <p className="text-sm font-normal">
+                No Product Listings found. Create one above to get started.
+              </p>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

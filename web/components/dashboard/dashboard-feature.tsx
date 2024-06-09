@@ -14,7 +14,7 @@ const links: { label: string; href: string }[] = [
 export default function DashboardFeature() {
   return (
     <div>
-      <AppHero title="gm" subtitle="Connect your wallet to start selling" />
+      <AppHero title="gm" subtitle="Welcome to ClickCrate Dashboard!" />
       <div
         className="max-w-xl mx-auto py-6 sm:px-6 lg:px-8 text-center"
         style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: '600' }}

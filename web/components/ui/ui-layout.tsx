@@ -206,17 +206,17 @@ export function ellipsify(str = '', len = 4) {
 export function useTransactionToast() {
   return (signature: string) => {
     const toastId = toast.success(
-      <div className=" flex flex-row">
-        <div className="flex flex-row justify-end">
+      <div className="flex flex-col">
+        <div className="flex flex-row justify-center">
           <button
-            className="btn btn-xs btn-ghost p-0 mb-2"
+            className="btn btn-xs btn-ghost p-0 m-0"
             onClick={() => toast.dismiss(toastId)}
           >
             DISMISS
           </button>
         </div>
-        <div>
-          <div className="text-sm">Transaction sent!</div>
+        <div className="flex flex-col justify-center items-center">
+          <div className="text-md mb-[1px]">Transaction sent!</div>
           <ExplorerLink
             path={`tx/${signature}`}
             label={'View Transaction'}
