@@ -53,7 +53,7 @@ export function AccountBalanceCheck({ address }: { address: PublicKey }) {
           is not found on this cluster.
         </span>
         <button
-          className="btn btn-xs btn-neutral"
+          className="btn btn-xs btn-neutral text-white bg-primary border-primary hover:bg-secondary hover:border-secondary"
           onClick={() =>
             mutation.mutateAsync(1).catch((err) => console.log(err))
           }
