@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-
+use std::collections::BTreeMap;
 #[account]
 pub struct ClickCrateState {
     pub id: Pubkey,
@@ -29,12 +29,44 @@ pub struct ProductListingState {
     pub sold: u64,
     pub clickcrate_pos: Option<Pubkey>,
     pub is_active: bool,
+    pub price: u64,
 }
 
 impl MaxSize for ProductListingState {
     fn get_max_size() -> usize {
-        return 8 + 32 + 1 + 32 + 32 + 1 + 1 + 8 + 8 + (1 + 32) + 1;
+        return 8 + 32 + 1 + 32 + 32 + 1 + 1 + 8 + 8 + (1 + 32) + 1 + 8;
     }
+}
+
+#[account]
+pub struct OrderOracle {
+    pub validation: OracleValidation,
+    pub order_statuses: BTreeMap<Pubkey, OrderStatus>,
+    pub bump: u8,
+}
+
+impl MaxSize for OrderOracle {
+    fn get_max_size() -> usize {
+        return 8 + 5 + 4 + (32 + 1) * 100; // Discriminator (8) + Validation (5) + Map (4 + (32 + 1) * 100)
+    }
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
+pub enum OracleValidation {
+    Uninitialized,
+    V1 {
+        create: ExternalValidationResult,
+        transfer: ExternalValidationResult,
+        burn: ExternalValidationResult,
+        update: ExternalValidationResult,
+    },
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
+pub enum ExternalValidationResult {
+    Approved,
+    Rejected,
+    Pass,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
@@ -63,6 +95,17 @@ pub enum Origin {
     Clickcrate,
     Shopify,
     Square,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
+pub enum OrderStatus {
+    Pending,
+    Placed,
+    Confirmed,
+    Fulfilled,
+    Delivered,
+    Completed,
+    Cancelled,
 }
 
 pub trait MaxSize {

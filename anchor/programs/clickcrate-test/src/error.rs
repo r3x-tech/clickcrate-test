@@ -28,12 +28,18 @@ pub enum ClickCrateErrors {
     #[msg("Product Listing already deactived!")]
     ProductListingDeactivated,
 
-    #[msg("The product is out of stock")]
+    #[msg("Product is out of stock")]
     ProductOutOfStock,
 
     #[msg("Invalid product listing registration")]
     InvalidProductListingRegistration,
 
-    #[msg("Purchase did not go through")]
-    PurchaseFailed,
+    #[msg("Order not found")]
+    OrderNotFound,
+
+    #[msg("Order not confirmed")]
+    OrderNotConfirmed,
+
+    #[msg("Order not completed")]
+    OrderNotCompleted,
 }

@@ -152,5 +152,74 @@ pub struct MakePurchase<'info> {
         bump,
     )]
     pub product_listing: Account<'info, ProductListingState>,
+    #[account(
+        seeds = [b"order_oracle".as_ref()],
+        bump,
+    )]
+    pub order_oracle: Account<'info, OrderOracle>,
+    #[account(
+      mut,
+      seeds = [b"vault", product_listing.owner.as_ref()],
+      bump,
+    )]
+    pub vault: AccountInfo<'info>,
+    #[account(
+      seeds = [b"authority"],
+      bump,
+    )]
+    pub authority: AccountInfo<'info>,
     pub owner: Signer<'info>,
 }
+
+#[derive(Accounts)]
+pub struct CreateOracleAccount<'info> {
+    #[account(
+        init,
+        seeds = [b"oracle", seller.key().as_ref()],
+        bump,
+        payer = payer,
+        space = 8 + OrderOracle::get_max_size(),
+    )]
+    pub oracle: Account<'info, OrderOracle>,
+    pub seller: Signer<'info>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(product_id: Pubkey, new_order_status: OrderStatus)]
+pub struct UpdateOrderStatus<'info> {
+    #[account(
+        mut,
+        seeds = [b"oracle", seller.key().as_ref()],
+        bump = oracle.bump,
+    )]
+    pub oracle: Account<'info, OrderOracle>,
+    pub seller: Signer<'info>,
+    #[account(mut)]
+    pub product_nft: Account<'info, ProductListingState>,
+}
+
+#[derive(Accounts)]
+pub struct CompleteOrder<'info> {
+    #[account(
+        mut,
+        seeds = [b"oracle", seller.key().as_ref()],
+        bump = oracle.bump,
+    )]
+    pub oracle: Account<'info, OrderOracle>,
+    #[account(mut)]
+    pub seller: Signer<'info>,
+    #[account(mut)]
+    pub product_nft: Account<'info, ProductListingState>,
+    #[account(
+        mut,
+        seeds = [b"vault", seller.key().as_ref()],
+        bump,
+    )]
+    pub vault: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+pub const AUTHORITY_SEED: &[u8] = b"authority";
