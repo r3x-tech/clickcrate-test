@@ -1,13 +1,7 @@
 use anchor_lang::prelude::*;
 use mpl_core::{
-    instructions::{
-        AddPluginV1Builder, ApprovePluginAuthorityV1Builder, TransferV1Builder,
-        UpdatePluginV1Builder,
-    },
-    types::{
-        Attribute, Attributes, FreezeDelegate, Plugin, PluginAuthority, PluginType,
-        TransferDelegate,
-    },
+    instructions::{TransferV1Builder, UpdatePluginV1Builder},
+    types::{Attribute, Attributes, FreezeDelegate, Plugin, PluginType},
 };
 use solana_program::{
     account_info::AccountInfo, entrypoint::ProgramResult, program::invoke, program::invoke_signed,
@@ -26,6 +20,8 @@ use crate::error::*;
 #[program]
 pub mod clickcrate_test {
     use std::collections::BTreeMap;
+
+    use mpl_core::{accounts::BaseAssetV1, fetch_plugin, types::PluginAuthority};
 
     use super::*;
 
@@ -127,35 +123,90 @@ pub mod clickcrate_test {
         Ok(())
     }
 
-    pub fn place_product_listing(
-        ctx: Context<PlaceProductListing>,
-        product_id: Pubkey,
-        clickcrate_id: Pubkey,
-    ) -> ProgramResult {
-        let clickcrate = &mut ctx.accounts.clickcrate;
-        let product_listing = &mut ctx.accounts.product_listing;
-        clickcrate.product = Some(product_id);
-        product_listing.clickcrate_pos = Some(clickcrate_id);
+    pub fn initialize_vault(ctx: Context<InitializeVault>) -> Result<()> {
+        let vault = &mut ctx.accounts.vault;
+        vault.owner = *ctx.accounts.owner.key;
+        vault.bump = ctx.bumps.vault;
+        Ok(())
+    }
 
+    pub fn create_oracle(ctx: Context<InitializeOracle>, _seller: Pubkey) -> Result<()> {
+        let oracle_account = &mut ctx.accounts.oracle;
+        oracle_account.validation = OracleValidation::Uninitialized;
+        oracle_account.order_statuses = BTreeMap::new();
+        oracle_account.bump = ctx.bumps.oracle;
+        Ok(())
+    }
+
+    pub fn place_product(ctx: Context<PlaceProductListing>, price: u64) -> Result<()> {
+        let product_listing = &mut ctx.accounts.product_listing;
+        let clickcrate = &mut ctx.accounts.clickcrate;
+        let authority_pda = Pubkey::find_program_address(&[b"authority"], ctx.program_id).0;
+
+        // Check if authorities have been transferred
+        let asset_account = &ctx.accounts.asset_account;
+
+        // Check if the freeze plugin has been delegated to the program authority PDA
+        match fetch_plugin::<BaseAssetV1, Plugin>(asset_account, PluginType::FreezeDelegate) {
+            Ok((
+                plugin_authority,
+                Plugin::FreezeDelegate(FreezeDelegate { frozen: true }),
+                _size,
+            )) => match plugin_authority {
+                PluginAuthority::Address { address } => {
+                    require!(
+                        address == authority_pda,
+                        ClickCrateErrors::InvalidFreezeAuthority
+                    );
+                }
+                _ => return Err(ClickCrateErrors::InvalidFreezeAuthority.into()),
+            },
+            _ => {
+                return Err(ClickCrateErrors::FreezeAuthorityNotFound.into());
+            }
+        }
+
+        // Check if the transfer plugin has been delegated to the program authority PDA
+        match fetch_plugin::<BaseAssetV1, Plugin>(asset_account, PluginType::TransferDelegate) {
+            Ok((plugin_authority, Plugin::TransferDelegate(_), _size)) => match plugin_authority {
+                PluginAuthority::Address { address } => {
+                    require!(
+                        address == authority_pda,
+                        ClickCrateErrors::InvalidTransferAuthority
+                    );
+                }
+                _ => return Err(ClickCrateErrors::InvalidTransferAuthority.into()),
+            },
+            _ => {
+                return Err(ClickCrateErrors::TransferAuthorityNotFound.into());
+            }
+        }
+
+        // Freeze the product NFTs
         let freeze_ix = UpdatePluginV1Builder::new()
-            .asset(product_id)
+            .asset(product_listing.id)
             .payer(ctx.accounts.owner.key())
             .plugin(Plugin::FreezeDelegate(FreezeDelegate { frozen: true }))
             .instruction();
 
-        let signers = vec![ctx.accounts.owner.to_account_info()];
-        let instructions = vec![freeze_ix];
+        // Set vault for sales funds
+        let vault = &ctx.accounts.vault;
+        let (vault_pda, _vault_bump) = Pubkey::find_program_address(&[b"vault"], ctx.program_id);
+        require!(
+            vault.key() == vault_pda,
+            ClickCrateErrors::InvalidVaultAccount
+        );
 
-        invoke_signed(
-            &instructions.concat(),
-            &[
-                ctx.accounts.clickcrate.to_account_info(),
-                ctx.accounts.product_listing.to_account_info(),
-                ctx.accounts.owner.to_account_info(),
-            ],
-            &[signers.as_slice()],
-        )?;
+        // Set oracle for orders
+        let order_oracle = &mut ctx.accounts.order_oracle;
+        order_oracle.validation = OracleValidation::Uninitialized;
+        order_oracle.order_statuses = BTreeMap::new();
+        order_oracle.bump = ctx.bumps.order_oracle;
 
+        product_listing.clickcrate_pos = Some(clickcrate.id);
+        product_listing.price = price;
+        product_listing.order_oracle = order_oracle.key();
+        clickcrate.product = Some(product_listing.id);
         Ok(())
     }
 
@@ -242,32 +293,22 @@ pub mod clickcrate_test {
                 }))
                 .instruction();
 
-            let signers = vec![ctx.accounts.authority.to_account_info()];
-            let instructions = vec![unfreeze_ix, transfer_ix, set_order_status_ix];
+            // let signers = vec![ctx.accounts.authority.to_account_info()];
+            // let instructions = vec![unfreeze_ix, transfer_ix, set_order_status_ix];
 
-            invoke_signed(
-                &instructions.concat(),
-                &[
-                    ctx.accounts.clickcrate.to_account_info(),
-                    ctx.accounts.product_listing.to_account_info(),
-                    ctx.accounts.owner.to_account_info(),
-                    ctx.accounts.authority.to_account_info(),
-                ],
-                &[signers.as_slice()],
-            )?;
+            // invoke_signed(
+            //     &instructions.concat(),
+            //     &[
+            //         ctx.accounts.clickcrate.to_account_info(),
+            //         ctx.accounts.product_listing.to_account_info(),
+            //         ctx.accounts.owner.to_account_info(),
+            //         ctx.accounts.authority.to_account_info(),
+            //     ],
+            //     &[signers.as_slice()],
+            // )?;
         } else {
             return Err(ClickCrateErrors::ProductOutOfStock);
         }
-
-        Ok(())
-    }
-
-    pub fn create_oracle_account(ctx: Context<CreateOracleAccount>, _seller: Pubkey) -> Result<()> {
-        let oracle_account = &mut ctx.accounts.oracle;
-
-        oracle_account.validation = OracleValidation::Uninitialized;
-        oracle_account.order_statuses = BTreeMap::new();
-        oracle_account.bump = ctx.bumps.oracle;
 
         Ok(())
     }

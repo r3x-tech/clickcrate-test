@@ -1,6 +1,5 @@
-use anchor_lang::prelude::*;
-
 use crate::account::*;
+use anchor_lang::prelude::*;
 
 #[derive(Accounts)]
 #[instruction(id: Pubkey, eligible_placement_type: PlacementType, eligible_product_category: ProductCategory, manager: Pubkey,
@@ -114,7 +113,61 @@ pub struct PlaceProductListing<'info> {
         bump,
     )]
     pub product_listing: Account<'info, ProductListingState>,
+    #[account(mut)]
+    pub asset_account: AccountInfo<'info>,
+    #[account(
+      init,
+      seeds = [b"order_oracle", product_listing.key().as_ref()],
+      bump,
+      payer = owner,
+      space = 8 + OrderOracle::get_max_size(),
+  )]
+    pub order_oracle: Account<'info, OrderOracle>,
+    #[account(
+        mut,
+        constraint = vault.owner == system_program.key(),
+    )]
+    pub vault: Account<'info, VaultAccount>,
+    #[account(
+        seeds = [b"authority"],
+        bump,
+    )]
+    pub authority: AccountInfo<'info>,
+    #[account(mut)]
     pub owner: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+// New context for initializing the vault account
+#[derive(Accounts)]
+pub struct InitializeVault<'info> {
+    #[account(
+        init,
+        seeds = [b"vault", owner.key().as_ref()],
+        bump,
+        payer = owner,
+        space = 8 + VaultAccount::get_max_size(),
+    )]
+    pub vault: Account<'info, VaultAccount>,
+    #[account(mut)]
+    pub owner: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct InitializeOracle<'info> {
+    #[account(
+        init,
+        seeds = [b"oracle", seller.key().as_ref()],
+        bump,
+        payer = payer,
+        space = 8 + OrderOracle::get_max_size(),
+    )]
+    pub oracle: Account<'info, OrderOracle>,
+    pub seller: Signer<'info>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -134,6 +187,7 @@ pub struct RemoveProductListing<'info> {
     )]
     pub product_listing: Account<'info, ProductListingState>,
     pub owner: Signer<'info>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -172,22 +226,6 @@ pub struct MakePurchase<'info> {
 }
 
 #[derive(Accounts)]
-pub struct CreateOracleAccount<'info> {
-    #[account(
-        init,
-        seeds = [b"oracle", seller.key().as_ref()],
-        bump,
-        payer = payer,
-        space = 8 + OrderOracle::get_max_size(),
-    )]
-    pub oracle: Account<'info, OrderOracle>,
-    pub seller: Signer<'info>,
-    #[account(mut)]
-    pub payer: Signer<'info>,
-    pub system_program: Program<'info, System>,
-}
-
-#[derive(Accounts)]
 #[instruction(product_id: Pubkey, new_order_status: OrderStatus)]
 pub struct UpdateOrderStatus<'info> {
     #[account(
@@ -221,5 +259,3 @@ pub struct CompleteOrder<'info> {
     pub vault: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
 }
-
-pub const AUTHORITY_SEED: &[u8] = b"authority";

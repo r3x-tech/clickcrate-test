@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use mpl_core::types::{Key, UpdateAuthority};
 use std::collections::BTreeMap;
 #[account]
 pub struct ClickCrateState {
@@ -30,11 +31,25 @@ pub struct ProductListingState {
     pub clickcrate_pos: Option<Pubkey>,
     pub is_active: bool,
     pub price: u64,
+    pub vault: Pubkey,
+    pub order_oracle: Pubkey,
 }
 
 impl MaxSize for ProductListingState {
     fn get_max_size() -> usize {
-        return 8 + 32 + 1 + 32 + 32 + 1 + 1 + 8 + 8 + (1 + 32) + 1 + 8;
+        return 8 + 32 + 1 + 32 + 32 + 1 + 1 + 8 + 8 + (1 + 32) + 1 + 8 + 32 + 32;
+    }
+}
+
+#[account]
+pub struct VaultAccount {
+    pub owner: Pubkey,
+    pub bump: u8,
+}
+
+impl MaxSize for VaultAccount {
+    fn get_max_size() -> usize {
+        return 8 + 32 + 1;
     }
 }
 

@@ -42,4 +42,25 @@ pub enum ClickCrateErrors {
 
     #[msg("Order not completed")]
     OrderNotCompleted,
+
+    #[msg("Invalid oracle")]
+    InvalidOrderOracleAccount,
+
+    #[msg("Invalid vault")]
+    InvalidVaultAccount,
+
+    #[msg("Freeze authority not found")]
+    FreezeAuthorityNotFound,
+
+    #[msg("Transfer authority not found")]
+    TransferAuthorityNotFound,
+
+    #[msg("Invalid freeze authority")]
+    InvalidFreezeAuthority,
+
+    #[msg("Invalid transfer authority")]
+    InvalidTransferAuthority,
+
+    #[msg("Bump not found")]
+    BumpNotFound,
 }
