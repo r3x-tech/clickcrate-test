@@ -4,10 +4,10 @@ pub enum ClickCrateErrors {
     #[msg("ClickCrate has already been registered")]
     ClickCrateExists,
 
-    #[msg("ClickCrate already actived!")]
+    #[msg("ClickCrate is actived")]
     ClickCrateActivated,
 
-    #[msg("ClickCrate already deactived!")]
+    #[msg("ClickCrate is deactived")]
     ClickCrateDeactivated,
 
     #[msg("ClickCrate not found")]
@@ -22,10 +22,10 @@ pub enum ClickCrateErrors {
     #[msg("Product Listing has already been registered")]
     ProductListingExists,
 
-    #[msg("Product Listing already actived!")]
+    #[msg("Product Listing is actived")]
     ProductListingActivated,
 
-    #[msg("Product Listing already deactived!")]
+    #[msg("Product Listing is deactived")]
     ProductListingDeactivated,
 
     #[msg("Product is out of stock")]
@@ -63,4 +63,13 @@ pub enum ClickCrateErrors {
 
     #[msg("Bump not found")]
     BumpNotFound,
+
+    #[msg("Vault not emptied")]
+    VaultNotEmpty,
+
+    #[msg("Insufficient balance")]
+    InsufficientBalance,
+
+    #[msg("Failed to close oracle account")]
+    OracleFailedToClose,
 }

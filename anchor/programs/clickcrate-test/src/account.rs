@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
-use mpl_core::types::{Key, UpdateAuthority};
-use std::collections::BTreeMap;
+use mpl_core::programs::MPL_CORE_ID;
+
 #[account]
 pub struct ClickCrateState {
     pub id: Pubkey,
@@ -32,37 +32,37 @@ pub struct ProductListingState {
     pub is_active: bool,
     pub price: u64,
     pub vault: Pubkey,
-    pub order_oracle: Pubkey,
+    pub order_manager: Origin,
 }
 
 impl MaxSize for ProductListingState {
     fn get_max_size() -> usize {
-        return 8 + 32 + 1 + 32 + 32 + 1 + 1 + 8 + 8 + (1 + 32) + 1 + 8 + 32 + 32;
+        8 + 32 + 1 + 32 + 32 + 1 + 1 + 8 + 8 + (1 + 32) + 1 + 8 + 32 + 1
     }
 }
 
 #[account]
 pub struct VaultAccount {
-    pub owner: Pubkey,
     pub bump: u8,
 }
 
 impl MaxSize for VaultAccount {
     fn get_max_size() -> usize {
-        return 8 + 32 + 1;
+        return 8 + 1;
     }
 }
 
 #[account]
 pub struct OrderOracle {
+    pub order_status: OrderStatus,
+    pub order_manager: Origin,
     pub validation: OracleValidation,
-    pub order_statuses: BTreeMap<Pubkey, OrderStatus>,
     pub bump: u8,
 }
 
 impl MaxSize for OrderOracle {
     fn get_max_size() -> usize {
-        return 8 + 5 + 4 + (32 + 1) * 100; // Discriminator (8) + Validation (5) + Map (4 + (32 + 1) * 100)
+        8 + 1 + 1 + 5 + 1
     }
 }
 
@@ -125,4 +125,12 @@ pub enum OrderStatus {
 
 pub trait MaxSize {
     fn get_max_size() -> usize;
+}
+
+pub struct Core;
+
+impl anchor_lang::Id for Core {
+    fn id() -> Pubkey {
+        MPL_CORE_ID
+    }
 }
