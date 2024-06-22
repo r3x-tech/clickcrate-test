@@ -478,22 +478,26 @@ pub mod clickcrate_test {
             ClickCrateErrors::InsufficientBalance
         );
 
-        // Transfer funds from vault to seller
-        **ctx
-            .accounts
-            .vault
-            .to_account_info()
-            .try_borrow_mut_lamports()? -= amount;
-        **ctx.accounts.seller.try_borrow_mut_lamports()? += amount;
+        // // Transfer funds from vault to seller
+        // **ctx
+        //     .accounts
+        //     .vault
+        //     .to_account_info()
+        //     .try_borrow_mut_lamports()? -= amount;
+        // **ctx.accounts.seller.try_borrow_mut_lamports()? += amount;
 
-        // invoke(
-        //     &system_instruction::transfer(&vault.key(), &seller.key(), amount),
-        //     &[
-        //         vault.to_account_info(),
-        //         seller.to_account_info(),
-        //         ctx.accounts.system_program.to_account_info(),
-        //     ],
-        // )?;
+        invoke(
+            &system_instruction::transfer(
+                &ctx.accounts.vault.key(),
+                &ctx.accounts.seller.key(),
+                amount,
+            ),
+            &[
+                ctx.accounts.vault.to_account_info(),
+                ctx.accounts.seller.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+            ],
+        )?;
 
         Ok(())
     }
