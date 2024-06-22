@@ -140,8 +140,8 @@ pub struct InitializeVault<'info> {
 pub struct InitializeOracle<'info> {
     #[account(mut)]
     pub product_listing: Account<'info, ProductListingState>,
-    #[account(mut)]
     /// CHECK: This is a Metaplex core asset account
+    #[account(mut)]
     pub product: UncheckedAccount<'info>,
     #[account(
         init,
@@ -253,8 +253,8 @@ pub struct MakePurchase<'info> {
       bump = vault.bump,
     )]
     pub vault: Account<'info, VaultAccount>,
-    #[account(mut)]
     /// CHECK: This is a Metaplex Core NFT
+    #[account(mut)]
     pub product: UncheckedAccount<'info>,
     pub core_program: Program<'info, Core>,
     #[account(mut, constraint = owner.key() == product_listing.owner)]
@@ -306,8 +306,8 @@ pub struct CompleteOrder<'info> {
     /// CHECK: This is the seller's wallet
     #[account(mut, constraint = seller.key() == product_listing.owner)]
     pub seller: Signer<'info>,
-    #[account(mut)]
     /// CHECK: This is a Metaplex Core NFT
+    #[account(mut)]
     pub product: UncheckedAccount<'info>,
     #[account(constraint = authority.key() == product_listing.owner)]
     pub authority: Signer<'info>,

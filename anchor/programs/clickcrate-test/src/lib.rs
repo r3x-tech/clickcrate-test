@@ -347,22 +347,25 @@ pub mod clickcrate_test {
     ) -> Result<()> {
         let clickcrate = &mut ctx.accounts.clickcrate;
         let product_listing = &mut ctx.accounts.product_listing;
-        let order_oracle = &mut ctx.accounts.order_oracle;
+        let oracle = &mut ctx.accounts.oracle;
+        let product = &ctx.accounts.product;
 
         // Check if the product is placed in ClickCrate
         require!(
-            clickcrate.product == Some(product_id),
+            clickcrate.product == Some(product_listing.id),
             ClickCrateErrors::ProductNotFound
         );
 
-        let order_status = order_oracle
-            .order_statuses
-            .get(&product_id)
-            .ok_or(ClickCrateErrors::OrderNotFound)?;
-
+        // Check if the provided product_id matches the product account
         require!(
-            *order_status == OrderStatus::Placed,
-            ClickCrateErrors::ProductNotFound
+            product.key() == product_id,
+            ClickCrateErrors::InvalidProduct
+        );
+
+        // Check the order status in the oracle
+        require!(
+            oracle.order_status == OrderStatus::Placed,
+            ClickCrateErrors::InvalidOrderStatus
         );
 
         // Check if the product is in stock
@@ -391,22 +394,17 @@ pub mod clickcrate_test {
         product_listing.sold += quantity;
 
         // Update order oracle
-        order_oracle.validations.insert(
-            product_id,
-            OracleValidation::V1 {
-                create: ExternalValidationResult::Pass,
-                transfer: ExternalValidationResult::Rejected,
-                burn: ExternalValidationResult::Pass,
-                update: ExternalValidationResult::Pass,
-            },
-        );
-        order_oracle
-            .order_statuses
-            .insert(product_id, OrderStatus::Pending);
+        oracle.order_status = OrderStatus::Pending;
+        oracle.validation = OracleValidation::V1 {
+            create: ExternalValidationResult::Pass,
+            transfer: ExternalValidationResult::Rejected,
+            burn: ExternalValidationResult::Pass,
+            update: ExternalValidationResult::Pass,
+        };
 
         // Update order status attribute on the NFT
         UpdatePluginV1CpiBuilder::new(&ctx.accounts.core_program.to_account_info())
-            .asset(&ctx.accounts.asset_account)
+            .asset(product)
             .payer(&ctx.accounts.buyer.to_account_info())
             .plugin(Plugin::Attributes(Attributes {
                 attribute_list: vec![Attribute {
@@ -418,7 +416,6 @@ pub mod clickcrate_test {
 
         Ok(())
     }
-
     pub fn update_order_status(
         ctx: Context<UpdateOrderStatus>,
         product_id: Pubkey,
@@ -460,10 +457,10 @@ pub mod clickcrate_test {
     }
 
     pub fn complete_order(ctx: Context<CompleteOrder>) -> Result<()> {
-        let product_nft = Asset::deserialize(&mut &ctx.accounts.product_nft.data.borrow()[..])?;
+        let product = Asset::deserialize(&mut &ctx.accounts.product.data.borrow()[..])?;
 
         require!(
-            product_nft.owner == ctx.accounts.seller.key(),
+            product.owner == ctx.accounts.seller.key(),
             ClickCrateErrors::InvalidProductNFTOwner
         );
 
