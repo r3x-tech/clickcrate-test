@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::TokenAccount;
 use mpl_core::{
     instructions::{
         AddPluginV1CpiBuilder, RemovePluginV1CpiBuilder, TransferV1Builder, TransferV1CpiBuilder,
@@ -27,7 +26,7 @@ use crate::error::*;
 
 #[program]
 pub mod clickcrate_test {
-    use mpl_core::Asset;
+    use mpl_core::{Asset, Collection};
 
     use super::*;
 
@@ -159,19 +158,17 @@ pub mod clickcrate_test {
         Ok(())
     }
 
-    pub fn place_product_listing(ctx: Context<PlaceProductListing>, price: u64) -> Result<()> {
+    pub fn stock_clickrate(ctx: Context<PlaceProductListing>, price: u64) -> Result<()> {
         let product_listing: &mut Account<ProductListingState> = &mut ctx.accounts.product_listing;
         let clickcrate: &mut Account<ClickCrateState> = &mut ctx.accounts.clickcrate;
+        let collection = &ctx.accounts.collection;
 
-        // Check listing is active
         require!(
-            product_listing.is_active == true,
+            product_listing.is_active,
             ClickCrateErrors::ProductListingDeactivated
         );
-
-        // Check pos is active
         require!(
-            clickcrate.is_active == true,
+            clickcrate.is_active,
             ClickCrateErrors::ClickCrateDeactivated
         );
 
@@ -184,41 +181,43 @@ pub mod clickcrate_test {
         // };
         // let vault_ctx = Context::new(&ctx.program_id, &mut vault_accounts, &[], ctx.bumps.vault);
 
+        // Initialize vault
         let vault = &mut ctx.accounts.vault;
-
-        let product_listing = &mut ctx.accounts.product_listing;
         product_listing.vault = vault.key();
         // initialize_vault(vault_ctx)?;
 
-        // ctx.accounts
-        //     .vault
-        //     .initialize(ctx.accounts.product_listing.key(), ctx.bumps.vault);
-
-        // Fetch child NFTs of the collection
-
         // Get the number of minted NFTs in the collection
         let collection_data = collection.try_borrow_data()?;
-        let collection_account =
-            mpl_core::accounts::CollectionV1::try_deserialize(&mut &collection_data[..])?;
-        let total_minted = collection_account.num_minted;
+        let collection_account = Collection::deserialize(&mut &collection_data[..])?;
+        let total_minted = collection_account.base.num_minted;
 
-        // Check if we need to process more NFTs
+        // Check if we need to process more NFTst
         let total_processed = product_listing.in_stock + product_listing.sold;
         require!(
-            total_processed < total_minted,
-            ClickCrateErrors::AllNFTsProcessed
+            total_processed < total_minted as u64,
+            ClickCrateErrors::InvalidStockingRequest
         );
-        let child_nfts = fetch_child_nfts(&ctx.accounts.collection, &ctx.accounts.core_program)?;
 
-        for child_nft in child_nfts {
+        let product_accounts = &ctx.remaining_accounts;
+        require!(
+            product_accounts.len() >= 1 && product_accounts.len() <= 10,
+            ClickCrateErrors::InvalidStockingRequest
+        );
+
+        // Process the NFTs
+        for product_account in product_accounts.iter() {
+            // Deserialize the product account
+            let product_data = product_account.try_borrow_data()?;
+            let product = Asset::deserialize(&mut &product_data[..])?;
+
             // Create and initialize Oracle for this specific child NFT
-            let oracle_seeds: &[&[u8; 6]; 2] = &[b"oracle", child_nft.key().as_ref()];
+            let oracle_seeds: &[&[u8; 6]; 2] = &[b"oracle", product_data];
             let (oracle_pda, _) = Pubkey::find_program_address(oracle_seeds, ctx.program_id);
 
             // Create a new context for initializing the oracle
             let oracle_accounts = InitializeOracle {
                 product_listing: ctx.accounts.product_listing,
-                product: child_nft,
+                product: product_account,
                 oracle: oracle_pda,
                 payer: ctx.accounts.owner,
                 system_program: ctx.accounts.system_program,

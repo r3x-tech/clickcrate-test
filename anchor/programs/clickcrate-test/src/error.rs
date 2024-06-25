@@ -34,6 +34,9 @@ pub enum ClickCrateErrors {
     #[msg("Product out of stock")]
     ProductOutOfStock,
 
+    #[msg("Invalid stocking request")]
+    InvalidStockingRequest,
+
     #[msg("Invalid listing registration")]
     InvalidProductListingRegistration,
 

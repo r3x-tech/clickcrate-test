@@ -160,7 +160,7 @@ pub struct InitializeOracle<'info> {
 
 #[derive(Accounts)]
 #[instruction(product_listing_id: Pubkey, clickcrate_id: Pubkey)]
-pub struct PlaceProductListing<'info> {
+pub struct StockClickrate<'info> {
     #[account(
         mut,
         has_one = owner,
@@ -190,7 +190,6 @@ pub struct PlaceProductListing<'info> {
   )]
     pub vault: Account<'info, VaultAccount>,
     /// CHECK: This is the Metaplex core collection account
-    pub collection: UncheckedAccount<'info>,
     pub core_program: Program<'info, Core>,
     #[account(mut)]
     pub owner: Signer<'info>,
