@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 #[error_code]
 pub enum ClickCrateErrors {
-    #[msg("ClickCrate has already been registered")]
+    #[msg("ClickCrate already registered")]
     ClickCrateExists,
 
     #[msg("ClickCrate is actived")]
@@ -19,7 +19,7 @@ pub enum ClickCrateErrors {
     #[msg("Product Listing was not found")]
     ProductNotFound,
 
-    #[msg("Product Listing has already been registered")]
+    #[msg("Product Listing already registered")]
     ProductListingExists,
 
     #[msg("Product Listing is actived")]
@@ -28,10 +28,13 @@ pub enum ClickCrateErrors {
     #[msg("Product Listing is deactived")]
     ProductListingDeactivated,
 
-    #[msg("Product is out of stock")]
+    #[msg("Product not placed")]
+    ProductNotPlaced,
+
+    #[msg("Product out of stock")]
     ProductOutOfStock,
 
-    #[msg("Invalid product listing registration")]
+    #[msg("Invalid listing registration")]
     InvalidProductListingRegistration,
 
     #[msg("Order not found")]
@@ -61,15 +64,15 @@ pub enum ClickCrateErrors {
     #[msg("Invalid transfer authority")]
     InvalidTransferAuthority,
 
-    #[msg("Bump not found")]
-    BumpNotFound,
-
-    #[msg("Vault not emptied")]
+    #[msg("Vault not empty")]
     VaultNotEmpty,
 
     #[msg("Insufficient balance")]
     InsufficientBalance,
 
-    #[msg("Failed to close oracle account")]
+    #[msg("Oracle account closure failed")]
     OracleFailedToClose,
+
+    #[msg("Unauthorized update")]
+    UnauthorizedUpdate,
 }

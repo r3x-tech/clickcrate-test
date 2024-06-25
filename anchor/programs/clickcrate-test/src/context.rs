@@ -1,6 +1,5 @@
 use crate::account::*;
 use anchor_lang::prelude::*;
-use mpl_core::{accounts::BaseAssetV1, Asset};
 #[derive(Accounts)]
 #[instruction(id: Pubkey, eligible_placement_type: PlacementType, eligible_product_category: ProductCategory, manager: Pubkey,
 )]
@@ -116,25 +115,25 @@ pub struct DeactivateProductListing<'info> {
     pub owner: Signer<'info>,
 }
 
-#[derive(Accounts)]
-pub struct InitializeVault<'info> {
-    #[account(mut)]
-    pub product_listing: Account<'info, ProductListingState>,
-    #[account(
-        init,
-        seeds = [b"vault", product_listing.key().as_ref()],
-        bump,
-        payer = owner,
-        space = 8 + VaultAccount::get_max_size(),
-    )]
-    pub vault: Account<'info, VaultAccount>,
-    #[account(
-        mut,
-        constraint = owner.key() == product_listing.owner
-    )]
-    pub owner: Signer<'info>,
-    pub system_program: Program<'info, System>,
-}
+// #[derive(Accounts)]
+// pub struct InitializeVault<'info> {
+//     #[account(mut)]
+//     pub product_listing: Account<'info, ProductListingState>,
+//     #[account(
+//         init,
+//         seeds = [b"vault", product_listing.key().as_ref()],
+//         bump,
+//         payer = owner,
+//         space = 8 + VaultAccount::get_max_size(),
+//     )]
+//     pub vault: Account<'info, VaultAccount>,
+//     #[account(
+//         mut,
+//         constraint = owner.key() == product_listing.owner
+//     )]
+//     pub owner: Signer<'info>,
+//     pub system_program: Program<'info, System>,
+// }
 
 #[derive(Accounts)]
 pub struct InitializeOracle<'info> {
@@ -176,15 +175,22 @@ pub struct PlaceProductListing<'info> {
         bump,
     )]
     pub product_listing: Account<'info, ProductListingState>,
+    // #[account(
+    //   mut,
+    //   seeds = [b"vault", product_listing.key().as_ref()],
+    //   bump
+    // )]
+    // pub vault: Account<'info, VaultAccount>,
     #[account(
-      mut,
-      has_one = owner,
+      init,
       seeds = [b"vault", product_listing.key().as_ref()],
-      bump
-    )]
+      bump,
+      payer = owner,
+      space = 8 + VaultAccount::get_max_size(),
+  )]
     pub vault: Account<'info, VaultAccount>,
     /// CHECK: This is the Metaplex core collection account
-    pub collection_account: UncheckedAccount<'info>,
+    pub collection: UncheckedAccount<'info>,
     pub core_program: Program<'info, Core>,
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -210,13 +216,14 @@ pub struct RemoveProductListing<'info> {
     pub product_listing: Account<'info, ProductListingState>,
     #[account(
       mut,
-      has_one = owner,
       seeds = [b"vault", product_listing.key().as_ref()],
       bump,
       constraint = vault.key() == product_listing.vault,
       close = owner
     )]
     pub vault: Account<'info, VaultAccount>,
+    /// CHECK: This is the Metaplex core collection account
+    pub collection: UncheckedAccount<'info>,
     #[account(mut)]
     pub owner: Signer<'info>,
     pub core_program: Program<'info, Core>,
@@ -248,7 +255,6 @@ pub struct MakePurchase<'info> {
     pub oracle: Account<'info, OrderOracle>,
     #[account(
       mut,
-      has_one = owner,
       seeds = [b"vault", product_listing.key().as_ref()],
       bump = vault.bump,
     )]
@@ -264,25 +270,34 @@ pub struct MakePurchase<'info> {
     pub system_program: Program<'info, System>,
 }
 
-// #[derive(Accounts)]
-// #[instruction(product_id: Pubkey, new_order_status: OrderStatus)]
-// pub struct UpdateOrderStatus<'info> {
-//     #[account(
-//     mut,
-//     seeds = [b"oracle", product.key().as_ref()],
-//     bump,
-//     realloc = 8 + OrderOracle::get_max_size(),
-//     realloc::payer = seller,
-//     realloc::zero = true,
-//    )]
-//     pub oracle: Account<'info, OrderOracle>,
-//     #[account(mut)]
-//     pub seller: Signer<'info>,
-//     #[account(mut)]
-//     /// CHECK: This is a Metaplex Core NFT
-//     pub product: UncheckedAccount<'info>,
-//     pub system_program: Program<'info, System>,
-// }
+#[derive(Accounts)]
+#[instruction(product_id: Pubkey, product_listing_id: Pubkey, new_order_status: OrderStatus)]
+pub struct UpdateOrderStatus<'info> {
+    #[account(
+      mut,
+      has_one = owner,
+      seeds = [b"listing".as_ref(), product_listing_id.key().as_ref()],
+      bump,
+    )]
+    pub product_listing: Account<'info, ProductListingState>,
+    #[account(
+      mut,
+      seeds = [b"oracle", product.key().as_ref()],
+      bump,
+      realloc = 8 + OrderOracle::get_max_size(),
+      realloc::payer = seller,
+      realloc::zero = true,
+    )]
+    pub oracle: Account<'info, OrderOracle>,
+    #[account(mut)]
+    pub owner: Signer<'info>,
+    #[account(mut)]
+    pub seller: Signer<'info>,
+    #[account(mut)]
+    /// CHECK: This is a Metaplex Core NFT
+    pub product: UncheckedAccount<'info>,
+    pub system_program: Program<'info, System>,
+}
 
 #[derive(Accounts)]
 pub struct CompleteOrder<'info> {
@@ -300,7 +315,7 @@ pub struct CompleteOrder<'info> {
     #[account(
         mut,
         seeds = [b"oracle", product.key().as_ref()],
-        bump = order_oracle.bump,
+        bump = oracle.bump,
     )]
     pub oracle: Account<'info, OrderOracle>,
     /// CHECK: This is the seller's wallet

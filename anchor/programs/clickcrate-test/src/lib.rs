@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token_interface::{transfer_checked, TransferChecked};
+use anchor_spl::token::TokenAccount;
 use mpl_core::{
     instructions::{
         AddPluginV1CpiBuilder, RemovePluginV1CpiBuilder, TransferV1Builder, TransferV1CpiBuilder,
@@ -10,11 +10,12 @@ use mpl_core::{
         TransferDelegate,
     },
 };
+
 use solana_program::{
     account_info::AccountInfo, entrypoint::ProgramResult, program::invoke, pubkey::Pubkey,
     system_instruction,
 };
-declare_id!("9A14uKSX7DgPPH6Z8GumDewQ97Jn6riBxSKvnrJsM9vA");
+declare_id!("ENmHn3TEBqzfvwi19xc9cYsTmKseBSbxhqqXETiEKgJ9");
 
 pub mod account;
 pub mod context;
@@ -26,8 +27,7 @@ use crate::error::*;
 
 #[program]
 pub mod clickcrate_test {
-
-    use mpl_core::accounts::BaseAssetV1;
+    use mpl_core::Asset;
 
     use super::*;
 
@@ -78,7 +78,7 @@ pub mod clickcrate_test {
     ) -> Result<()> {
         let product_listing = &mut ctx.accounts.product_listing;
         product_listing.id = id;
-        product_listing.origin = origin;
+        product_listing.origin = origin.clone();
         product_listing.owner = ctx.accounts.owner.key();
         product_listing.manager = manager;
         product_listing.placement_type = placement_type;
@@ -88,7 +88,7 @@ pub mod clickcrate_test {
         product_listing.is_active = false;
         product_listing.price = price;
         product_listing.vault = Pubkey::default(); // Set a default or pass as parameter
-        product_listing.order_manager = origin;
+        product_listing.order_manager = origin.clone();
         Ok(())
     }
 
@@ -131,20 +131,29 @@ pub mod clickcrate_test {
         Ok(())
     }
 
+    // pub fn initialize_vault(ctx: Context<InitializeVault>) -> Result<()> {
+    //     let vault = &mut ctx.accounts.vault;
+    //     vault.bump = ctx.bumps.vault;
+
+    //     let product_listing = &mut ctx.accounts.product_listing;
+    //     product_listing.vault = vault.key();
+    //     Ok(())
+    // }
+
     pub fn initialize_oracle(ctx: Context<InitializeOracle>) -> Result<()> {
         let oracle = &mut ctx.accounts.oracle;
         let product_listing = &ctx.accounts.product_listing;
 
         oracle.set_inner(OrderOracle {
             order_status: OrderStatus::Placed,
-            order_manager: product_listing.order_manager,
+            order_manager: product_listing.order_manager.clone(),
             validation: OracleValidation::V1 {
                 create: ExternalValidationResult::Pass,
-                transfer: ExternalValidationResult::Reject,
+                transfer: ExternalValidationResult::Rejected,
                 burn: ExternalValidationResult::Pass,
                 update: ExternalValidationResult::Pass,
             },
-            bump: *ctx.bumps.get("oracle").unwrap(),
+            bump: ctx.bumps.oracle,
         });
 
         Ok(())
@@ -152,8 +161,7 @@ pub mod clickcrate_test {
 
     pub fn place_product_listing(ctx: Context<PlaceProductListing>, price: u64) -> Result<()> {
         let product_listing: &mut Account<ProductListingState> = &mut ctx.accounts.product_listing;
-        let clickcrate = &mut ctx.accounts.clickcrate;
-        let oracle = &mut ctx.accounts.oracle;
+        let clickcrate: &mut Account<ClickCrateState> = &mut ctx.accounts.clickcrate;
 
         // Check listing is active
         require!(
@@ -168,31 +176,61 @@ pub mod clickcrate_test {
         );
 
         // Initialize vault
-        ctx.accounts.vault.initialize(
-            ctx.accounts.product_listing.key(),
-            *ctx.bumps.get("vault").unwrap(),
-        );
+        // let vault_accounts = InitializeVault {
+        //     product_listing: ctx.accounts.product_listing,
+        //     vault: ctx.accounts.vault,
+        //     owner: ctx.accounts.owner,
+        //     system_program: ctx.accounts.system_program,
+        // };
+        // let vault_ctx = Context::new(&ctx.program_id, &mut vault_accounts, &[], ctx.bumps.vault);
+
+        let vault = &mut ctx.accounts.vault;
+
+        let product_listing = &mut ctx.accounts.product_listing;
+        product_listing.vault = vault.key();
+        // initialize_vault(vault_ctx)?;
+
+        // ctx.accounts
+        //     .vault
+        //     .initialize(ctx.accounts.product_listing.key(), ctx.bumps.vault);
 
         // Fetch child NFTs of the collection
+
+        // Get the number of minted NFTs in the collection
+        let collection_data = collection.try_borrow_data()?;
+        let collection_account =
+            mpl_core::accounts::CollectionV1::try_deserialize(&mut &collection_data[..])?;
+        let total_minted = collection_account.num_minted;
+
+        // Check if we need to process more NFTs
+        let total_processed = product_listing.in_stock + product_listing.sold;
+        require!(
+            total_processed < total_minted,
+            ClickCrateErrors::AllNFTsProcessed
+        );
         let child_nfts = fetch_child_nfts(&ctx.accounts.collection, &ctx.accounts.core_program)?;
 
         for child_nft in child_nfts {
             // Create and initialize Oracle for this specific child NFT
-            let oracle_seeds = &[b"oracle", child_nft.key().as_ref()];
+            let oracle_seeds: &[&[u8; 6]; 2] = &[b"oracle", child_nft.key().as_ref()];
             let (oracle_pda, _) = Pubkey::find_program_address(oracle_seeds, ctx.program_id);
 
             // Create a new context for initializing the oracle
-            let cpi_accounts = InitializeOracle {
-                product_listing: ctx.accounts.product_listing.to_account_info(),
-                product: child_nft.to_account_info(),
-                oracle: oracle_pda.to_account_info(),
-                payer: ctx.accounts.owner.to_account_info(),
-                system_program: ctx.accounts.system_program.to_account_info(),
+            let oracle_accounts = InitializeOracle {
+                product_listing: ctx.accounts.product_listing,
+                product: child_nft,
+                oracle: oracle_pda,
+                payer: ctx.accounts.owner,
+                system_program: ctx.accounts.system_program,
             };
-            let cpi_ctx = CpiContext::new(ctx.program_id.to_account_info(), cpi_accounts);
-
+            let oracle_ctx = Context::new(
+                &ctx.program_id,
+                &oracle_accounts,
+                &[],
+                ctx.remaining_accounts,
+            );
             // Call the initialize_oracle instruction
-            initialize_oracle(cpi_ctx)?;
+            initialize_oracle(oracle_ctx)?;
 
             // Freeze the Asset
             AddPluginV1CpiBuilder::new(&ctx.accounts.core_program.to_account_info())
@@ -359,13 +397,13 @@ pub mod clickcrate_test {
         // Check if the provided product_id matches the product account
         require!(
             product.key() == product_id,
-            ClickCrateErrors::InvalidProduct
+            ClickCrateErrors::ProductNotFound
         );
 
         // Check the order status in the oracle
         require!(
             oracle.order_status == OrderStatus::Placed,
-            ClickCrateErrors::InvalidOrderStatus
+            ClickCrateErrors::ProductNotPlaced
         );
 
         // Check if the product is in stock
@@ -424,9 +462,9 @@ pub mod clickcrate_test {
         let oracle = &mut ctx.accounts.oracle;
 
         require!(
-            ctx.accounts.authority.key() == ctx.accounts.product_listing.owner
-                || ctx.accounts.authority.key() == ctx.accounts.product_listing.manager,
-            ClickCrateErrors::UnauthorizedStatusUpdate
+            ctx.accounts.seller.key() == ctx.accounts.product_listing.owner
+                || ctx.accounts.seller.key() == ctx.accounts.product_listing.manager,
+            ClickCrateErrors::UnauthorizedUpdate
         );
 
         oracle.order_status = new_order_status;
@@ -460,13 +498,13 @@ pub mod clickcrate_test {
         let product = Asset::deserialize(&mut &ctx.accounts.product.data.borrow()[..])?;
 
         require!(
-            product.owner == ctx.accounts.seller.key(),
-            ClickCrateErrors::InvalidProductNFTOwner
+            product.base.owner.key() == ctx.accounts.seller.key(),
+            ClickCrateErrors::UnauthorizedUpdate
         );
 
         // Check the order status
         require!(
-            ctx.accounts.order_oracle.order_status == OrderStatus::Completed,
+            ctx.accounts.oracle.order_status == OrderStatus::Completed,
             ClickCrateErrors::OrderNotCompleted
         );
 
