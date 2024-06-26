@@ -26,7 +26,15 @@ use crate::error::*;
 
 #[program]
 pub mod clickcrate_test {
-    use mpl_core::{Asset, Collection};
+    use anchor_lang::system_program;
+    use mpl_core::{
+        instructions::{AddExternalPluginAdapterV1Builder, AddExternalPluginAdapterV1CpiBuilder},
+        types::{
+            ExternalCheckResult, ExternalPluginAdapterInitInfo, HookableLifecycleEvent,
+            OracleInitInfo, ValidationResultsOffset,
+        },
+        Asset, Collection,
+    };
 
     use super::*;
 
@@ -158,7 +166,10 @@ pub mod clickcrate_test {
         Ok(())
     }
 
-    pub fn stock_clickrate(ctx: Context<PlaceProductListing>, price: u64) -> Result<()> {
+    pub fn stock_clickrate<'a, 'b, 'c: 'info, 'info>(
+        ctx: Context<'a, 'b, 'c, 'info, StockClickrate<'info>>,
+        price: u64,
+    ) -> Result<()> {
         let product_listing: &mut Account<ProductListingState> = &mut ctx.accounts.product_listing;
         let clickcrate: &mut Account<ClickCrateState> = &mut ctx.accounts.clickcrate;
         let collection = &ctx.accounts.collection;
@@ -191,53 +202,75 @@ pub mod clickcrate_test {
         let collection_account = Collection::deserialize(&mut &collection_data[..])?;
         let total_minted = collection_account.base.num_minted;
 
-        // Check if we need to process more NFTst
+        // Check if need to process more NFTs
         let total_processed = product_listing.in_stock + product_listing.sold;
         require!(
             total_processed < total_minted as u64,
             ClickCrateErrors::InvalidStockingRequest
         );
 
-        let product_accounts = &ctx.remaining_accounts;
+        let product_accounts = ctx.remaining_accounts;
+
         require!(
-            product_accounts.len() >= 1 && product_accounts.len() <= 10,
+            product_accounts.len() >= 1 && product_accounts.len() <= 20,
             ClickCrateErrors::InvalidStockingRequest
         );
+
+        let core_program_info = ctx.accounts.core_program.to_account_info();
+        let collection_info = ctx.accounts.collection.to_account_info();
+        let owner_info = ctx.accounts.owner.to_account_info();
+        let system_program_info = ctx.accounts.system_program.to_account_info();
 
         // Process the NFTs
         for product_account in product_accounts.iter() {
             // Deserialize the product account
             let product_data = product_account.try_borrow_data()?;
-            let product = Asset::deserialize(&mut &product_data[..])?;
-
-            // Create and initialize Oracle for this specific child NFT
-            let oracle_seeds: &[&[u8; 6]; 2] = &[b"oracle", product_data];
-            let (oracle_pda, _) = Pubkey::find_program_address(oracle_seeds, ctx.program_id);
-
-            // Create a new context for initializing the oracle
-            let oracle_accounts = InitializeOracle {
-                product_listing: ctx.accounts.product_listing,
-                product: product_account,
-                oracle: oracle_pda,
-                payer: ctx.accounts.owner,
-                system_program: ctx.accounts.system_program,
-            };
-            let oracle_ctx = Context::new(
-                &ctx.program_id,
-                &oracle_accounts,
-                &[],
-                ctx.remaining_accounts,
+            require!(
+                Asset::deserialize(&mut &product_data[..]).is_ok(),
+                ClickCrateErrors::InvalidProductAccount
             );
-            // Call the initialize_oracle instruction
-            initialize_oracle(oracle_ctx)?;
+
+            // // Create and initialize Oracle for this specific child NFT
+            // let oracle_seeds = &[b"oracle", product_account.key.as_ref()];
+            // let (oracle_pda, bump) = Pubkey::find_program_address(oracle_seeds, ctx.program_id);
+            // let oracle_account = Account::<OrderOracle>::try_from(&oracle_pda);
+
+            // // Create a new context for initializing the oracle
+            // let oracle_accounts = &mut InitializeOracle {
+            //     product_listing: ctx.accounts.product_listing,
+            //     product: unchecked_account,
+            //     oracle: oracle_account,
+            //     payer: ctx.accounts.owner,
+            //     system_program: ctx.accounts.system_program,
+            // };
+            // let oracle_ctx = Context::new(&ctx.program_id, &oracle_accounts, &[], &[]);
+            // // Call the initialize_oracle instruction
+            // initialize_oracle(oracle_ctx)?;
+
+            // Create and initialize Oracle for this specific product
+            // let oracle_account = Account::<OrderOracle>::create(
+            //     CpiContext::new(
+            //         ctx.accounts.system_program.to_account_info(),
+            //         system_program::CreateAccount {
+            //             from: ctx.accounts.owner.to_account_info(),
+            //             to: oracle_pda,
+            //         },
+            //     ),
+            //     OrderOracle::size() as u64,
+            //     ctx.program_id,
+            // )?;
+
+            // oracle_account.initialize(ctx.accounts.product_listing.order_manager.clone(), bump)?;
+
+            // oracle_account.initialize(ctx.accounts.product_listing.order_manager.clone(), bump)?;
 
             // Freeze the Asset
-            AddPluginV1CpiBuilder::new(&ctx.accounts.core_program.to_account_info())
-                .asset(&child_nft)
-                .collection(Some(&ctx.accounts.collection.to_account_info()))
-                .payer(&ctx.accounts.owner.to_account_info())
-                .authority(Some(&ctx.accounts.owner.to_account_info()))
-                .system_program(&ctx.accounts.system_program.to_account_info())
+            AddPluginV1CpiBuilder::new(&core_program_info)
+                .asset(&product_account)
+                .collection(Some(&collection_info))
+                .payer(&owner_info)
+                .authority(Some(&owner_info))
+                .system_program(&system_program_info)
                 .plugin(Plugin::FreezeDelegate(FreezeDelegate { frozen: true }))
                 .init_authority(PluginAuthority::Address {
                     address: product_listing.key(),
@@ -245,8 +278,8 @@ pub mod clickcrate_test {
                 .invoke()?;
 
             // Add TransferDelegate Plugin
-            AddPluginV1CpiBuilder::new(&ctx.accounts.core_program.to_account_info())
-                .asset(&child_nft)
+            AddPluginV1CpiBuilder::new(&core_program_info)
+                .asset(&product_account)
                 .collection(Some(&ctx.accounts.collection.to_account_info()))
                 .payer(&ctx.accounts.owner.to_account_info())
                 .authority(Some(&ctx.accounts.owner.to_account_info()))
@@ -259,24 +292,26 @@ pub mod clickcrate_test {
 
             // Add Oracle Plugin
             let (oracle_pda, _) = Pubkey::find_program_address(
-                &[b"oracle", child_nft.key().as_ref()],
+                &[b"oracle", product_account.key().as_ref()],
                 ctx.program_id,
             );
 
-            AddPluginV1CpiBuilder::new(&ctx.accounts.core_program.to_account_info())
-                .asset(&child_nft)
+            AddExternalPluginAdapterV1CpiBuilder::new(&core_program_info)
+                .asset(&product_account)
                 .collection(Some(&ctx.accounts.collection.to_account_info()))
                 .payer(&ctx.accounts.owner.to_account_info())
                 .authority(Some(&ctx.accounts.owner.to_account_info()))
                 .system_program(&ctx.accounts.system_program.to_account_info())
-                .plugin(Plugin::Oracle(Oracle {
+                .init_info(ExternalPluginAdapterInitInfo::Oracle(OracleInitInfo {
                     base_address: oracle_pda,
+                    results_offset: Some(ValidationResultsOffset::Anchor),
+                    lifecycle_checks: vec![(
+                        HookableLifecycleEvent::Transfer,
+                        ExternalCheckResult { flags: 4 },
+                    )],
                     base_address_config: None,
-                    results_offset: ValidationResultsOffset::Anchor,
+                    init_plugin_authority: None,
                 }))
-                .init_authority(PluginAuthority::Address {
-                    address: product_listing.key(),
-                })
                 .invoke()?;
         }
 

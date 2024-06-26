@@ -1,5 +1,6 @@
 use crate::account::*;
 use anchor_lang::prelude::*;
+use mpl_core::{accounts::BaseAssetV1, Asset};
 #[derive(Accounts)]
 #[instruction(id: Pubkey, eligible_placement_type: PlacementType, eligible_product_category: ProductCategory, manager: Pubkey,
 )]
@@ -136,11 +137,16 @@ pub struct DeactivateProductListing<'info> {
 // }
 
 #[derive(Accounts)]
+#[instruction(product_listing_id: Pubkey)]
+
 pub struct InitializeOracle<'info> {
-    #[account(mut)]
+    #[account(
+      mut,
+      seeds = [b"listing".as_ref(), product_listing_id.key().as_ref()],
+      bump,
+    )]
     pub product_listing: Account<'info, ProductListingState>,
     /// CHECK: This is a Metaplex core asset account
-    #[account(mut)]
     pub product: UncheckedAccount<'info>,
     #[account(
         init,
@@ -159,7 +165,7 @@ pub struct InitializeOracle<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(product_listing_id: Pubkey, clickcrate_id: Pubkey)]
+#[instruction(product_listing_id: Pubkey, clickcrate_id: Pubkey, price: u64)]
 pub struct StockClickrate<'info> {
     #[account(
         mut,
@@ -190,6 +196,7 @@ pub struct StockClickrate<'info> {
   )]
     pub vault: Account<'info, VaultAccount>,
     /// CHECK: This is the Metaplex core collection account
+    pub collection: UncheckedAccount<'info>,
     pub core_program: Program<'info, Core>,
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -279,15 +286,15 @@ pub struct UpdateOrderStatus<'info> {
       bump,
     )]
     pub product_listing: Account<'info, ProductListingState>,
-    #[account(
-      mut,
-      seeds = [b"oracle", product.key().as_ref()],
-      bump,
-      realloc = 8 + OrderOracle::get_max_size(),
-      realloc::payer = seller,
-      realloc::zero = true,
-    )]
-    pub oracle: Account<'info, OrderOracle>,
+    // #[account(
+    //   mut,
+    //   seeds = [b"oracle", product.key().as_ref()],
+    //   bump,
+    //   realloc = 8 + OrderOracle::get_max_size(),
+    //   realloc::payer = seller,
+    //   realloc::zero = true,
+    // )]
+    // pub oracle: Account<'info, OrderOracle>,
     #[account(mut)]
     pub owner: Signer<'info>,
     #[account(mut)]

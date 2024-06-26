@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use mpl_core::programs::MPL_CORE_ID;
+use mpl_core::{programs::MPL_CORE_ID, Asset};
 
 #[account]
 pub struct ClickCrateState {
@@ -65,6 +65,37 @@ impl MaxSize for OrderOracle {
         8 + 1 + 1 + 5 + 1
     }
 }
+
+// #[account]
+// pub struct OrderOracle {
+//     pub order_status: OrderStatus,
+//     pub order_manager: Origin,
+//     pub validation: OracleValidation,
+//     pub bump: u8,
+// }
+
+// impl OrderOracle {
+//     pub fn initialize(&mut self, order_manager: Origin, bump: u8) -> Result<()> {
+//         self.order_status = OrderStatus::Placed;
+//         self.order_manager = order_manager;
+//         self.validation = OracleValidation::V1 {
+//             create: ExternalValidationResult::Pass,
+//             transfer: ExternalValidationResult::Rejected,
+//             burn: ExternalValidationResult::Pass,
+//             update: ExternalValidationResult::Pass,
+//         };
+//         self.bump = bump;
+//         Ok(())
+//     }
+
+//     pub fn size() -> usize {
+//         8 + // discriminator
+//         1 + // order_status
+//         1 + // order_manager
+//         5 + // validation
+//         1 // bump
+//     }
+// }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq)]
 pub enum OracleValidation {
