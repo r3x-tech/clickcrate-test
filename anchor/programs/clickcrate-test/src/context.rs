@@ -1,6 +1,5 @@
 use crate::account::*;
 use anchor_lang::prelude::*;
-use mpl_core::{accounts::BaseAssetV1, Asset};
 #[derive(Accounts)]
 #[instruction(id: Pubkey, eligible_placement_type: PlacementType, eligible_product_category: ProductCategory, manager: Pubkey,
 )]
@@ -36,7 +35,7 @@ pub struct UpdateClickCrate<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, in_stock: u64, manager: Pubkey)]
+#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, manager: Pubkey)]
 pub struct RegisterProductListing<'info> {
     #[account(
         init,
@@ -52,7 +51,7 @@ pub struct RegisterProductListing<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, in_stock: u64, manager: Pubkey)]
+#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, manager: Pubkey)]
 pub struct UpdateProductListing<'info> {
     #[account(
         mut,
@@ -138,7 +137,6 @@ pub struct DeactivateProductListing<'info> {
 
 #[derive(Accounts)]
 #[instruction(product_listing_id: Pubkey)]
-
 pub struct InitializeOracle<'info> {
     #[account(
       mut,
@@ -166,7 +164,7 @@ pub struct InitializeOracle<'info> {
 
 #[derive(Accounts)]
 #[instruction(product_listing_id: Pubkey, clickcrate_id: Pubkey, price: u64)]
-pub struct StockClickrate<'info> {
+pub struct PlaceProducts<'info> {
     #[account(
         mut,
         has_one = owner,
@@ -196,7 +194,7 @@ pub struct StockClickrate<'info> {
   )]
     pub vault: Account<'info, VaultAccount>,
     /// CHECK: This is the Metaplex core collection account
-    pub collection: UncheckedAccount<'info>,
+    pub listing_collection: UncheckedAccount<'info>,
     pub core_program: Program<'info, Core>,
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -205,7 +203,7 @@ pub struct StockClickrate<'info> {
 
 #[derive(Accounts)]
 #[instruction(product_listing_id: Pubkey, clickcrate_id: Pubkey)]
-pub struct RemoveProductListing<'info> {
+pub struct RemoveProducts<'info> {
     #[account(
         mut,
         has_one = owner,
@@ -229,7 +227,7 @@ pub struct RemoveProductListing<'info> {
     )]
     pub vault: Account<'info, VaultAccount>,
     /// CHECK: This is the Metaplex core collection account
-    pub collection: UncheckedAccount<'info>,
+    pub listing_collection: UncheckedAccount<'info>,
     #[account(mut)]
     pub owner: Signer<'info>,
     pub core_program: Program<'info, Core>,

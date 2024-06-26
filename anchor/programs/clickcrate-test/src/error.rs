@@ -40,6 +40,9 @@ pub enum ClickCrateErrors {
     #[msg("Invalid stocking request")]
     InvalidStockingRequest,
 
+    #[msg("Invalid stocking amount")]
+    InvalidStockingAmount,
+
     #[msg("Invalid listing registration")]
     InvalidProductListingRegistration,
 
