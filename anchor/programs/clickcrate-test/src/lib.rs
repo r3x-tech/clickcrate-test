@@ -1,4 +1,7 @@
 use anchor_lang::prelude::*;
+use anchor_lang::solana_program::{
+    account_info::AccountInfo, program::invoke, pubkey::Pubkey, system_instruction,
+};
 use mpl_core::{
     instructions::{
         AddExternalPluginAdapterV1CpiBuilder, AddPluginV1CpiBuilder,
@@ -12,10 +15,7 @@ use mpl_core::{
     },
     Asset, Collection,
 };
-use solana_program::{
-    account_info::AccountInfo, program::invoke, pubkey::Pubkey, system_instruction,
-};
-declare_id!("ENmHn3TEBqzfvwi19xc9cYsTmKseBSbxhqqXETiEKgJ9");
+declare_id!("DwALQVbHk58rCtvjgaodThL5exDzJT1ecYVuXfvsgqGF");
 
 pub mod account;
 pub mod context;
@@ -57,7 +57,7 @@ pub mod clickcrate_test {
         eligible_product_category: ProductCategory,
         manager: Pubkey,
     ) -> Result<()> {
-        let clickcrate = &mut ctx.accounts.clickcrate;
+        let clickcrate: &mut Account<ClickCrateState> = &mut ctx.accounts.clickcrate;
         clickcrate.id = id;
         clickcrate.manager = manager;
         clickcrate.eligible_placement_type = eligible_placement_type;
@@ -309,7 +309,7 @@ pub mod clickcrate_test {
         // Check if the vault is empty (of product sale funds)
         require!(
             vault.to_account_info().lamports()
-                == Rent::get()?.minimum_balance(VaultAccount::get_max_size()),
+                == Rent::get()?.minimum_balance(VaultAccount::MAX_SIZE),
             ClickCrateErrors::VaultNotEmpty
         );
 

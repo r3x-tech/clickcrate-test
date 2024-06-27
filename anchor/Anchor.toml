@@ -1,18 +1,18 @@
 [toolchain]
 
 [features]
-seeds = false
+resolution = true
 skip-lint = false
 
 [programs.localnet]
-clickcrate_test = "ENmHn3TEBqzfvwi19xc9cYsTmKseBSbxhqqXETiEKgJ9"
+clickcrate_test = "DwALQVbHk58rCtvjgaodThL5exDzJT1ecYVuXfvsgqGF"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
 cluster = "Localnet"
-wallet = "/Users/ap/solana-wallets/clickcrate-wallet.json"
+wallet = "~/solana-wallets/clickcrate-wallet.json"
 
 [scripts]
 test = "../node_modules/.bin/nx run anchor:jest"

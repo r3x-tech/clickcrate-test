@@ -9,7 +9,7 @@ pub struct RegisterClickCrate<'info> {
         seeds = [b"clickcrate".as_ref(), id.key().as_ref()],
         bump,
         payer = owner,
-        space = 8 + ClickCrateState::get_max_size(),
+        space = 8 + ClickCrateState::MAX_SIZE,
     )]
     pub clickcrate: Account<'info, ClickCrateState>,
     #[account(mut)]
@@ -24,7 +24,7 @@ pub struct UpdateClickCrate<'info> {
         mut,
         seeds = [b"clickcrate".as_ref(), id.key().as_ref()],
         bump,
-        realloc = 8 + ClickCrateState::get_max_size(),
+        realloc = 8 + ClickCrateState::MAX_SIZE,
         realloc::payer = owner,
         realloc::zero = true,
     )]
@@ -42,7 +42,7 @@ pub struct RegisterProductListing<'info> {
         seeds = [b"listing".as_ref(), id.key().as_ref()],
         bump,
         payer = owner,
-        space = 8 + ProductListingState::get_max_size(),
+        space = 8 + ProductListingState::MAX_SIZE,
     )]
     pub product_listing: Account<'info, ProductListingState>,
     #[account(mut)]
@@ -57,7 +57,7 @@ pub struct UpdateProductListing<'info> {
         mut,
         seeds = [b"listing".as_ref(), id.key().as_ref()],
         bump,
-        realloc= 8 + ProductListingState::get_max_size(),
+        realloc= 8 + ProductListingState::MAX_SIZE,
         realloc::payer = owner,
         realloc::zero = true,
     )]
@@ -124,7 +124,7 @@ pub struct DeactivateProductListing<'info> {
 //         seeds = [b"vault", product_listing.key().as_ref()],
 //         bump,
 //         payer = owner,
-//         space = 8 + VaultAccount::get_max_size(),
+//         space = 8 + VaultAccount::MAX_SIZE,
 //     )]
 //     pub vault: Account<'info, VaultAccount>,
 //     #[account(
@@ -151,7 +151,7 @@ pub struct InitializeOracle<'info> {
         seeds = [b"oracle", product.key().as_ref()],
         bump,
         payer = payer,
-        space = 8 + OrderOracle::get_max_size(),
+        space = 8 + OrderOracle::MAX_SIZE,
     )]
     pub oracle: Account<'info, OrderOracle>,
     #[account(
@@ -208,7 +208,7 @@ pub struct PlaceProducts<'info> {
       seeds = [b"vault", product_listing.key().as_ref()],
       bump,
       payer = owner,
-      space = 8 + VaultAccount::get_max_size(),
+      space = 8 + VaultAccount::MAX_SIZE,
   )]
     pub vault: Account<'info, VaultAccount>,
     /// CHECK: This is the Metaplex core collection account
@@ -306,7 +306,7 @@ pub struct UpdateOrderStatus<'info> {
     //   mut,
     //   seeds = [b"oracle", product.key().as_ref()],
     //   bump,
-    //   realloc = 8 + OrderOracle::get_max_size(),
+    //   realloc = 8 + OrderOracle::MAX_SIZE,
     //   realloc::payer = seller,
     //   realloc::zero = true,
     // )]

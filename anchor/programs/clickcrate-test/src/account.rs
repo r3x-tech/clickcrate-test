@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use mpl_core::{programs::MPL_CORE_ID, Asset};
+use mpl_core::programs::MPL_CORE_ID;
 
 #[account]
 pub struct ClickCrateState {
@@ -13,9 +13,7 @@ pub struct ClickCrateState {
 }
 
 impl MaxSize for ClickCrateState {
-    fn get_max_size() -> usize {
-        return 8 + 32 + 32 + 32 + 1 + 1 + (1 + 32) + 1;
-    }
+    const MAX_SIZE: usize = 8 + 32 + 32 + 32 + 1 + 1 + (1 + 32) + 1;
 }
 
 #[account]
@@ -36,9 +34,7 @@ pub struct ProductListingState {
 }
 
 impl MaxSize for ProductListingState {
-    fn get_max_size() -> usize {
-        8 + 32 + 1 + 32 + 32 + 1 + 1 + 8 + 8 + (1 + 32) + 1 + 8 + 32 + 1
-    }
+    const MAX_SIZE: usize = 8 + 32 + 1 + 32 + 32 + 1 + 1 + 8 + 8 + (1 + 32) + 1 + 8 + 32 + 1;
 }
 
 #[account]
@@ -47,9 +43,7 @@ pub struct VaultAccount {
 }
 
 impl MaxSize for VaultAccount {
-    fn get_max_size() -> usize {
-        return 8 + 1;
-    }
+    const MAX_SIZE: usize = 8 + 1;
 }
 
 #[account]
@@ -61,9 +55,7 @@ pub struct OrderOracle {
 }
 
 impl MaxSize for OrderOracle {
-    fn get_max_size() -> usize {
-        8 + 1 + 1 + 5 + 1
-    }
+    const MAX_SIZE: usize = 8 + 1 + 1 + 5 + 1;
 }
 
 // #[account]
@@ -155,7 +147,7 @@ pub enum OrderStatus {
 }
 
 pub trait MaxSize {
-    fn get_max_size() -> usize;
+    const MAX_SIZE: usize;
 }
 
 pub struct Core;
