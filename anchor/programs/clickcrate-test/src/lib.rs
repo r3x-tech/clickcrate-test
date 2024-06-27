@@ -1,13 +1,14 @@
 use anchor_lang::prelude::*;
 use mpl_core::{
     instructions::{
-        AddExternalPluginAdapterV1CpiBuilder, AddPluginV1CpiBuilder, RemovePluginV1CpiBuilder,
-        TransferV1CpiBuilder, UpdatePluginV1CpiBuilder,
+        AddExternalPluginAdapterV1CpiBuilder, AddPluginV1CpiBuilder,
+        RemoveExternalPluginAdapterV1CpiBuilder, RemovePluginV1CpiBuilder,
+        UpdatePluginV1CpiBuilder,
     },
     types::{
-        Attribute, Attributes, ExternalCheckResult, ExternalPluginAdapterInitInfo, FreezeDelegate,
-        HookableLifecycleEvent, OracleInitInfo, Plugin, PluginAuthority, PluginType,
-        TransferDelegate, ValidationResultsOffset,
+        Attribute, Attributes, ExternalCheckResult, ExternalPluginAdapterInitInfo,
+        ExternalPluginAdapterKey, FreezeDelegate, HookableLifecycleEvent, OracleInitInfo, Plugin,
+        PluginAuthority, PluginType, TransferDelegate, ValidationResultsOffset,
     },
     Asset, Collection,
 };
@@ -156,6 +157,10 @@ pub mod clickcrate_test {
         Ok(())
     }
 
+    pub fn close_oracle(_ctx: Context<CloseOracle>) -> Result<()> {
+        Ok(())
+    }
+
     pub fn place_products<'a, 'b, 'c: 'info, 'info>(
         ctx: Context<'a, 'b, 'c, 'info, PlaceProducts<'info>>,
         price: u64,
@@ -166,10 +171,6 @@ pub mod clickcrate_test {
         let product_accounts = ctx.remaining_accounts;
         let vault = &ctx.accounts.vault;
 
-        let (vault_pda, _vault_bump) = Pubkey::find_program_address(
-            &[b"vault", product_listing.key().as_ref()],
-            ctx.program_id,
-        );
         let collection_data = listing_collection.try_borrow_data()?;
         let collection_account = Collection::deserialize(&mut &collection_data[..])?;
         let total_minted = collection_account.base.num_minted;
@@ -188,18 +189,12 @@ pub mod clickcrate_test {
             ClickCrateErrors::ClickCrateDeactivated
         );
         require!(
-            vault.key() == vault_pda,
-            ClickCrateErrors::InvalidVaultAccount
-        );
-        require!(
             product_listing.in_stock == 0
                 && product_listing.sold == 0
-                && product_accounts.len() as u32 == total_minted,
+                && product_accounts.len() as u32 == total_minted
+                && product_accounts.len() >= 1
+                && product_accounts.len() <= 20,
             ClickCrateErrors::InvalidStockingRequest
-        );
-        require!(
-            product_accounts.len() >= 1 && product_accounts.len() <= 20,
-            ClickCrateErrors::InvalidStockingAmount
         );
 
         // Lock the NFTs
@@ -209,6 +204,7 @@ pub mod clickcrate_test {
                 Asset::deserialize(&mut &product_data[..]).is_ok(),
                 ClickCrateErrors::InvalidProductAccount
             );
+            // let deserialized_product = Asset::deserialize(&mut &product_data[..]).unwrap();
 
             // Freeze the Asset
             AddPluginV1CpiBuilder::new(&core_program_info)
@@ -269,10 +265,46 @@ pub mod clickcrate_test {
         Ok(())
     }
 
-    pub fn remove_products(ctx: Context<RemoveProducts>) -> Result<()> {
-        let product_listing = &mut ctx.accounts.product_listing;
-        let clickcrate = &mut ctx.accounts.clickcrate;
-        let vault = &mut ctx.accounts.vault;
+    pub fn remove_products<'a, 'b, 'c: 'info, 'info>(
+        ctx: Context<'a, 'b, 'c, 'info, RemoveProducts<'info>>,
+    ) -> Result<()> {
+        let product_listing: &mut Account<ProductListingState> = &mut ctx.accounts.product_listing;
+        let clickcrate: &mut Account<ClickCrateState> = &mut ctx.accounts.clickcrate;
+        let listing_collection = &ctx.accounts.listing_collection;
+        let product_accounts = ctx.remaining_accounts;
+        let vault = &ctx.accounts.vault;
+
+        let (vault_pda, _vault_bump) = Pubkey::find_program_address(
+            &[b"vault", product_listing.key().as_ref()],
+            ctx.program_id,
+        );
+        let collection_data = listing_collection.try_borrow_data()?;
+        let collection_account = Collection::deserialize(&mut &collection_data[..])?;
+        let total_minted = collection_account.base.num_minted;
+
+        let core_program_info = ctx.accounts.core_program.to_account_info();
+        let collection_info = ctx.accounts.listing_collection.to_account_info();
+        let owner_info = ctx.accounts.owner.to_account_info();
+        let system_program_info = ctx.accounts.system_program.to_account_info();
+
+        require!(
+            product_listing.is_active,
+            ClickCrateErrors::ProductListingDeactivated
+        );
+        require!(
+            clickcrate.is_active,
+            ClickCrateErrors::ClickCrateDeactivated
+        );
+        require!(
+            vault.key() == vault_pda,
+            ClickCrateErrors::InvalidVaultAccount
+        );
+        require!(
+            product_accounts.len() as u32 == total_minted
+                && product_accounts.len() >= 1
+                && product_accounts.len() <= 20,
+            ClickCrateErrors::InvalidRemovalRequest
+        );
 
         // Check if the vault is empty (of product sale funds)
         require!(
@@ -281,18 +313,22 @@ pub mod clickcrate_test {
             ClickCrateErrors::VaultNotEmpty
         );
 
-        // Fetch child NFTs of the collection
-        let child_nfts =
-            fetch_child_nfts(&ctx.accounts.listing_collection, &ctx.accounts.core_program)?;
+        // Unlock the NFTs
+        for product_account in product_accounts.iter() {
+            let product_data = product_account.try_borrow_data()?;
+            require!(
+                Asset::deserialize(&mut &product_data[..]).is_ok(),
+                ClickCrateErrors::InvalidProductAccount
+            );
+            let deserialized_product = Asset::deserialize(&mut &product_data[..]).unwrap();
 
-        for child_nft in child_nfts {
             // Unfreeze the Asset
-            UpdatePluginV1CpiBuilder::new(&ctx.accounts.core_program.to_account_info())
-                .asset(&child_nft)
-                .collection(Some(&ctx.accounts.listing_collection.to_account_info()))
-                .payer(&ctx.accounts.owner.to_account_info())
+            UpdatePluginV1CpiBuilder::new(&core_program_info)
+                .asset(&product_account)
+                .collection(Some(&collection_info))
+                .payer(&owner_info)
                 .authority(Some(&product_listing.to_account_info()))
-                .system_program(&ctx.accounts.system_program.to_account_info())
+                .system_program(&system_program_info)
                 .plugin(Plugin::FreezeDelegate(FreezeDelegate { frozen: false }))
                 .invoke_signed(&[&[
                     b"listing",
@@ -301,52 +337,86 @@ pub mod clickcrate_test {
                 ]])?;
 
             // Remove the FreezeDelegate Plugin
-            RemovePluginV1CpiBuilder::new(&ctx.accounts.core_program.to_account_info())
-                .asset(&child_nft)
-                .collection(Some(&ctx.accounts.listing_collection.to_account_info()))
-                .payer(&ctx.accounts.owner.to_account_info())
-                .authority(Some(&ctx.accounts.owner.to_account_info()))
-                .system_program(&ctx.accounts.system_program.to_account_info())
+            RemovePluginV1CpiBuilder::new(&core_program_info)
+                .asset(&product_account)
+                .collection(Some(&collection_info))
+                .payer(&owner_info)
+                .authority(Some(&owner_info))
+                .system_program(&system_program_info)
                 .plugin_type(PluginType::FreezeDelegate)
                 .invoke()?;
 
             // Remove the TransferDelegate Plugin
-            RemovePluginV1CpiBuilder::new(&ctx.accounts.core_program.to_account_info())
-                .asset(&child_nft)
-                .collection(Some(&ctx.accounts.listing_collection.to_account_info()))
-                .payer(&ctx.accounts.owner.to_account_info())
-                .authority(Some(&ctx.accounts.owner.to_account_info()))
-                .system_program(&ctx.accounts.system_program.to_account_info())
+            RemovePluginV1CpiBuilder::new(&core_program_info)
+                .asset(&product_account)
+                .collection(Some(&collection_info))
+                .payer(&owner_info)
+                .authority(Some(&owner_info))
+                .system_program(&system_program_info)
                 .plugin_type(PluginType::TransferDelegate)
                 .invoke()?;
 
             // Remove the Oracle Plugin
-            RemovePluginV1CpiBuilder::new(&ctx.accounts.core_program.to_account_info())
-                .asset(&child_nft)
-                .collection(Some(&ctx.accounts.listing_collection.to_account_info()))
-                .payer(&ctx.accounts.owner.to_account_info())
-                .authority(Some(&ctx.accounts.owner.to_account_info()))
-                .system_program(&ctx.accounts.system_program.to_account_info())
-                .plugin_type(PluginType::Oracle)
+            let oracle = deserialized_product
+                .external_plugin_adapter_list
+                .oracles
+                .first()
+                .ok_or(ClickCrateErrors::OracleNotFound)?;
+
+            RemoveExternalPluginAdapterV1CpiBuilder::new(&core_program_info)
+                .asset(&product_account)
+                .collection(Some(&collection_info))
+                .payer(&owner_info)
+                .authority(Some(&owner_info))
+                .system_program(&system_program_info)
+                .key(ExternalPluginAdapterKey::Oracle(oracle.base_address))
                 .invoke()?;
 
-            // Close the Oracle account
-            let oracle_seeds = &[b"oracle", child_nft.key().as_ref()];
-            let (oracle_pda, _bump) = Pubkey::find_program_address(oracle_seeds, ctx.program_id);
+            //   // Remove the Oracle Plugin
+            //   let (oracle_pda, _) = Pubkey::find_program_address(
+            //     &[b"oracle", product_account.key().as_ref()],
+            //     ctx.program_id,
+            // );
+            // RemoveExternalPluginAdapterV1CpiBuilder::new(
+            //     &ctx.accounts.core_program.to_account_info(),
+            // )
+            // .asset(&product_account)
+            // .collection(Some(&ctx.accounts.listing_collection.to_account_info()))
+            // .payer(&ctx.accounts.owner.to_account_info())
+            // .authority(Some(&ctx.accounts.owner.to_account_info()))
+            // .system_program(&ctx.accounts.system_program.to_account_info())
+            // .key(ExternalPluginAdapterKey::Oracle(oracle_pda))
+            // .invoke()?;
 
-            let oracle_account_info = ctx.accounts.system_program.to_account_info();
-            if let Ok(mut oracle_account) = Account::<OrderOracle>::try_from(&oracle_account_info) {
-                let oracle_lamports = oracle_account.to_account_info().lamports();
-                **oracle_account.to_account_info().try_borrow_mut_lamports()? = 0;
-                **vault.to_account_info().try_borrow_mut_lamports()? += oracle_lamports;
+            // // Close the Oracle account
+            // let oracle_seeds = &[b"oracle", product_account.key().as_ref()];
+            // let (oracle_pda, _bump) = Pubkey::find_program_address(oracle_seeds, ctx.program_id);
 
-                oracle_account.close(vault.to_account_info())?;
-            } else {
-                ClickCrateErrors::OracleFailedToClose
-            }
+            // let oAccount: std::result::Result<Asset, std::io::Error> = deserialized_product
+
+            // let oracle_account_info = Account::<OrderOracle>::try_from(&oracle_pda)?;
+            // let oracle_lamports = product_account.to_account_info().lamports();
+            // **oracle_account_info
+            //     .to_account_info()
+            //     .try_borrow_mut_lamports()? = 0;
+            // **ctx.accounts.owner.try_borrow_mut_lamports()? += oracle_lamports;
+
+            // oracle_account_info.close(ctx.accounts.owner.to_account_info())?;
+
+            product_listing.in_stock -= 1;
         }
-        clickcrate.product = None;
-        product_listing.clickcrate_pos = None;
+
+        if product_listing.in_stock == 0 {
+            clickcrate.product = None;
+            product_listing.clickcrate_pos = None;
+
+            // Close the vault account
+            let vault_lamports = vault.to_account_info().lamports();
+            **vault.to_account_info().try_borrow_mut_lamports()? = 0;
+            **ctx.accounts.owner.try_borrow_mut_lamports()? += vault_lamports;
+
+            product_listing.vault = Pubkey::default();
+        }
 
         Ok(())
     }
@@ -427,9 +497,9 @@ pub mod clickcrate_test {
 
         Ok(())
     }
+
     pub fn update_order_status(
         ctx: Context<UpdateOrderStatus>,
-        product_id: Pubkey,
         new_order_status: OrderStatus,
     ) -> Result<()> {
         let oracle = &mut ctx.accounts.oracle;
@@ -440,7 +510,7 @@ pub mod clickcrate_test {
             ClickCrateErrors::UnauthorizedUpdate
         );
 
-        oracle.order_status = new_order_status;
+        oracle.order_status = new_order_status.clone();
         oracle.validation = match new_order_status {
             OrderStatus::Pending => OracleValidation::V1 {
                 create: ExternalValidationResult::Pass,

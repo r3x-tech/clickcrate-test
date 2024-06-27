@@ -163,6 +163,24 @@ pub struct InitializeOracle<'info> {
 }
 
 #[derive(Accounts)]
+pub struct CloseOracle<'info> {
+    #[account(mut)]
+    pub product_listing: Account<'info, ProductListingState>,
+    #[account(
+        mut,
+        close = owner,
+        seeds = [b"oracle", product.key().as_ref()],
+        bump,
+    )]
+    pub oracle: Account<'info, OrderOracle>,
+    /// CHECK: This is a Metaplex Core NFT
+    pub product: UncheckedAccount<'info>,
+    #[account(mut)]
+    pub owner: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
 #[instruction(product_listing_id: Pubkey, clickcrate_id: Pubkey, price: u64)]
 pub struct PlaceProducts<'info> {
     #[account(
@@ -219,11 +237,11 @@ pub struct RemoveProducts<'info> {
     )]
     pub product_listing: Account<'info, ProductListingState>,
     #[account(
-      mut,
-      seeds = [b"vault", product_listing.key().as_ref()],
-      bump,
-      constraint = vault.key() == product_listing.vault,
-      close = owner
+        mut,
+        seeds = [b"vault", product_listing.key().as_ref()],
+        bump,
+        constraint = vault.key() == product_listing.vault,
+        close = owner
     )]
     pub vault: Account<'info, VaultAccount>,
     /// CHECK: This is the Metaplex core collection account
@@ -266,11 +284,11 @@ pub struct MakePurchase<'info> {
     /// CHECK: This is a Metaplex Core NFT
     #[account(mut)]
     pub product: UncheckedAccount<'info>,
-    pub core_program: Program<'info, Core>,
     #[account(mut, constraint = owner.key() == product_listing.owner)]
     pub owner: Signer<'info>,
     #[account(mut)]
     pub buyer: Signer<'info>,
+    pub core_program: Program<'info, Core>,
     pub system_program: Program<'info, System>,
 }
 
@@ -293,13 +311,16 @@ pub struct UpdateOrderStatus<'info> {
     //   realloc::zero = true,
     // )]
     // pub oracle: Account<'info, OrderOracle>,
+    #[account(
+      mut,
+      seeds = [b"oracle", product_id.key().as_ref()],
+      bump = oracle.bump,
+     )]
+    pub oracle: Account<'info, OrderOracle>,
     #[account(mut)]
     pub owner: Signer<'info>,
     #[account(mut)]
     pub seller: Signer<'info>,
-    #[account(mut)]
-    /// CHECK: This is a Metaplex Core NFT
-    pub product: UncheckedAccount<'info>,
     pub system_program: Program<'info, System>,
 }
 

@@ -43,6 +43,12 @@ pub enum ClickCrateErrors {
     #[msg("Invalid stocking amount")]
     InvalidStockingAmount,
 
+    #[msg("Invalid removal request")]
+    InvalidRemovalRequest,
+
+    #[msg("Invalid removal amount")]
+    InvalidRemovalAmount,
+
     #[msg("Invalid listing registration")]
     InvalidProductListingRegistration,
 
@@ -81,6 +87,9 @@ pub enum ClickCrateErrors {
 
     #[msg("Oracle account closure failed")]
     OracleFailedToClose,
+
+    #[msg("Oracle not found")]
+    OracleNotFound,
 
     #[msg("Unauthorized update")]
     UnauthorizedUpdate,
