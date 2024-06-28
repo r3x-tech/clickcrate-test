@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  ClickcrateTest,
   ClickcrateTestIDL,
   getClickcrateTestProgramId,
 } from '@clickcrate-test/anchor';
@@ -26,6 +27,7 @@ export function useClickCrateListingProgram() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const provider = useAnchorProvider();
+
   const programId = useMemo(
     () => getClickcrateTestProgramId(cluster.network as Cluster),
     [cluster]
@@ -34,7 +36,7 @@ export function useClickCrateListingProgram() {
   //   'RcGXdMiga83T527zSoCQDaWdMmU2qVQA3GCkfZyGrXc'
   // );
 
-  const program = new Program(ClickcrateTestIDL, programId, provider);
+  const program = new Program(ClickcrateTestIDL as ClickcrateTest, provider);
 
   const accounts = useQuery({
     queryKey: ['clickcrate-test', 'all', { cluster }],
