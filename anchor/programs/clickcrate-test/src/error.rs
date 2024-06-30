@@ -94,4 +94,7 @@ pub enum ClickCrateErrors {
 
     #[msg("Unauthorized update")]
     UnauthorizedUpdate,
+
+    #[msg("Unauthorized close")]
+    UnauthorizedClose,
 }

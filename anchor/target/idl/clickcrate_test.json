@@ -1,8 +1,8 @@
 {
-  "address": "DwALQVbHk58rCtvjgaodThL5exDzJT1ecYVuXfvsgqGF",
+  "address": "7ddTXwv4emb2oazbjgBbY7z8t85vmBrmwBBA2bFJfpQS",
   "metadata": {
     "name": "clickcrate_test",
-    "version": "0.24.0",
+    "version": "0.26.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
@@ -121,7 +121,27 @@
       "accounts": [
         {
           "name": "product_listing",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  115,
+                  116,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "product_listing_id"
+              }
+            ]
+          }
         },
         {
           "name": "oracle",
@@ -147,7 +167,8 @@
           }
         },
         {
-          "name": "product"
+          "name": "product",
+          "writable": true
         },
         {
           "name": "owner",
@@ -159,7 +180,12 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "_product_listing_id",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "complete_order",
@@ -176,11 +202,27 @@
       "accounts": [
         {
           "name": "product_listing",
-          "writable": true
-        },
-        {
-          "name": "product_account",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  115,
+                  116,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "product_listing_id"
+              }
+            ]
+          }
         },
         {
           "name": "vault",
@@ -245,7 +287,12 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "_product_listing_id",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "deactivate_clickcrate",
@@ -559,6 +606,14 @@
       ],
       "args": [
         {
+          "name": "_product_listing_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "_clickcrate_id",
+          "type": "pubkey"
+        },
+        {
           "name": "product_id",
           "type": "pubkey"
         },
@@ -626,8 +681,9 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "product_listing_id"
+                "kind": "account",
+                "path": "product_listing.id",
+                "account": "ProductListingState"
               }
             ]
           }
@@ -676,6 +732,14 @@
         }
       ],
       "args": [
+        {
+          "name": "_product_listing_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "_clickcrate_id",
+          "type": "pubkey"
+        },
         {
           "name": "price",
           "type": "u64"
@@ -952,7 +1016,16 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "_product_listing_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "_clickcrate_id",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "update_clickcrate",
@@ -1111,6 +1184,14 @@
       ],
       "args": [
         {
+          "name": "_product_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "_product_listing_id",
+          "type": "pubkey"
+        },
+        {
           "name": "new_order_status",
           "type": {
             "defined": {
@@ -1168,6 +1249,10 @@
         }
       ],
       "args": [
+        {
+          "name": "_id",
+          "type": "pubkey"
+        },
         {
           "name": "new_placement_type",
           "type": {
@@ -1404,6 +1489,11 @@
       "code": 6030,
       "name": "UnauthorizedUpdate",
       "msg": "Unauthorized update"
+    },
+    {
+      "code": 6031,
+      "name": "UnauthorizedClose",
+      "msg": "Unauthorized close"
     }
   ],
   "types": [

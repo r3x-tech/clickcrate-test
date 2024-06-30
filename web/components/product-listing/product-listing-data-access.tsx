@@ -51,7 +51,16 @@ export function useClickCrateListingProgram() {
   const registerProductListing = useMutation({
     mutationKey: ['clickcrate-test', 'registerProductListing', { cluster }],
     mutationFn: async (
-      args: [PublicKey, PublicKey, string, string, string, number, PublicKey]
+      args: [
+        PublicKey,
+        PublicKey,
+        string,
+        string,
+        string,
+        number,
+        PublicKey,
+        BN
+      ]
     ) => {
       const [
         id,
@@ -62,6 +71,7 @@ export function useClickCrateListingProgram() {
         productCategory,
         inStock,
         manager,
+        price,
       ] = args;
       const [productListingAddress] = PublicKey.findProgramAddressSync(
         [Buffer.from('listing'), id.toBuffer()],
@@ -91,11 +101,13 @@ export function useClickCrateListingProgram() {
           new BN(inStock),
           manager
         )
-        .accounts({
-          productListing: productListingAddress,
-          owner: program.provider.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
+        .accounts([
+          {
+            productListing: productListingAddress,
+            owner: program.provider.publicKey,
+            systemProgram: SystemProgram.programId,
+          },
+        ])
         .rpc();
     },
     onSuccess: (signature) => {
@@ -172,28 +184,32 @@ export function useClickCrateListingProgramAccount({
     onError: () => toast.error('Failed to deactivate Product Listing'),
   });
 
-  const placeProductListing = useMutation({
-    mutationKey: [
-      'clickcrate-test',
-      'placeProductListing',
-      { cluster, account },
-    ],
-    mutationFn: async (args: PlaceProductListingArgs) => {
-      const { productId, clickcrateId } = args;
+  const placeProducts = useMutation({
+    mutationKey: ['clickcrate-test', 'placeProducts', { cluster, account }],
+    mutationFn: async (args: { clickcrateId: PublicKey; price: BN }) => {
+      const { clickcrateId, price } = args;
+const [clickcrateAccount] = PublicKey.findProgramAddressSync(
+      [Buffer.from('clickcrate'), clickcrateId.toBuffer()],
+      programId
+    );
 
-      const [clickcrateAccount] = PublicKey.findProgramAddressSync(
-        [Buffer.from('clickcrate'), clickcrateId.toBuffer()],
-        programId
-      );
+    const [vaultAccount] = PublicKey.findProgramAddressSync(
+      [Buffer.from('vault'), account.toBuffer()],
+      programId
+    );
 
-      return program.methods
-        .placeProductListing(productId, clickcrateId)
-        .accounts({
-          clickcrate: clickcrateAccount,
-          productListing: account,
-          owner: program.provider.publicKey,
-        })
-        .rpc();
+    return program.methods
+      .placeProducts(clickcrateprice)
+      .accounts({
+        clickcrate: clickcrateAccount,
+        productListing: account,
+        vault: vaultAccount,
+        listingCollection: /* You need to provide the correct address for this */,
+        coreProgram: new PublicKey('CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d'),
+        owner: program.provider.publicKey,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
     },
     onSuccess: (signature) => {
       transactionToast(signature);
@@ -218,11 +234,13 @@ export function useClickCrateListingProgramAccount({
 
       return program.methods
         .removeProductListing(productId, clickcrateId)
-        .accounts({
-          clickcrate: account,
-          productListing: productListingAccount,
-          owner: program.provider.publicKey,
-        })
+        .accounts([
+          {
+            clickcrate: account,
+            productListing: productListingAccount,
+            owner: program.provider.publicKey,
+          },
+        ])
         .rpc();
     },
     onSuccess: (signature) => {
@@ -258,11 +276,13 @@ export function useClickCrateListingProgramAccount({
           convertedProductCategory,
           newManager
         )
-        .accounts({
-          productListing: account,
-          owner: program.provider.publicKey,
-          systemProgram: SystemProgram.programId,
-        })
+        .accounts([
+          {
+            productListing: account,
+            owner: program.provider.publicKey,
+            systemProgram: SystemProgram.programId,
+          },
+        ])
         .rpc();
     },
     onSuccess: (signature) => {

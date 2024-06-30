@@ -51,7 +51,7 @@ pub struct RegisterProductListing<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, manager: Pubkey)]
+#[instruction(id: Pubkey, placement_type: PlacementType, product_category: ProductCategory, manager: Pubkey)]
 pub struct UpdateProductListing<'info> {
     #[account(
         mut,
@@ -163,8 +163,13 @@ pub struct InitializeOracle<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(product_listing_id: Pubkey)]
 pub struct CloseOracle<'info> {
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = [b"listing".as_ref(), product_listing_id.key().as_ref()],
+        bump,
+    )]
     pub product_listing: Account<'info, ProductListingState>,
     #[account(
         mut,
@@ -174,6 +179,7 @@ pub struct CloseOracle<'info> {
     )]
     pub oracle: Account<'info, OrderOracle>,
     /// CHECK: This is a Metaplex Core NFT
+    #[account(mut)]
     pub product: UncheckedAccount<'info>,
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -193,7 +199,7 @@ pub struct PlaceProducts<'info> {
     #[account(
         mut,
         has_one = owner,
-        seeds = [b"listing".as_ref(), product_listing_id.key().as_ref()],
+        seeds = [b"listing".as_ref(), product_listing.id.key().as_ref()],
         bump,
     )]
     pub product_listing: Account<'info, ProductListingState>,
@@ -325,12 +331,14 @@ pub struct UpdateOrderStatus<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(product_listing_id: Pubkey)]
 pub struct CompleteOrder<'info> {
-    #[account(mut)]
+    #[account(
+    mut,
+    seeds = [b"listing".as_ref(), product_listing_id.key().as_ref()],
+    bump,
+  )]
     pub product_listing: Account<'info, ProductListingState>,
-    #[account(mut)]
-    /// CHECK: This is a Metaplex Core NFT, which we'll deserialize manually
-    pub product_account: UncheckedAccount<'info>,
     #[account(
       mut,
       seeds = [b"vault", product_listing.key().as_ref()],

@@ -15,7 +15,7 @@ use mpl_core::{
     },
     Asset, Collection,
 };
-declare_id!("DwALQVbHk58rCtvjgaodThL5exDzJT1ecYVuXfvsgqGF");
+declare_id!("7ddTXwv4emb2oazbjgBbY7z8t85vmBrmwBBA2bFJfpQS");
 
 pub mod account;
 pub mod context;
@@ -27,7 +27,6 @@ use crate::error::*;
 
 #[program]
 pub mod clickcrate_test {
-
     use super::*;
 
     pub fn register_clickcrate(
@@ -92,6 +91,7 @@ pub mod clickcrate_test {
 
     pub fn update_product_listing(
         ctx: Context<UpdateProductListing>,
+        _id: Pubkey,
         new_placement_type: PlacementType,
         new_product_category: ProductCategory,
         new_manager: Pubkey,
@@ -157,12 +157,27 @@ pub mod clickcrate_test {
         Ok(())
     }
 
-    pub fn close_oracle(_ctx: Context<CloseOracle>) -> Result<()> {
+    pub fn close_oracle(ctx: Context<CloseOracle>, _product_listing_id: Pubkey) -> Result<()> {
+        let product_listing: &mut Account<ProductListingState> = &mut ctx.accounts.product_listing;
+        let product_account = &mut ctx.accounts.product;
+        let product_data = product_account.try_borrow_data()?;
+        require!(
+            Asset::deserialize(&mut &product_data[..]).is_ok(),
+            ClickCrateErrors::InvalidProductAccount
+        );
+        let deserialized_asset = Asset::deserialize(&mut &product_data[..]).unwrap();
+        require!(
+            ctx.accounts.owner.key() == product_listing.owner.key()
+                && deserialized_asset.base.owner.key() == product_listing.owner.key(),
+            ClickCrateErrors::UnauthorizedClose
+        );
         Ok(())
     }
 
     pub fn place_products<'a, 'b, 'c: 'info, 'info>(
         ctx: Context<'a, 'b, 'c, 'info, PlaceProducts<'info>>,
+        _product_listing_id: Pubkey,
+        _clickcrate_id: Pubkey,
         price: u64,
     ) -> Result<()> {
         let product_listing: &mut Account<ProductListingState> = &mut ctx.accounts.product_listing;
@@ -267,6 +282,8 @@ pub mod clickcrate_test {
 
     pub fn remove_products<'a, 'b, 'c: 'info, 'info>(
         ctx: Context<'a, 'b, 'c, 'info, RemoveProducts<'info>>,
+        _product_listing_id: Pubkey,
+        _clickcrate_id: Pubkey,
     ) -> Result<()> {
         let product_listing: &mut Account<ProductListingState> = &mut ctx.accounts.product_listing;
         let clickcrate: &mut Account<ClickCrateState> = &mut ctx.accounts.clickcrate;
@@ -423,6 +440,8 @@ pub mod clickcrate_test {
 
     pub fn make_purchase(
         ctx: Context<MakePurchase>,
+        _product_listing_id: Pubkey,
+        _clickcrate_id: Pubkey,
         product_id: Pubkey,
         quantity: u64,
     ) -> Result<()> {
@@ -500,6 +519,8 @@ pub mod clickcrate_test {
 
     pub fn update_order_status(
         ctx: Context<UpdateOrderStatus>,
+        _product_id: Pubkey,
+        _product_listing_id: Pubkey,
         new_order_status: OrderStatus,
     ) -> Result<()> {
         let oracle = &mut ctx.accounts.oracle;
@@ -537,7 +558,7 @@ pub mod clickcrate_test {
         Ok(())
     }
 
-    pub fn complete_order(ctx: Context<CompleteOrder>) -> Result<()> {
+    pub fn complete_order(ctx: Context<CompleteOrder>, _product_listing_id: Pubkey) -> Result<()> {
         let product = Asset::deserialize(&mut &ctx.accounts.product.data.borrow()[..])?;
 
         require!(

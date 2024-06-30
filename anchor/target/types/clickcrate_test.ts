@@ -5,10 +5,10 @@
  * IDL can be found at `target/idl/clickcrate_test.json`.
  */
 export type ClickcrateTest = {
-  "address": "G6s8wC4fFWP8q1wuNqRYMGEZDaDTHREff9XTojykTpCi",
+  "address": "DwALQVbHk58rCtvjgaodThL5exDzJT1ecYVuXfvsgqGF",
   "metadata": {
     "name": "clickcrateTest",
-    "version": "0.24.0",
+    "version": "0.26.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
@@ -127,7 +127,27 @@ export type ClickcrateTest = {
       "accounts": [
         {
           "name": "productListing",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  115,
+                  116,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "productListingId"
+              }
+            ]
+          }
         },
         {
           "name": "oracle",
@@ -153,7 +173,8 @@ export type ClickcrateTest = {
           }
         },
         {
-          "name": "product"
+          "name": "product",
+          "writable": true
         },
         {
           "name": "owner",
@@ -165,7 +186,12 @@ export type ClickcrateTest = {
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "productListingId",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "completeOrder",
@@ -182,11 +208,27 @@ export type ClickcrateTest = {
       "accounts": [
         {
           "name": "productListing",
-          "writable": true
-        },
-        {
-          "name": "productAccount",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  115,
+                  116,
+                  105,
+                  110,
+                  103
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "productListingId"
+              }
+            ]
+          }
         },
         {
           "name": "vault",
@@ -251,7 +293,12 @@ export type ClickcrateTest = {
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "productListingId",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "deactivateClickcrate",
@@ -565,6 +612,14 @@ export type ClickcrateTest = {
       ],
       "args": [
         {
+          "name": "productListingId",
+          "type": "pubkey"
+        },
+        {
+          "name": "clickcrateId",
+          "type": "pubkey"
+        },
+        {
           "name": "productId",
           "type": "pubkey"
         },
@@ -632,8 +687,9 @@ export type ClickcrateTest = {
                 ]
               },
               {
-                "kind": "arg",
-                "path": "productListingId"
+                "kind": "account",
+                "path": "product_listing.id",
+                "account": "productListingState"
               }
             ]
           }
@@ -682,6 +738,14 @@ export type ClickcrateTest = {
         }
       ],
       "args": [
+        {
+          "name": "productListingId",
+          "type": "pubkey"
+        },
+        {
+          "name": "clickcrateId",
+          "type": "pubkey"
+        },
         {
           "name": "price",
           "type": "u64"
@@ -958,7 +1022,16 @@ export type ClickcrateTest = {
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "productListingId",
+          "type": "pubkey"
+        },
+        {
+          "name": "clickcrateId",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "updateClickcrate",
@@ -1117,6 +1190,14 @@ export type ClickcrateTest = {
       ],
       "args": [
         {
+          "name": "productId",
+          "type": "pubkey"
+        },
+        {
+          "name": "productListingId",
+          "type": "pubkey"
+        },
+        {
           "name": "newOrderStatus",
           "type": {
             "defined": {
@@ -1174,6 +1255,10 @@ export type ClickcrateTest = {
         }
       ],
       "args": [
+        {
+          "name": "id",
+          "type": "pubkey"
+        },
         {
           "name": "newPlacementType",
           "type": {
@@ -1410,6 +1495,11 @@ export type ClickcrateTest = {
       "code": 6030,
       "name": "unauthorizedUpdate",
       "msg": "Unauthorized update"
+    },
+    {
+      "code": 6031,
+      "name": "unauthorizedClose",
+      "msg": "Unauthorized close"
     }
   ],
   "types": [
