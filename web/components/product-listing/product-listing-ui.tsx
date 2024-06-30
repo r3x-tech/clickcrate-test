@@ -32,6 +32,7 @@ export function ProductListingRegister({
   const [productCategory, setProductCategory] =
     useState<ProductCategory | null>(null);
   const [productInStock, setProductInStock] = useState<BN>(new BN(0));
+  const [unitPriceInSol, setUnitPriceInSol] = useState(0);
 
   const isProductFormValid =
     productId.trim() !== '' &&
@@ -49,6 +50,7 @@ export function ProductListingRegister({
         productCategory,
         productInStock.toNumber(),
         publicKey,
+        new BN(unitPriceInSol * 1000000000),
       ]);
       onClose();
     } else {
@@ -96,6 +98,13 @@ export function ProductListingRegister({
           placeholder="Product Stock"
           value={productInStock.toString()}
           onChange={(e) => setProductInStock(new BN(parseInt(e.target.value)))}
+          className="rounded-lg p-2 text-black"
+        />
+        <input
+          type="number"
+          placeholder="Unit Price (in SOL)"
+          value={unitPriceInSol}
+          onChange={(e) => setUnitPriceInSol(Number(e.target.value))}
           className="rounded-lg p-2 text-black"
         />
         <select
@@ -669,19 +678,20 @@ function ProductListingPlaceModal({
   currentProductId: PublicKey;
   isPlaceFormValid: boolean;
 }) {
-  const { placeProductListing } = useClickCrateListingProgramAccount({
+  const { placeProducts } = useClickCrateListingProgramAccount({
     account,
   });
 
   const { publicKey } = useWallet();
-  const [productId, setProductId] = useState('');
   const [clickcrateId, setClickCrateId] = useState('');
+  const [unitPriceInSol, setUnitPriceInSol] = useState(0);
 
   const handlePlaceProduct = () => {
     if (publicKey && isPlaceFormValid) {
-      placeProductListing.mutateAsync({
+      placeProducts.mutateAsync({
         productId: currentProductId,
         clickcrateId: new PublicKey(clickcrateId),
+        price: new BN(unitPriceInSol * 1000000000),
       });
       onClose();
     }
@@ -718,20 +728,29 @@ function ProductListingPlaceModal({
           onChange={(e) => setClickCrateId(e.target.value)}
           className="rounded-lg p-2 text-black"
         />
+
+        <input
+          type="number"
+          placeholder="Unit Price (in SOL)"
+          value={unitPriceInSol}
+          onChange={(e) => setUnitPriceInSol(Number(e.target.value))}
+          className="rounded-lg p-2 text-black"
+        />
+
         <div className="flex flex-row gap-[4%] py-2">
           <button
             className="btn btn-xs lg:btn-sm btn-outline w-[48%] py-3"
             onClick={onClose}
-            disabled={placeProductListing.isPending}
+            disabled={placeProducts.isPending}
           >
             Cancel
           </button>
           <button
             className="btn btn-xs lg:btn-sm btn-primary w-[48%] py-3"
             onClick={handlePlaceProduct}
-            disabled={placeProductListing.isPending || !isPlaceFormValid}
+            disabled={placeProducts.isPending || !isPlaceFormValid}
           >
-            {placeProductListing.isPending ? 'Placing...' : 'Place'}
+            {placeProducts.isPending ? 'Placing...' : 'Place'}
           </button>
         </div>
       </div>

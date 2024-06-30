@@ -17,7 +17,6 @@ import {
   getOriginFromString,
   getPlacementTypeFromString,
   getProductCategoryFromString,
-  PlaceProductListingArgs,
   RemoveProductListingArgs,
 } from '../../types';
 import { useMemo } from 'react';
@@ -69,10 +68,12 @@ export function useClickCrateListingProgram() {
         origin,
         placementType,
         productCategory,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         inStock,
         manager,
         price,
       ] = args;
+
       const [productListingAddress] = PublicKey.findProgramAddressSync(
         [Buffer.from('listing'), id.toBuffer()],
         programId
@@ -98,8 +99,8 @@ export function useClickCrateListingProgram() {
           convertedOrigin,
           convertedPlacementType,
           convertedProductCategory,
-          new BN(inStock),
-          manager
+          manager,
+          price
         )
         .accounts([
           {
@@ -186,30 +187,41 @@ export function useClickCrateListingProgramAccount({
 
   const placeProducts = useMutation({
     mutationKey: ['clickcrate-test', 'placeProducts', { cluster, account }],
-    mutationFn: async (args: { clickcrateId: PublicKey; price: BN }) => {
-      const { clickcrateId, price } = args;
-const [clickcrateAccount] = PublicKey.findProgramAddressSync(
-      [Buffer.from('clickcrate'), clickcrateId.toBuffer()],
-      programId
-    );
+    mutationFn: async (args: {
+      productId: PublicKey;
+      clickcrateId: PublicKey;
+      price: BN;
+    }) => {
+      const { productId, clickcrateId, price } = args;
+      const [clickcrateAccount] = PublicKey.findProgramAddressSync(
+        [Buffer.from('clickcrate'), clickcrateId.toBuffer()],
+        programId
+      );
 
-    const [vaultAccount] = PublicKey.findProgramAddressSync(
-      [Buffer.from('vault'), account.toBuffer()],
-      programId
-    );
+      const [productListingAccount] = PublicKey.findProgramAddressSync(
+        [Buffer.from('clickcrate'), clickcrateId.toBuffer()],
+        programId
+      );
 
-    return program.methods
-      .placeProducts(clickcrateprice)
-      .accounts({
-        clickcrate: clickcrateAccount,
-        productListing: account,
-        vault: vaultAccount,
-        listingCollection: /* You need to provide the correct address for this */,
-        coreProgram: new PublicKey('CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d'),
-        owner: program.provider.publicKey,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+      const [vaultAccount] = PublicKey.findProgramAddressSync(
+        [Buffer.from('vault'), account.toBuffer()],
+        programId
+      );
+
+      return program.methods
+        .placeProducts(account, clickcrateId, price)
+        .accounts({
+          clickcrate: clickcrateAccount,
+          productListing: productListingAccount,
+          vault: vaultAccount,
+          listingCollection: productId,
+          coreProgram: new PublicKey(
+            'CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d'
+          ),
+          owner: program.provider.publicKey,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc();
     },
     onSuccess: (signature) => {
       transactionToast(signature);
@@ -296,7 +308,7 @@ const [clickcrateAccount] = PublicKey.findProgramAddressSync(
     accountQuery,
     activateProductListing,
     deactivateProductListing,
-    placeProductListing,
+    placeProducts,
     removeProductListing,
     updateProductListing,
   };
