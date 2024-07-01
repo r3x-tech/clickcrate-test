@@ -199,7 +199,7 @@ pub struct PlaceProducts<'info> {
     #[account(
         mut,
         has_one = owner,
-        seeds = [b"listing".as_ref(), product_listing.id.key().as_ref()],
+        seeds = [b"listing".as_ref(), product_listing_id.key().as_ref()],
         bump,
     )]
     pub product_listing: Account<'info, ProductListingState>,

@@ -1,8 +1,8 @@
 {
-  "address": "7ddTXwv4emb2oazbjgBbY7z8t85vmBrmwBBA2bFJfpQS",
+  "address": "3XUQKX7tSMfFk6KqQNSxbANJHq6tSvuH5cJpTrpnLYVQ",
   "metadata": {
     "name": "clickcrate_test",
-    "version": "0.26.0",
+    "version": "0.33.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
@@ -681,9 +681,8 @@
                 ]
               },
               {
-                "kind": "account",
-                "path": "product_listing.id",
-                "account": "ProductListingState"
+                "kind": "arg",
+                "path": "product_listing_id"
               }
             ]
           }
@@ -1422,76 +1421,81 @@
     },
     {
       "code": 6017,
+      "name": "ProductRemovalFailed",
+      "msg": "Product removal failed"
+    },
+    {
+      "code": 6018,
       "name": "OrderNotFound",
       "msg": "Order not found"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "OrderNotConfirmed",
       "msg": "Order not confirmed"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "OrderNotCompleted",
       "msg": "Order not completed"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "InvalidOrderOracleAccount",
       "msg": "Invalid oracle"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "InvalidVaultAccount",
       "msg": "Invalid vault"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "FreezeAuthorityNotFound",
       "msg": "Freeze authority not found"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "TransferAuthorityNotFound",
       "msg": "Transfer authority not found"
     },
     {
-      "code": 6024,
+      "code": 6025,
       "name": "InvalidFreezeAuthority",
       "msg": "Invalid freeze authority"
     },
     {
-      "code": 6025,
+      "code": 6026,
       "name": "InvalidTransferAuthority",
       "msg": "Invalid transfer authority"
     },
     {
-      "code": 6026,
+      "code": 6027,
       "name": "VaultNotEmpty",
       "msg": "Vault not empty"
     },
     {
-      "code": 6027,
+      "code": 6028,
       "name": "InsufficientBalance",
       "msg": "Insufficient balance"
     },
     {
-      "code": 6028,
+      "code": 6029,
       "name": "OracleFailedToClose",
       "msg": "Oracle account closure failed"
     },
     {
-      "code": 6029,
+      "code": 6030,
       "name": "OracleNotFound",
       "msg": "Oracle not found"
     },
     {
-      "code": 6030,
+      "code": 6031,
       "name": "UnauthorizedUpdate",
       "msg": "Unauthorized update"
     },
     {
-      "code": 6031,
+      "code": 6032,
       "name": "UnauthorizedClose",
       "msg": "Unauthorized close"
     }

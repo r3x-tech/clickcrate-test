@@ -53,6 +53,9 @@ pub enum ClickCrateErrors {
     #[msg("Invalid listing registration")]
     InvalidProductListingRegistration,
 
+    #[msg("Product removal failed")]
+    ProductRemovalFailed,
+
     #[msg("Order not found")]
     OrderNotFound,
 

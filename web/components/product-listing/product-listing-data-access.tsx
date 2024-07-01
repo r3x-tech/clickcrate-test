@@ -31,9 +31,6 @@ export function useClickCrateListingProgram() {
     () => getClickcrateTestProgramId(cluster.network as Cluster),
     [cluster]
   );
-  // const programId = new PublicKey(
-  //   'RcGXdMiga83T527zSoCQDaWdMmU2qVQA3GCkfZyGrXc'
-  // );
 
   const program = new Program(ClickcrateTestIDL as ClickcrateTest, provider);
 
@@ -150,10 +147,12 @@ export function useClickCrateListingProgramAccount({
     mutationFn: async () => {
       return program.methods
         .activateProductListing()
-        .accounts({
-          productListing: account,
-          owner: program.provider.publicKey,
-        })
+        .accounts([
+          {
+            productListing: account,
+            owner: program.provider.publicKey,
+          },
+        ])
         .rpc();
     },
     onSuccess: (signature) => {
@@ -172,10 +171,12 @@ export function useClickCrateListingProgramAccount({
     mutationFn: async () => {
       return program.methods
         .deactivateProductListing()
-        .accounts({
-          productListing: account,
-          owner: program.provider.publicKey,
-        })
+        .accounts([
+          {
+            productListing: account,
+            owner: program.provider.publicKey,
+          },
+        ])
         .rpc();
     },
     onSuccess: (signature) => {
@@ -188,18 +189,18 @@ export function useClickCrateListingProgramAccount({
   const placeProducts = useMutation({
     mutationKey: ['clickcrate-test', 'placeProducts', { cluster, account }],
     mutationFn: async (args: {
-      productId: PublicKey;
+      productListingId: PublicKey;
       clickcrateId: PublicKey;
       price: BN;
     }) => {
-      const { productId, clickcrateId, price } = args;
+      const { productListingId, clickcrateId, price } = args;
       const [clickcrateAccount] = PublicKey.findProgramAddressSync(
         [Buffer.from('clickcrate'), clickcrateId.toBuffer()],
         programId
       );
 
       const [productListingAccount] = PublicKey.findProgramAddressSync(
-        [Buffer.from('clickcrate'), clickcrateId.toBuffer()],
+        [Buffer.from('listing'), productListingId.toBuffer()],
         programId
       );
 
@@ -209,18 +210,19 @@ export function useClickCrateListingProgramAccount({
       );
 
       return program.methods
-        .placeProducts(account, clickcrateId, price)
+        .placeProducts(productListingId, clickcrateId, price)
         .accounts({
           clickcrate: clickcrateAccount,
           productListing: productListingAccount,
           vault: vaultAccount,
-          listingCollection: productId,
+          listingCollection: productListingId,
           coreProgram: new PublicKey(
             'CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d'
           ),
           owner: program.provider.publicKey,
           systemProgram: SystemProgram.programId,
         })
+        .remainingAccounts([])
         .rpc();
     },
     onSuccess: (signature) => {
