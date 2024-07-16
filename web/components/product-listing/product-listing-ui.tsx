@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
-import { PublicKey } from '@solana/web3.js';
+import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import { useEffect, useState } from 'react';
 import { ellipsify } from '../ui/ui-layout';
 import { ExplorerLink } from '../cluster/cluster-ui';
@@ -565,19 +565,24 @@ function ProductListingUpdateModal({
   const [productCategory, setProductCategory] =
     useState<ProductCategory | null>(null);
   const [manager, setManager] = useState<PublicKey | null>(null);
+  const [price, setPrice] = useState<string>('');
 
   const handleUpdateProductListing = () => {
     if (
       manager === null ||
       placementType === null ||
-      productCategory === null
+      productCategory === null ||
+      price === ''
     ) {
       toast.error('All fields required');
     } else if (publicKey && isUpdateProductListingFormValid) {
+      const priceInLamports = new BN(parseFloat(price) * LAMPORTS_PER_SOL);
       updateProductListing.mutateAsync([
+        account,
         placementType,
         productCategory,
         manager,
+        priceInLamports,
       ]);
       onClose();
     } else {
@@ -642,6 +647,15 @@ function ProductListingUpdateModal({
           type="text"
           placeholder="Manager"
           onChange={(e) => setManager(new PublicKey(e.target.value))}
+          className="rounded-lg p-2 text-black"
+        />
+        <input
+          type="number"
+          step="0.000000001"
+          min="0"
+          placeholder="Price in SOL"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
           className="rounded-lg p-2 text-black"
         />
         <div className="flex flex-row gap-[4%] py-2">

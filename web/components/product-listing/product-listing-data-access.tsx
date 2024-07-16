@@ -408,8 +408,14 @@ export function useClickCrateListingProgramAccount({
       'updateProductListing',
       { cluster, account },
     ],
-    mutationFn: async (args: [string, string, PublicKey]) => {
-      const [newPlacementType, newProductCategory, newManager] = args;
+    mutationFn: async (args: [PublicKey, string, string, PublicKey, BN]) => {
+      const [
+        productListingId,
+        newPlacementType,
+        newProductCategory,
+        newManager,
+        newPrice,
+      ] = args;
 
       const nPt = newPlacementType;
       console.log(nPt);
@@ -424,9 +430,11 @@ export function useClickCrateListingProgramAccount({
 
       return program.methods
         .updateProductListing(
+          productListingId,
           convertedPlacementType,
           convertedProductCategory,
-          newManager
+          newManager,
+          newPrice
         )
         .accounts([
           {
