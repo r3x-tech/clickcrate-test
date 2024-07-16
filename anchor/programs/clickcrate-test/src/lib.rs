@@ -15,7 +15,7 @@ use mpl_core::{
     },
     Asset, Collection,
 };
-declare_id!("3XUQKX7tSMfFk6KqQNSxbANJHq6tSvuH5cJpTrpnLYVQ");
+declare_id!("YxxtndmPmahv4HpAeuQZvhXseGNrd8teW9hes4aMYwY");
 
 pub mod account;
 pub mod context;
@@ -37,7 +37,7 @@ pub mod clickcrate_test {
         manager: Pubkey,
     ) -> Result<()> {
         msg!("ClickCrate Registration in progress");
-        let clickcrate: &mut Account<ClickCrateState> = &mut ctx.accounts.clickcrate;
+        let clickcrate = &mut ctx.accounts.clickcrate;
         clickcrate.id = id;
         clickcrate.owner = ctx.accounts.owner.key();
         clickcrate.manager = manager;
@@ -56,7 +56,7 @@ pub mod clickcrate_test {
         eligible_product_category: ProductCategory,
         manager: Pubkey,
     ) -> Result<()> {
-        let clickcrate: &mut Account<ClickCrateState> = &mut ctx.accounts.clickcrate;
+        let clickcrate = &mut ctx.accounts.clickcrate;
         clickcrate.id = id;
         clickcrate.manager = manager;
         clickcrate.eligible_placement_type = eligible_placement_type;
@@ -138,7 +138,11 @@ pub mod clickcrate_test {
     //     Ok(())
     // }
 
-    pub fn initialize_oracle(ctx: Context<InitializeOracle>) -> Result<()> {
+    pub fn initialize_oracle(
+        ctx: Context<InitializeOracle>,
+        _product_listing_id: Pubkey,
+        _product_id: Pubkey,
+    ) -> Result<()> {
         let oracle = &mut ctx.accounts.oracle;
         let product_listing = &ctx.accounts.product_listing;
 
@@ -157,7 +161,11 @@ pub mod clickcrate_test {
         Ok(())
     }
 
-    pub fn close_oracle(ctx: Context<CloseOracle>, _product_listing_id: Pubkey) -> Result<()> {
+    pub fn close_oracle(
+        ctx: Context<CloseOracle>,
+        _product_listing_id: Pubkey,
+        _product_id: Pubkey,
+    ) -> Result<()> {
         let product_listing: &mut Account<ProductListingState> = &mut ctx.accounts.product_listing;
         let product_account = &mut ctx.accounts.product;
         let product_data = product_account.try_borrow_data()?;
@@ -466,7 +474,7 @@ pub mod clickcrate_test {
         let clickcrate = &mut ctx.accounts.clickcrate;
         let product_listing = &mut ctx.accounts.product_listing;
         let oracle = &mut ctx.accounts.oracle;
-        let product = &ctx.accounts.product;
+        let product = &ctx.accounts.product_account;
 
         // Check if the product is placed in ClickCrate
         require!(

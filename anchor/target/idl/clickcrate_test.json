@@ -1,8 +1,8 @@
 {
-  "address": "3XUQKX7tSMfFk6KqQNSxbANJHq6tSvuH5cJpTrpnLYVQ",
+  "address": "YxxtndmPmahv4HpAeuQZvhXseGNrd8teW9hes4aMYwY",
   "metadata": {
     "name": "clickcrate_test",
-    "version": "0.33.0",
+    "version": "0.47.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
@@ -160,8 +160,8 @@
                 ]
               },
               {
-                "kind": "account",
-                "path": "product"
+                "kind": "arg",
+                "path": "product_id"
               }
             ]
           }
@@ -183,6 +183,10 @@
       "args": [
         {
           "name": "_product_listing_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "_product_id",
           "type": "pubkey"
         }
       ]
@@ -431,7 +435,8 @@
           }
         },
         {
-          "name": "product"
+          "name": "product",
+          "writable": true
         },
         {
           "name": "oracle",
@@ -450,8 +455,8 @@
                 ]
               },
               {
-                "kind": "account",
-                "path": "product"
+                "kind": "arg",
+                "path": "product_id"
               }
             ]
           }
@@ -466,7 +471,16 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "_product_listing_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "_product_id",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "make_purchase",
@@ -549,8 +563,8 @@
                 ]
               },
               {
-                "kind": "account",
-                "path": "product"
+                "kind": "arg",
+                "path": "product_id"
               }
             ]
           }
@@ -578,7 +592,7 @@
           }
         },
         {
-          "name": "product",
+          "name": "product_account",
           "writable": true
         },
         {
@@ -710,11 +724,8 @@
           }
         },
         {
-          "name": "listing_collection"
-        },
-        {
-          "name": "core_program",
-          "address": "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d"
+          "name": "listing_collection",
+          "writable": true
         },
         {
           "name": "owner",
@@ -724,6 +735,10 @@
             "clickcrate",
             "product_listing"
           ]
+        },
+        {
+          "name": "core_program",
+          "address": "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d"
         },
         {
           "name": "system_program",
@@ -995,7 +1010,8 @@
           }
         },
         {
-          "name": "listing_collection"
+          "name": "listing_collection",
+          "writable": true
         },
         {
           "name": "owner",

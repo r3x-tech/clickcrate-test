@@ -678,7 +678,7 @@ function ProductListingPlaceModal({
   currentProductId: PublicKey;
   isPlaceFormValid: boolean;
 }) {
-  const { placeProducts } = useClickCrateListingProgramAccount({
+  const { placeProductListing } = useClickCrateListingProgramAccount({
     account,
   });
 
@@ -688,8 +688,8 @@ function ProductListingPlaceModal({
 
   const handlePlaceProduct = () => {
     if (publicKey && isPlaceFormValid) {
-      placeProducts.mutateAsync({
-        productId: currentProductId,
+      placeProductListing.mutateAsync({
+        productListingId: currentProductId,
         clickcrateId: new PublicKey(clickcrateId),
         price: new BN(unitPriceInSol * 1000000000),
       });
@@ -741,16 +741,16 @@ function ProductListingPlaceModal({
           <button
             className="btn btn-xs lg:btn-sm btn-outline w-[48%] py-3"
             onClick={onClose}
-            disabled={placeProducts.isPending}
+            disabled={placeProductListing.isPending}
           >
             Cancel
           </button>
           <button
             className="btn btn-xs lg:btn-sm btn-primary w-[48%] py-3"
             onClick={handlePlaceProduct}
-            disabled={placeProducts.isPending || !isPlaceFormValid}
+            disabled={placeProductListing.isPending || !isPlaceFormValid}
           >
-            {placeProducts.isPending ? 'Placing...' : 'Place'}
+            {placeProductListing.isPending ? 'Placing...' : 'Place'}
           </button>
         </div>
       </div>

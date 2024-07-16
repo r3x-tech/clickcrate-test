@@ -5,10 +5,10 @@
  * IDL can be found at `target/idl/clickcrate_test.json`.
  */
 export type ClickcrateTest = {
-  "address": "3XUQKX7tSMfFk6KqQNSxbANJHq6tSvuH5cJpTrpnLYVQ",
+  "address": "YxxtndmPmahv4HpAeuQZvhXseGNrd8teW9hes4aMYwY",
   "metadata": {
     "name": "clickcrateTest",
-    "version": "0.33.0",
+    "version": "0.47.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
@@ -166,8 +166,8 @@ export type ClickcrateTest = {
                 ]
               },
               {
-                "kind": "account",
-                "path": "product"
+                "kind": "arg",
+                "path": "productId"
               }
             ]
           }
@@ -189,6 +189,10 @@ export type ClickcrateTest = {
       "args": [
         {
           "name": "productListingId",
+          "type": "pubkey"
+        },
+        {
+          "name": "productId",
           "type": "pubkey"
         }
       ]
@@ -437,7 +441,8 @@ export type ClickcrateTest = {
           }
         },
         {
-          "name": "product"
+          "name": "product",
+          "writable": true
         },
         {
           "name": "oracle",
@@ -456,8 +461,8 @@ export type ClickcrateTest = {
                 ]
               },
               {
-                "kind": "account",
-                "path": "product"
+                "kind": "arg",
+                "path": "productId"
               }
             ]
           }
@@ -472,7 +477,16 @@ export type ClickcrateTest = {
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "productListingId",
+          "type": "pubkey"
+        },
+        {
+          "name": "productId",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "makePurchase",
@@ -555,8 +569,8 @@ export type ClickcrateTest = {
                 ]
               },
               {
-                "kind": "account",
-                "path": "product"
+                "kind": "arg",
+                "path": "productId"
               }
             ]
           }
@@ -584,7 +598,7 @@ export type ClickcrateTest = {
           }
         },
         {
-          "name": "product",
+          "name": "productAccount",
           "writable": true
         },
         {
@@ -716,11 +730,8 @@ export type ClickcrateTest = {
           }
         },
         {
-          "name": "listingCollection"
-        },
-        {
-          "name": "coreProgram",
-          "address": "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d"
+          "name": "listingCollection",
+          "writable": true
         },
         {
           "name": "owner",
@@ -730,6 +741,10 @@ export type ClickcrateTest = {
             "clickcrate",
             "productListing"
           ]
+        },
+        {
+          "name": "coreProgram",
+          "address": "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d"
         },
         {
           "name": "systemProgram",
@@ -1001,7 +1016,8 @@ export type ClickcrateTest = {
           }
         },
         {
-          "name": "listingCollection"
+          "name": "listingCollection",
+          "writable": true
         },
         {
           "name": "owner",

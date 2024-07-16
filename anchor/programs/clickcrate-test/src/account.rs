@@ -1,6 +1,5 @@
 use anchor_lang::prelude::*;
 use mpl_core::programs::MPL_CORE_ID;
-
 #[account]
 pub struct ClickCrateState {
     pub id: Pubkey,
@@ -125,6 +124,7 @@ pub enum ProductCategory {
     Sports,
     Automotive,
     Grocery,
+    Beverage,
     Health,
 }
 
