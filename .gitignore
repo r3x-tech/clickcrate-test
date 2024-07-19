@@ -45,3 +45,9 @@ anchor/target/.rustc_info.json
 !anchor/target/types/*.ts
 test-ledger
 .yarn
+
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
