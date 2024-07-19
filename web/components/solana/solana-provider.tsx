@@ -56,7 +56,7 @@ export function SolanaProvider({ children }: { children: ReactNode }) {
       // }),
       new TipLinkWalletAdapter({
         title: 'ClickCrate Dashboard',
-        clientId: 'f4856b33-38fd-4902-8094-4174a85edbbd',
+        clientId: process.env.TIPLINK_API_KEY!,
         theme: 'dark', // pick between "dark"/"light"/"system"
       }),
     ],
