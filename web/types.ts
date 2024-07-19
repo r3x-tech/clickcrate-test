@@ -128,18 +128,22 @@ export type RegisterClickCrateArgs = {
 };
 
 export type RemoveProductListingArgs = {
-  productId: PublicKey;
+  productListingId: PublicKey;
   clickcrateId: PublicKey;
 };
 
 export type PlaceProductListingArgs = {
-  productId: PublicKey;
+  productListingId: PublicKey;
   clickcrateId: PublicKey;
+  price: BN;
 };
 
 export type MakePurchaseArgs = {
-  productId: PublicKey;
+  productListingId: PublicKey;
   clickcrateId: PublicKey;
+  productId: PublicKey;
+  quantity: number;
+  currentBuyer: PublicKey;
 };
 
 export interface NFT {

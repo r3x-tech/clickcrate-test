@@ -576,7 +576,6 @@ function ClickCratePosUpdateModal({
     } else if (publicKey && isUpdateClickCrateFormValid) {
       updateClickCrate.mutateAsync([
         account,
-        manager,
         placementType,
         productCategory,
         manager,
@@ -692,8 +691,11 @@ function ClickCratePosPurchaseModal({
   const handleMakePurchase = () => {
     if (publicKey && isMakePurchaseFormValid) {
       makePurchase.mutateAsync({
-        productId: currentProductId,
+        productListingId: currentProductId,
         clickcrateId: currentClickcrateId,
+        productId: currentProductId,
+        quantity: 1,
+        currentBuyer: publicKey,
       });
       onClose();
     }
@@ -782,7 +784,7 @@ function ClickCratePosProductInfoModal({
       currentProductId
     ) {
       removeProductListing.mutateAsync({
-        productId: currentProductId,
+        productListingId: currentProductId,
         clickcrateId: currentClickcrateId,
       });
       onClose();
