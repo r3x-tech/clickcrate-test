@@ -31,14 +31,18 @@ export function ProductListingRegister({
     useState<PlacementType | null>(null);
   const [productCategory, setProductCategory] =
     useState<ProductCategory | null>(null);
-  const [productInStock, setProductInStock] = useState<BN>(new BN(0));
-  const [unitPriceInSol, setUnitPriceInSol] = useState(0);
+  const [unitPriceInSol, setUnitPriceInSol] = useState<number | null>(null);
+  const [productOrderManager, setProductOrderManager] = useState<Origin | null>(
+    null
+  );
 
   const isProductFormValid =
     productId.trim() !== '' &&
     productOrigin !== null &&
     productPlacementType !== null &&
-    productCategory !== null;
+    productCategory !== null &&
+    unitPriceInSol !== null &&
+    productOrderManager !== null;
 
   const handleProductRegistration = () => {
     if (publicKey && isProductFormValid) {
@@ -48,9 +52,9 @@ export function ProductListingRegister({
         productOrigin,
         productPlacementType,
         productCategory,
-        productInStock.toNumber(),
         publicKey,
         new BN(unitPriceInSol * 1000000000),
+        productOrderManager,
       ]);
       onClose();
     } else {
@@ -88,23 +92,32 @@ export function ProductListingRegister({
 
         <input
           type="text"
-          placeholder="Product ID"
+          placeholder="Product ID (Core NFT Address)"
           value={productId}
           onChange={(e) => setProductId(e.target.value)}
           className="rounded-lg p-2 text-black"
         />
-        <input
+
+        {/* <input
           type="number"
           placeholder="Product Stock"
-          value={productInStock.toString()}
-          onChange={(e) => setProductInStock(new BN(parseInt(e.target.value)))}
+          value={productInStock === null ? '' : productInStock}
+          onChange={(e) => {
+            const value = e.target.value;
+            setProductInStock(value === '' ? null : Number(value));
+          }}
           className="rounded-lg p-2 text-black"
-        />
+        /> */}
+
         <input
+          id="unitPrice"
           type="number"
           placeholder="Unit Price (in SOL)"
-          value={unitPriceInSol}
-          onChange={(e) => setUnitPriceInSol(Number(e.target.value))}
+          value={unitPriceInSol === null ? '' : unitPriceInSol}
+          onChange={(e) => {
+            const value = e.target.value;
+            setUnitPriceInSol(value === '' ? null : Number(value));
+          }}
           className="rounded-lg p-2 text-black"
         />
         <select
@@ -113,7 +126,7 @@ export function ProductListingRegister({
           className="rounded-lg p-2 text-black"
         >
           <option value="">Select an origin</option>
-          <option value="Clickcrate">Clickcrate</option>
+          <option value="Clickcrate">ClickCrate</option>
           <option value="Shopify">Shopify</option>
           <option value="Square">Square</option>
         </select>
@@ -147,6 +160,16 @@ export function ProductListingRegister({
           <option value="Automotive">Automotive</option>
           <option value="Grocery">Grocery</option>
           <option value="Health">Health</option>
+        </select>
+        <select
+          value={productOrderManager || ''}
+          onChange={(e) => setProductOrderManager(e.target.value as Origin)}
+          className="rounded-lg p-2 text-black"
+        >
+          <option value="">Select an order manager</option>
+          <option value="Clickcrate">ClickCrate</option>
+          <option value="Shopify">Shopify</option>
+          <option value="Square">Square</option>
         </select>
         <div className="flex flex-row gap-[4%] py-2">
           <button
@@ -263,10 +286,10 @@ export function ProductListingsList({
               />
             </div>
             <div className="flex flex-row w-[10%]">
-              <p className="text-start font-bold text-xs">ID </p>
+              <p className="text-start font-bold text-xs">ACCOUNT</p>
             </div>
             <div className="flex flex-row w-[10%]">
-              <p className="text-start font-bold text-xs">NAME </p>
+              <p className="text-start font-bold text-xs">ID</p>
             </div>
             <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">STATUS </p>

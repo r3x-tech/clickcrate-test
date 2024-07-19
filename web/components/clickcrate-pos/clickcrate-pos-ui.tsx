@@ -81,7 +81,7 @@ export function ClickCratePosRegister({
 
         <input
           type="text"
-          placeholder="pNFT Collection ID"
+          placeholder="Collection ID (Core NFT Address)"
           value={clickcrateId}
           onChange={(e) => setClickcrateId(e.target.value)}
           className="rounded-lg p-2 text-black"
@@ -230,10 +230,10 @@ export function ClickCratePosList({
               />
             </div>
             <div className="flex flex-row w-[10%]">
-              <p className="text-start font-bold text-xs">ID </p>
+              <p className="text-start font-bold text-xs">ACCOUNT </p>
             </div>
             <div className="flex flex-row w-[15%]">
-              <p className="text-start font-bold text-xs">NAME </p>
+              <p className="text-start font-bold text-xs">ID </p>
             </div>
             <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">STATUS </p>

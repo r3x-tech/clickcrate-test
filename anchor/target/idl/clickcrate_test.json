@@ -1,8 +1,8 @@
 {
-  "address": "YxxtndmPmahv4HpAeuQZvhXseGNrd8teW9hes4aMYwY",
+  "address": "8YE1ezqCBkz2W3yhY8uvNZJBfm7MzpbYE5eaM56XSkkr",
   "metadata": {
     "name": "clickcrate_test",
-    "version": "0.47.0",
+    "version": "0.50.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
@@ -920,6 +920,14 @@
         {
           "name": "price",
           "type": "u64"
+        },
+        {
+          "name": "order_manager",
+          "type": {
+            "defined": {
+              "name": "Origin"
+            }
+          }
         }
       ]
     },
@@ -1758,6 +1766,9 @@
           },
           {
             "name": "Grocery"
+          },
+          {
+            "name": "Beverage"
           },
           {
             "name": "Health"

@@ -36,7 +36,7 @@ pub struct UpdateClickCrate<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, manager: Pubkey)]
+#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, manager: Pubkey, price: u64, order_manager: Origin)]
 pub struct RegisterProductListing<'info> {
     #[account(
         init,

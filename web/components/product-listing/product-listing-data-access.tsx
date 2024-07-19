@@ -58,9 +58,9 @@ export function useClickCrateListingProgram() {
         string,
         string,
         string,
-        number,
         PublicKey,
-        BN
+        BN,
+        string
       ]
     ) => {
       const [
@@ -70,10 +70,9 @@ export function useClickCrateListingProgram() {
         origin,
         placementType,
         productCategory,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        inStock,
         manager,
         price,
+        orderManager,
       ] = args;
 
       const [productListingAddress] = PublicKey.findProgramAddressSync(
@@ -94,6 +93,7 @@ export function useClickCrateListingProgram() {
       const convertedPlacementType = getPlacementTypeFromString(placementType);
       const convertedProductCategory =
         getProductCategoryFromString(productCategory);
+      const convertedOrderManager = getOriginFromString(orderManager);
 
       return program.methods
         .registerProductListing(
@@ -102,7 +102,8 @@ export function useClickCrateListingProgram() {
           convertedPlacementType,
           convertedProductCategory,
           manager,
-          price
+          price,
+          convertedOrderManager
         )
         .accounts([
           {

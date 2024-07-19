@@ -15,7 +15,7 @@ use mpl_core::{
     },
     Asset, Collection,
 };
-declare_id!("YxxtndmPmahv4HpAeuQZvhXseGNrd8teW9hes4aMYwY");
+declare_id!("8YE1ezqCBkz2W3yhY8uvNZJBfm7MzpbYE5eaM56XSkkr");
 
 pub mod account;
 pub mod context;
@@ -72,6 +72,7 @@ pub mod clickcrate_test {
         product_category: ProductCategory,
         manager: Pubkey,
         price: u64,
+        order_manager: Origin,
     ) -> Result<()> {
         let product_listing = &mut ctx.accounts.product_listing;
         product_listing.id = id;
@@ -85,7 +86,7 @@ pub mod clickcrate_test {
         product_listing.is_active = false;
         product_listing.price = price;
         product_listing.vault = Pubkey::default();
-        product_listing.order_manager = origin.clone();
+        product_listing.order_manager = order_manager.clone();
         Ok(())
     }
 
