@@ -13,9 +13,16 @@ import {
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { ParticleAdapter } from '@solana/wallet-adapter-wallets';
 // import { ParticleAdapter } from '@particle-network/wallet-adapter-ext';
+import { TipLinkWalletAdapter } from '@tiplink/wallet-adapter';
+import {
+  WalletDisconnectButton,
+  WalletMultiButton,
+  TipLinkWalletAutoConnectV2,
+} from '@tiplink/wallet-adapter-react-ui';
 
 import { ReactNode, useCallback, useMemo } from 'react';
 import { useCluster } from '../cluster/cluster-data-access';
+import { useSearchParams } from 'next/navigation';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
@@ -40,29 +47,33 @@ export function SolanaProvider({ children }: { children: ReactNode }) {
        * Pass the client id that the TipLink team provides
        * Choose from "dark", "light", "system" for the theme
        */
-      new ParticleAdapter({
-        config: {
-          projectId: process.env.NEXT_PUBLIC_PROJECT_ID || '',
-          clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY || '',
-          appId: process.env.NEXT_PUBLIC_APP_ID || '',
-        },
-      }),
-      // new TipLinkWalletAdapter({
-      //   title: 'ClickCrate Dashboard',
-      //   clientId: '694bf97c-d2ac-4dfc-a786-a001812658df',
-      //   theme: 'dark', // pick between "dark"/"light"/"system"
+      // new ParticleAdapter({
+      //   config: {
+      //     projectId: process.env.NEXT_PUBLIC_PROJECT_ID || '',
+      //     clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY || '',
+      //     appId: process.env.NEXT_PUBLIC_APP_ID || '',
+      //   },
       // }),
+      new TipLinkWalletAdapter({
+        title: 'ClickCrate Dashboard',
+        clientId: 'f4856b33-38fd-4902-8094-4174a85edbbd',
+        theme: 'dark', // pick between "dark"/"light"/"system"
+      }),
     ],
     []
   );
 
+  const searchParams = useSearchParams();
+
   return (
     <ConnectionProvider endpoint={endpoint}>
-      {/* <TipLinkWalletAutoConnect isReady query={searchParams}> */}
       <WalletProvider wallets={wallets} onError={onError} autoConnect={true}>
-        <WalletModalProvider>{children}</WalletModalProvider>
+        <WalletModalProvider>
+          <TipLinkWalletAutoConnectV2 isReady query={searchParams}>
+            {children}
+          </TipLinkWalletAutoConnectV2>
+        </WalletModalProvider>
       </WalletProvider>
-      {/* </TipLinkWalletAutoConnect> */}
     </ConnectionProvider>
   );
 }
