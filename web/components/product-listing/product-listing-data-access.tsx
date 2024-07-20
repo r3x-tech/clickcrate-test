@@ -52,16 +52,7 @@ export function useClickCrateListingProgram() {
   const registerProductListing = useMutation({
     mutationKey: ['clickcrate-test', 'registerProductListing', { cluster }],
     mutationFn: async (
-      args: [
-        PublicKey,
-        PublicKey,
-        string,
-        string,
-        string,
-        PublicKey,
-        BN,
-        string
-      ]
+      args: [PublicKey, PublicKey, string, string, string, PublicKey, string]
     ) => {
       const [
         id,
@@ -71,7 +62,6 @@ export function useClickCrateListingProgram() {
         placementType,
         productCategory,
         manager,
-        price,
         orderManager,
       ] = args;
 
@@ -102,7 +92,6 @@ export function useClickCrateListingProgram() {
           convertedPlacementType,
           convertedProductCategory,
           manager,
-          price,
           convertedOrderManager
         )
         .accounts([
@@ -154,12 +143,10 @@ export function useClickCrateListingProgramAccount({
     mutationFn: async () => {
       return program.methods
         .activateProductListing()
-        .accounts([
-          {
-            productListing: account,
-            owner: program.provider.publicKey,
-          },
-        ])
+        .accountsStrict({
+          productListing: account,
+          owner: program.provider.publicKey,
+        })
         .rpc();
     },
     onSuccess: (signature) => {
@@ -178,12 +165,10 @@ export function useClickCrateListingProgramAccount({
     mutationFn: async () => {
       return program.methods
         .deactivateProductListing()
-        .accounts([
-          {
-            productListing: account,
-            owner: program.provider.publicKey,
-          },
-        ])
+        .accountsStrict({
+          productListing: account,
+          owner: program.provider.publicKey,
+        })
         .rpc();
     },
     onSuccess: (signature) => {
@@ -437,13 +422,11 @@ export function useClickCrateListingProgramAccount({
           newManager,
           newPrice
         )
-        .accounts([
-          {
-            productListing: account,
-            owner: program.provider.publicKey,
-            systemProgram: SystemProgram.programId,
-          },
-        ])
+        .accountsStrict({
+          productListing: account,
+          owner: program.provider.publicKey,
+          systemProgram: SystemProgram.programId,
+        })
         .rpc();
     },
     onSuccess: (signature) => {
@@ -474,7 +457,7 @@ export function useActivateProductListings() {
         productListingAccounts.map((account) =>
           program.methods
             .activateProductListing()
-            .accounts({
+            .accountsStrict({
               productListing: account,
               owner: program.provider.publicKey,
             })
@@ -484,8 +467,8 @@ export function useActivateProductListings() {
 
       return txSigs;
     },
-    onSuccess: () => {
-      transactionToast('Product Listings activated successfully');
+    onSuccess: (txSigs) => {
+      txSigs.forEach((txSig) => transactionToast(txSig));
       return accounts.refetch();
     },
     onError: () => toast.error('Failed to activate Product Listings'),
@@ -503,7 +486,7 @@ export function useDeactivateProductListings() {
         productListingAccounts.map((account) =>
           program.methods
             .deactivateProductListing()
-            .accounts({
+            .accountsStrict({
               productListing: account,
               owner: program.provider.publicKey,
             })
@@ -513,8 +496,8 @@ export function useDeactivateProductListings() {
 
       return txSigs;
     },
-    onSuccess: () => {
-      transactionToast('Product Listings deactivated successfully');
+    onSuccess: (txSigs) => {
+      txSigs.forEach((txSig) => transactionToast(txSig));
       return accounts.refetch();
     },
     onError: () => toast.error('Failed to deactivate Product Listings'),

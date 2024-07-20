@@ -36,7 +36,7 @@ pub struct UpdateClickCrate<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, manager: Pubkey, price: u64, order_manager: Origin)]
+#[instruction(id: Pubkey, origin: Origin, placement_type: PlacementType, product_category: ProductCategory, manager: Pubkey, order_manager: Origin)]
 pub struct RegisterProductListing<'info> {
     #[account(
         init,
@@ -52,13 +52,13 @@ pub struct RegisterProductListing<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(id: Pubkey, placement_type: PlacementType, product_category: ProductCategory, manager: Pubkey)]
+#[instruction(id: Pubkey, placement_type: PlacementType, product_category: ProductCategory, manager: Pubkey, price: u64)]
 pub struct UpdateProductListing<'info> {
     #[account(
         mut,
         seeds = [b"listing".as_ref(), id.key().as_ref()],
         bump,
-        realloc= 8 + ProductListingState::MAX_SIZE,
+        realloc = 8 + ProductListingState::MAX_SIZE,
         realloc::payer = owner,
         realloc::zero = true,
     )]
@@ -249,7 +249,7 @@ pub struct RemoveProducts<'info> {
         mut,
         seeds = [b"vault".as_ref(), product_listing.key().as_ref()],
         bump,
-        constraint = vault.key() == product_listing.vault,
+        constraint = product_listing.vault.is_some() && vault.key() == product_listing.vault.unwrap(),
         close = owner
     )]
     pub vault: Account<'info, VaultAccount>,

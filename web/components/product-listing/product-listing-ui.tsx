@@ -31,7 +31,6 @@ export function ProductListingRegister({
     useState<PlacementType | null>(null);
   const [productCategory, setProductCategory] =
     useState<ProductCategory | null>(null);
-  const [unitPriceInSol, setUnitPriceInSol] = useState<number | null>(null);
   const [productOrderManager, setProductOrderManager] = useState<Origin | null>(
     null
   );
@@ -41,7 +40,6 @@ export function ProductListingRegister({
     productOrigin !== null &&
     productPlacementType !== null &&
     productCategory !== null &&
-    unitPriceInSol !== null &&
     productOrderManager !== null;
 
   const handleProductRegistration = () => {
@@ -53,7 +51,6 @@ export function ProductListingRegister({
         productPlacementType,
         productCategory,
         publicKey,
-        new BN(unitPriceInSol * 1000000000),
         productOrderManager,
       ]);
       onClose();
@@ -108,18 +105,6 @@ export function ProductListingRegister({
           }}
           className="rounded-lg p-2 text-black"
         /> */}
-
-        <input
-          id="unitPrice"
-          type="number"
-          placeholder="Unit Price (in SOL)"
-          value={unitPriceInSol === null ? '' : unitPriceInSol}
-          onChange={(e) => {
-            const value = e.target.value;
-            setUnitPriceInSol(value === '' ? null : Number(value));
-          }}
-          className="rounded-lg p-2 text-black"
-        />
         <select
           value={productOrigin || ''}
           onChange={(e) => setProductOrigin(e.target.value as Origin)}
@@ -278,12 +263,12 @@ export function ProductListingsList({
           </button>
           <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-2 border-b-2 border-quaternary">
             <div className="flex flex-row w-[5%]">
-              <input
+              {/* <input
                 type="checkbox"
                 checked={allListingsSelected}
                 onChange={handleAllListingsSelectChange}
                 className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
-              />
+              /> */}
             </div>
             <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">ACCOUNT</p>
@@ -446,9 +431,7 @@ function ProductListingCard({
     </div>
   ) : (
     <div
-      className={`px-4 py-2 ${!isFirst ? 'border-t-2' : ''} ${
-        !isLast ? 'border-b-2' : ''
-      } border-quaternary`}
+      className={`px-4 py-2 ${!isLast ? 'border-b-2' : ''} border-quaternary`}
     >
       <div className="flex flex-row justify-start items-center w-[100%]">
         <div className="flex flex-row w-[5%]">
@@ -721,10 +704,10 @@ function ProductListingPlaceModal({
 
   const { publicKey } = useWallet();
   const [clickcrateId, setClickCrateId] = useState('');
-  const [unitPriceInSol, setUnitPriceInSol] = useState(0);
+  const [unitPriceInSol, setUnitPriceInSol] = useState<number | null>(null);
 
   const handlePlaceProduct = () => {
-    if (publicKey && isPlaceFormValid) {
+    if (publicKey && isPlaceFormValid && unitPriceInSol !== null) {
       placeProductListing.mutateAsync({
         productListingId: currentProductId,
         clickcrateId: new PublicKey(clickcrateId),
@@ -760,17 +743,21 @@ function ProductListingPlaceModal({
 
         <input
           type="text"
-          placeholder="ClickCrate Name"
+          placeholder="ClickCrate ID"
           value={clickcrateId}
           onChange={(e) => setClickCrateId(e.target.value)}
           className="rounded-lg p-2 text-black"
         />
 
         <input
+          id="unitPrice"
           type="number"
           placeholder="Unit Price (in SOL)"
-          value={unitPriceInSol}
-          onChange={(e) => setUnitPriceInSol(Number(e.target.value))}
+          value={unitPriceInSol === null ? '' : unitPriceInSol}
+          onChange={(e) => {
+            const value = e.target.value;
+            setUnitPriceInSol(value === '' ? null : Number(value));
+          }}
           className="rounded-lg p-2 text-black"
         />
 

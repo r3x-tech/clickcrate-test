@@ -222,12 +222,12 @@ export function ClickCratePosList({
           </button>
           <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-2 border-b-2 border-quaternary">
             <div className="flex flex-row w-[5%]">
-              <input
+              {/* <input
                 type="checkbox"
                 checked={allSelected}
                 onChange={handleAllSelectChange}
                 className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
-              />
+              /> */}
             </div>
             <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">ACCOUNT </p>
