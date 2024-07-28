@@ -15,6 +15,7 @@ const links: { label: string; path: string }[] = [
   // { label: 'Create', path: '/clickcrate-test' },
   { label: 'ClickCrates (POS)', path: '/clickcrate-pos' },
   { label: 'Product Listings', path: '/product-listing' },
+  { label: 'Orders', path: '/orders' },
 ];
 
 export default function RootLayout({
