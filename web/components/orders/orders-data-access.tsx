@@ -37,16 +37,15 @@ interface UpdateOrderStatusResponse {
   transaction: string;
 }
 
-export function useClickCrateOrders(productListingId: string) {
+export function useClickCrateOrders() {
   return useQuery<Order[], AxiosError>({
-    queryKey: ['clickcrate-orders', productListingId],
+    queryKey: ['clickcrate-orders'],
     queryFn: async () => {
-      const response = await axios.post<{ orders: Order[] }>(
+      const response = await axios.get<{ orders: Order[] }>(
         `${API_BASE_URL}/clickcrate/orders`,
-        { productListingId },
         {
           headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_CC_API_KEY!}`,
             'Content-Type': 'application/json',
           },
         }
@@ -68,7 +67,7 @@ export function useUpdateOrderStatus() {
         { status: newStatus },
         {
           headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`,
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_CC_API_KEY!}`,
             'Content-Type': 'application/json',
           },
         }

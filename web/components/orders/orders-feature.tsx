@@ -1,5 +1,3 @@
-// orders-feature.tsx
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -12,8 +10,7 @@ import toast from 'react-hot-toast';
 
 export default function ClickcrateOrdersFeature() {
   const { publicKey } = useWallet();
-  const [productListingId, setProductListingId] = useState('');
-  const ordersQuery = useClickCrateOrders(productListingId);
+  const ordersQuery = useClickCrateOrders();
 
   useEffect(() => {
     if (ordersQuery.error) {
@@ -21,48 +18,18 @@ export default function ClickcrateOrdersFeature() {
     }
   }, [ordersQuery.error]);
 
-  const handleProductListingIdSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (productListingId) {
-      ordersQuery.refetch();
-    }
+  const handleRefresh = () => {
+    ordersQuery.refetch();
   };
-
-  const isSubmitDisabled = !productListingId || ordersQuery.isFetching;
 
   return publicKey ? (
     <div>
-      <AppHero title="ClickCrate Orders" subtitle="Manage your incoming orders">
-        <form
-          onSubmit={handleProductListingIdSubmit}
-          className="flex flex-row items-end w-full mb-4"
-        >
-          <input
-            type="text"
-            value={productListingId}
-            onChange={(e) => setProductListingId(e.target.value)}
-            placeholder="Enter Product Listing ID"
-            className="input input-bordered flex-grow mr-2"
-          />
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={isSubmitDisabled}
-          >
-            {ordersQuery.isFetching ? 'Fetching...' : 'Fetch Orders'}
-          </button>
-        </form>
-        {!productListingId && (
-          <div className="alert alert-info">
-            <span>Enter a Product Listing ID to fetch orders.</span>
-          </div>
-        )}
-        {productListingId && (
-          <OrdersList
-            orders={ordersQuery.data ?? []}
-            isLoading={ordersQuery.isLoading}
-          />
-        )}
+      <AppHero title="" subtitle="">
+        <OrdersList
+          orders={ordersQuery.data}
+          isLoading={ordersQuery.isLoading}
+          onRefresh={handleRefresh}
+        />
       </AppHero>
     </div>
   ) : (

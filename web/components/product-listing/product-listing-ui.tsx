@@ -252,7 +252,7 @@ export function ProductListingsList({
         <div className="flex justify-center w-[100%] p-6">
           <span className="loading loading-spinner loading-md"></span>
         </div>
-      ) : accounts.data?.length ? (
+      ) : userAccounts?.length !== undefined && userAccounts.length > 0 ? (
         <div className="w-[100%] bg-background border-2 border-quaternary rounded-lg">
           <button
             id="refresh-listings"
