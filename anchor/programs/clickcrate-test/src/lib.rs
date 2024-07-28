@@ -15,7 +15,7 @@ use mpl_core::{
     },
     Asset, Collection,
 };
-declare_id!("YxxtndmPmahv4HpAeuQZvhXseGNrd8teW9hes4aMYwY");
+declare_id!("Hap7ccYvMT8GXa57JK37QCHSXKf4rQLSsJmZA3dnmzpx");
 
 pub mod account;
 pub mod context;
@@ -58,9 +58,9 @@ pub mod clickcrate_test {
     ) -> Result<()> {
         let clickcrate = &mut ctx.accounts.clickcrate;
         clickcrate.id = id;
-        clickcrate.manager = manager;
         clickcrate.eligible_placement_type = eligible_placement_type;
         clickcrate.eligible_product_category = eligible_product_category;
+        clickcrate.manager = manager;
         Ok(())
     }
 
@@ -71,7 +71,7 @@ pub mod clickcrate_test {
         placement_type: PlacementType,
         product_category: ProductCategory,
         manager: Pubkey,
-        price: u64,
+        order_manager: Origin,
     ) -> Result<()> {
         let product_listing = &mut ctx.accounts.product_listing;
         product_listing.id = id;
@@ -83,25 +83,23 @@ pub mod clickcrate_test {
         product_listing.in_stock = 0;
         product_listing.sold = 0;
         product_listing.is_active = false;
-        product_listing.price = price;
-        product_listing.vault = Pubkey::default();
-        product_listing.order_manager = origin.clone();
+        product_listing.order_manager = order_manager.clone();
         Ok(())
     }
 
     pub fn update_product_listing(
         ctx: Context<UpdateProductListing>,
         _id: Pubkey,
-        new_placement_type: PlacementType,
-        new_product_category: ProductCategory,
-        new_manager: Pubkey,
-        new_price: u64,
+        placement_type: PlacementType,
+        product_category: ProductCategory,
+        manager: Pubkey,
+        price: u64,
     ) -> Result<()> {
         let product_listing = &mut ctx.accounts.product_listing;
-        product_listing.manager = new_manager;
-        product_listing.placement_type = new_placement_type;
-        product_listing.product_category = new_product_category;
-        product_listing.price = new_price;
+        product_listing.placement_type = placement_type;
+        product_listing.product_category = product_category;
+        product_listing.price = Some(price);
+        product_listing.manager = manager;
         Ok(())
     }
 
@@ -281,8 +279,8 @@ pub mod clickcrate_test {
         }
 
         product_listing.clickcrate_pos = Some(clickcrate.id);
-        product_listing.vault = vault.key();
-        product_listing.price = price;
+        product_listing.vault = Some(vault.key());
+        product_listing.price = Some(price);
         clickcrate.product = Some(product_listing.id);
 
         Ok(())
@@ -420,7 +418,7 @@ pub mod clickcrate_test {
             ClickCrateErrors::ClickCrateDeactivated
         );
         require!(
-            vault.key() == product_listing.vault,
+            product_listing.vault.is_some() && vault.key() == product_listing.vault.unwrap(),
             ClickCrateErrors::InvalidVaultAccount
         );
 
@@ -500,8 +498,13 @@ pub mod clickcrate_test {
             ClickCrateErrors::ProductOutOfStock
         );
 
+        require!(
+            product_listing.price.is_some(),
+            ClickCrateErrors::PriceNotFound
+        );
+
         // Transfer funds from buyer to vault
-        let amount = product_listing.price * quantity;
+        let amount = product_listing.price.unwrap() * quantity;
         invoke(
             &system_instruction::transfer(
                 ctx.accounts.buyer.key,
@@ -602,7 +605,7 @@ pub mod clickcrate_test {
 
         // Ensure the vault has enough balance
         require!(
-            **ctx.accounts.vault.to_account_info().lamports.borrow() >= amount,
+            **ctx.accounts.vault.to_account_info().lamports.borrow() >= amount.unwrap(),
             ClickCrateErrors::InsufficientBalance
         );
 
@@ -618,7 +621,7 @@ pub mod clickcrate_test {
             &system_instruction::transfer(
                 &ctx.accounts.vault.key(),
                 &ctx.accounts.seller.key(),
-                amount,
+                amount.unwrap(),
             ),
             &[
                 ctx.accounts.vault.to_account_info(),

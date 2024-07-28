@@ -31,14 +31,16 @@ export function ProductListingRegister({
     useState<PlacementType | null>(null);
   const [productCategory, setProductCategory] =
     useState<ProductCategory | null>(null);
-  const [productInStock, setProductInStock] = useState<BN>(new BN(0));
-  const [unitPriceInSol, setUnitPriceInSol] = useState(0);
+  const [productOrderManager, setProductOrderManager] = useState<Origin | null>(
+    null
+  );
 
   const isProductFormValid =
     productId.trim() !== '' &&
     productOrigin !== null &&
     productPlacementType !== null &&
-    productCategory !== null;
+    productCategory !== null &&
+    productOrderManager !== null;
 
   const handleProductRegistration = () => {
     if (publicKey && isProductFormValid) {
@@ -48,9 +50,8 @@ export function ProductListingRegister({
         productOrigin,
         productPlacementType,
         productCategory,
-        productInStock.toNumber(),
         publicKey,
-        new BN(unitPriceInSol * 1000000000),
+        productOrderManager,
       ]);
       onClose();
     } else {
@@ -88,32 +89,29 @@ export function ProductListingRegister({
 
         <input
           type="text"
-          placeholder="Product ID"
+          placeholder="Product ID (Core NFT Address)"
           value={productId}
           onChange={(e) => setProductId(e.target.value)}
           className="rounded-lg p-2 text-black"
         />
-        <input
+
+        {/* <input
           type="number"
           placeholder="Product Stock"
-          value={productInStock.toString()}
-          onChange={(e) => setProductInStock(new BN(parseInt(e.target.value)))}
+          value={productInStock === null ? '' : productInStock}
+          onChange={(e) => {
+            const value = e.target.value;
+            setProductInStock(value === '' ? null : Number(value));
+          }}
           className="rounded-lg p-2 text-black"
-        />
-        <input
-          type="number"
-          placeholder="Unit Price (in SOL)"
-          value={unitPriceInSol}
-          onChange={(e) => setUnitPriceInSol(Number(e.target.value))}
-          className="rounded-lg p-2 text-black"
-        />
+        /> */}
         <select
           value={productOrigin || ''}
           onChange={(e) => setProductOrigin(e.target.value as Origin)}
           className="rounded-lg p-2 text-black"
         >
           <option value="">Select an origin</option>
-          <option value="Clickcrate">Clickcrate</option>
+          <option value="Clickcrate">ClickCrate</option>
           <option value="Shopify">Shopify</option>
           <option value="Square">Square</option>
         </select>
@@ -147,6 +145,16 @@ export function ProductListingRegister({
           <option value="Automotive">Automotive</option>
           <option value="Grocery">Grocery</option>
           <option value="Health">Health</option>
+        </select>
+        <select
+          value={productOrderManager || ''}
+          onChange={(e) => setProductOrderManager(e.target.value as Origin)}
+          className="rounded-lg p-2 text-black"
+        >
+          <option value="">Select an order manager</option>
+          <option value="Clickcrate">ClickCrate</option>
+          <option value="Shopify">Shopify</option>
+          <option value="Square">Square</option>
         </select>
         <div className="flex flex-row gap-[4%] py-2">
           <button
@@ -255,18 +263,18 @@ export function ProductListingsList({
           </button>
           <div className="flex flex-row justify-start items-center w-[100%] px-4 pb-2 pt-2 border-b-2 border-quaternary">
             <div className="flex flex-row w-[5%]">
-              <input
+              {/* <input
                 type="checkbox"
                 checked={allListingsSelected}
                 onChange={handleAllListingsSelectChange}
                 className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
-              />
+              /> */}
             </div>
             <div className="flex flex-row w-[10%]">
-              <p className="text-start font-bold text-xs">ID </p>
+              <p className="text-start font-bold text-xs">ACCOUNT</p>
             </div>
             <div className="flex flex-row w-[10%]">
-              <p className="text-start font-bold text-xs">NAME </p>
+              <p className="text-start font-bold text-xs">ID</p>
             </div>
             <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">STATUS </p>
@@ -423,9 +431,7 @@ function ProductListingCard({
     </div>
   ) : (
     <div
-      className={`px-4 py-2 ${!isFirst ? 'border-t-2' : ''} ${
-        !isLast ? 'border-b-2' : ''
-      } border-quaternary`}
+      className={`px-4 py-2 ${!isLast ? 'border-b-2' : ''} border-quaternary`}
     >
       <div className="flex flex-row justify-start items-center w-[100%]">
         <div className="flex flex-row w-[5%]">
@@ -698,10 +704,10 @@ function ProductListingPlaceModal({
 
   const { publicKey } = useWallet();
   const [clickcrateId, setClickCrateId] = useState('');
-  const [unitPriceInSol, setUnitPriceInSol] = useState(0);
+  const [unitPriceInSol, setUnitPriceInSol] = useState<number | null>(null);
 
   const handlePlaceProduct = () => {
-    if (publicKey && isPlaceFormValid) {
+    if (publicKey && isPlaceFormValid && unitPriceInSol !== null) {
       placeProductListing.mutateAsync({
         productListingId: currentProductId,
         clickcrateId: new PublicKey(clickcrateId),
@@ -737,17 +743,21 @@ function ProductListingPlaceModal({
 
         <input
           type="text"
-          placeholder="ClickCrate Name"
+          placeholder="ClickCrate ID"
           value={clickcrateId}
           onChange={(e) => setClickCrateId(e.target.value)}
           className="rounded-lg p-2 text-black"
         />
 
         <input
+          id="unitPrice"
           type="number"
           placeholder="Unit Price (in SOL)"
-          value={unitPriceInSol}
-          onChange={(e) => setUnitPriceInSol(Number(e.target.value))}
+          value={unitPriceInSol === null ? '' : unitPriceInSol}
+          onChange={(e) => {
+            const value = e.target.value;
+            setUnitPriceInSol(value === '' ? null : Number(value));
+          }}
           className="rounded-lg p-2 text-black"
         />
 

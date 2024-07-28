@@ -1,8 +1,8 @@
 {
-  "address": "YxxtndmPmahv4HpAeuQZvhXseGNrd8teW9hes4aMYwY",
+  "address": "Hap7ccYvMT8GXa57JK37QCHSXKf4rQLSsJmZA3dnmzpx",
   "metadata": {
     "name": "clickcrate_test",
-    "version": "0.47.0",
+    "version": "0.52.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
@@ -918,8 +918,12 @@
           "type": "pubkey"
         },
         {
-          "name": "price",
-          "type": "u64"
+          "name": "order_manager",
+          "type": {
+            "defined": {
+              "name": "Origin"
+            }
+          }
         }
       ]
     },
@@ -1269,7 +1273,7 @@
           "type": "pubkey"
         },
         {
-          "name": "new_placement_type",
+          "name": "placement_type",
           "type": {
             "defined": {
               "name": "PlacementType"
@@ -1277,7 +1281,7 @@
           }
         },
         {
-          "name": "new_product_category",
+          "name": "product_category",
           "type": {
             "defined": {
               "name": "ProductCategory"
@@ -1285,11 +1289,11 @@
           }
         },
         {
-          "name": "new_manager",
+          "name": "manager",
           "type": "pubkey"
         },
         {
-          "name": "new_price",
+          "name": "price",
           "type": "u64"
         }
       ]
@@ -1442,76 +1446,81 @@
     },
     {
       "code": 6018,
+      "name": "PriceNotFound",
+      "msg": "Price not found"
+    },
+    {
+      "code": 6019,
       "name": "OrderNotFound",
       "msg": "Order not found"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "OrderNotConfirmed",
       "msg": "Order not confirmed"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "OrderNotCompleted",
       "msg": "Order not completed"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "InvalidOrderOracleAccount",
       "msg": "Invalid oracle"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "InvalidVaultAccount",
       "msg": "Invalid vault"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "FreezeAuthorityNotFound",
       "msg": "Freeze authority not found"
     },
     {
-      "code": 6024,
+      "code": 6025,
       "name": "TransferAuthorityNotFound",
       "msg": "Transfer authority not found"
     },
     {
-      "code": 6025,
+      "code": 6026,
       "name": "InvalidFreezeAuthority",
       "msg": "Invalid freeze authority"
     },
     {
-      "code": 6026,
+      "code": 6027,
       "name": "InvalidTransferAuthority",
       "msg": "Invalid transfer authority"
     },
     {
-      "code": 6027,
+      "code": 6028,
       "name": "VaultNotEmpty",
       "msg": "Vault not empty"
     },
     {
-      "code": 6028,
+      "code": 6029,
       "name": "InsufficientBalance",
       "msg": "Insufficient balance"
     },
     {
-      "code": 6029,
+      "code": 6030,
       "name": "OracleFailedToClose",
       "msg": "Oracle account closure failed"
     },
     {
-      "code": 6030,
+      "code": 6031,
       "name": "OracleNotFound",
       "msg": "Oracle not found"
     },
     {
-      "code": 6031,
+      "code": 6032,
       "name": "UnauthorizedUpdate",
       "msg": "Unauthorized update"
     },
     {
-      "code": 6032,
+      "code": 6033,
       "name": "UnauthorizedClose",
       "msg": "Unauthorized close"
     }
@@ -1760,6 +1769,9 @@
             "name": "Grocery"
           },
           {
+            "name": "Beverage"
+          },
+          {
             "name": "Health"
           }
         ]
@@ -1826,11 +1838,15 @@
           },
           {
             "name": "price",
-            "type": "u64"
+            "type": {
+              "option": "u64"
+            }
           },
           {
             "name": "vault",
-            "type": "pubkey"
+            "type": {
+              "option": "pubkey"
+            }
           },
           {
             "name": "order_manager",

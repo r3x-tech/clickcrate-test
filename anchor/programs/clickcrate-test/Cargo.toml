@@ -1,6 +1,6 @@
 [package]
 name = "clickcrate-test"
-version = "0.47.0"
+version = "0.52.0"
 description = "Created with Anchor"
 edition = "2021"
 

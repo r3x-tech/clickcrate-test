@@ -329,8 +329,8 @@ export function useActivateClickCrates() {
 
       return txSigs;
     },
-    onSuccess: () => {
-      transactionToast('ClickCrates activated successfully');
+    onSuccess: (txSigs) => {
+      txSigs.forEach((txSig) => transactionToast(txSig));
       return accounts.refetch();
     },
     onError: () => toast.error('Failed to activate ClickCrates'),
@@ -358,8 +358,8 @@ export function useDeactivateClickCrates() {
 
       return txSigs;
     },
-    onSuccess: () => {
-      transactionToast('ClickCrates deactivated successfully');
+    onSuccess: (txSigs) => {
+      txSigs.forEach((txSig) => transactionToast(txSig));
       return accounts.refetch();
     },
     onError: () => toast.error('Failed to deactivate ClickCrates'),

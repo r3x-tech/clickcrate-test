@@ -27,8 +27,8 @@ pub struct ProductListingState {
     pub sold: u64,
     pub clickcrate_pos: Option<Pubkey>,
     pub is_active: bool,
-    pub price: u64,
-    pub vault: Pubkey,
+    pub price: Option<u64>,
+    pub vault: Option<Pubkey>,
     pub order_manager: Origin,
 }
 

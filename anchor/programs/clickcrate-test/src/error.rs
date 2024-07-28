@@ -56,6 +56,9 @@ pub enum ClickCrateErrors {
     #[msg("Product removal failed")]
     ProductRemovalFailed,
 
+    #[msg("Price not found")]
+    PriceNotFound,
+
     #[msg("Order not found")]
     OrderNotFound,
 
