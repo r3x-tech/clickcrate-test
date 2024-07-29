@@ -7,7 +7,12 @@ import { OrdersList } from './orders-ui';
 import { useClickCrateOrders } from './orders-data-access';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { IconCaretDownFilled, IconRefresh } from '@tabler/icons-react';
+import {
+  IconCaretDownFilled,
+  IconRefresh,
+  IconBox,
+  IconX,
+} from '@tabler/icons-react';
 
 export default function ClickcrateOrdersFeature() {
   const { publicKey } = useWallet();

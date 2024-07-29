@@ -2,6 +2,7 @@ import { useUpdateOrderStatus, Order } from './orders-data-access';
 import { ellipsify } from '../ui/ui-layout';
 import { ExplorerLink } from '../cluster/cluster-ui';
 import toast from 'react-hot-toast';
+import { IconTruck, IconCircleX } from '@tabler/icons-react';
 
 export function OrdersList({
   orders,
@@ -43,89 +44,98 @@ export function OrdersList({
   }
 
   return (
-    <div className="w-full bg-background border-2 border-quaternary rounded-lg">
+    <div className="flex flex-col w-full bg-background border-2 border-quaternary rounded-lg">
       <div className="flex flex-row justify-start items-center w-full px-4 pb-2 pt-2 border-b-2 border-quaternary">
-        <div className="w-1/6">
+        <div className="w-[15%]">
           <p className="text-start font-bold text-xs">ORDER ID</p>
         </div>
-        <div className="w-1/6">
+        <div className="w-[15%]">
           <p className="text-start font-bold text-xs">PRODUCT ID</p>
         </div>
-        <div className="w-1/6">
+        <div className="w-[15%]">
           <p className="text-start font-bold text-xs">BUYER ID</p>
         </div>
-        <div className="w-1/12">
-          <p className="text-start font-bold text-xs">QUANTITY</p>
+        <div className="w-[5%] text-right">
+          <p className="font-bold text-xs">QUANTITY</p>
         </div>
-        <div className="w-1/12">
-          <p className="text-start font-bold text-xs">TOTAL PRICE</p>
+        <div className="w-[15%] text-right">
+          <p className="font-bold text-xs">TOTAL PRICE</p>
         </div>
-        <div className="w-1/6">
-          <p className="text-start font-bold text-xs">STATUS</p>
+        <div className="w-[15%] text-right">
+          <p className="font-bold text-xs">STATUS</p>
         </div>
-        <div className="w-1/6">
-          <p className="text-start font-bold text-xs">ACTIONS</p>
-        </div>
+        <div className="w-[20%] text-right"></div>
       </div>
       {orders.map((order) => (
         <div
           key={order.id}
           className="flex flex-row justify-start items-center w-full px-4 py-2 border-b border-quaternary"
         >
-          <div className="w-1/6">
-            <ExplorerLink path={`tx/${order.id}`} label={ellipsify(order.id)} />
+          <div className="w-[15%] text-start">
+            <ExplorerLink
+              path={`tx/${order.id}`}
+              label={ellipsify(order.id)}
+              className="font-extralight text-xs underline"
+            />
           </div>
-          <div className="w-1/6">
+          <div className="w-[15%] text-start">
             <ExplorerLink
               path={`address/${order.productId}`}
               label={ellipsify(order.productId)}
+              className="font-extralight text-xs underline"
             />
           </div>
-          <div className="w-1/6">
+          <div className="w-[15%] text-start">
             <ExplorerLink
               path={`address/${order.buyerId}`}
               label={ellipsify(order.buyerId)}
+              className="font-extralight text-xs underline"
             />
           </div>
-          <div className="w-1/12">
-            <p className="text-start font-extralight text-xs">
-              {order.quantity}
-            </p>
+          <div className="w-[5%] text-right">
+            <p className="font-extralight text-xs">{order.quantity}</p>
           </div>
-          <div className="w-1/12">
-            <p className="text-start font-extralight text-xs">
-              {order.totalPrice} SOL
-            </p>
+          <div className="w-[15%] text-right">
+            <p className="font-extralight text-xs">{order.totalPrice} SOL</p>
           </div>
-          <div className="w-1/6">
-            <p className="text-start font-extralight text-xs">{order.status}</p>
+          <div className="w-[15%] text-right">
+            <p className="font-extralight text-xs">{order.status}</p>
           </div>
-          <div className="w-1/6">
-            <select
-              className="select select-bordered select-xs w-full max-w-xs"
-              value={order.status}
-              onChange={(e) => {
-                const newStatus = e.target.value as Order['status'];
+          <div className="flex flex-row w-[15%] ml-[5%]">
+            <button
+              className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
+              onClick={() => {
                 updateOrderStatus.mutate(
-                  { orderId: order.id, newStatus },
+                  { orderId: order.id, newStatus: 'Fulfilled' },
                   {
                     onError: (error) => {
-                      toast.error(
-                        `Failed to update order status: ${error.message}`
-                      );
+                      toast.error(`Failed to fulfill order: ${error.message}`);
                     },
                   }
                 );
               }}
+              style={{ fontSize: '12px', border: 'none' }}
             >
-              <option value="Pending">Pending</option>
-              <option value="Placed">Placed</option>
-              <option value="Confirmed">Confirmed</option>
-              <option value="Fulfilled">Fulfilled</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Completed">Completed</option>
-              <option value="Cancelled">Cancelled</option>
-            </select>
+              <IconTruck className="m-0 p-0" size={12} />
+              Fulfill
+            </button>
+            <button
+              className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
+              onClick={() => {
+                updateOrderStatus.mutate(
+                  { orderId: order.id, newStatus: 'Cancelled' },
+                  {
+                    onError: (error) => {
+                      toast.error(`Failed to cancel order: ${error.message}`);
+                    },
+                  }
+                );
+              }}
+              style={{ fontSize: '12px', border: 'none' }}
+            >
+              <IconCircleX className="m-0 p-0" size={12} />
+              Cancel
+            </button>
           </div>
         </div>
       ))}
