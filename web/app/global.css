@@ -12,17 +12,33 @@
 }
 
 html, body {
-  height: 100%;
-  /* font-family: var(--font-montserrat); */
+  height: 100% !important;
+  width: 100% !important;
+  font-family: var(--font-montserrat) !important;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
-
-/* * {
-  font-family: var(--font-montserrat);
-} */
 
 .active {
   background-color: #1c1c1c;
 }
+
+.body::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* body.modal-open {
+  overflow-y: hidden !important;
+  padding-right: 15px !important;
+  height: 100vw !important;
+  width: 100vw !important;
+} */
+
+/* .modal {
+  padding-right: 0px !important;
+} */
+
 
 .wallet-adapter-button-trigger {
    background: #000000 !important;
@@ -100,20 +116,3 @@ html, body {
 .btn-ghost:hover {
   @apply bg-[#202020] text-white border-2 border-[#202020] rounded-full !important;
 } */
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(-360deg);
-  }
-}
-
-.spin-animation {
-  animation: spin 0.25s linear !important;
-}
-
-.icon-flip {
-  transform: rotate(180deg);
-}

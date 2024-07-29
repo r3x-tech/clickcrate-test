@@ -2,7 +2,7 @@ import { useUpdateOrderStatus, Order } from './orders-data-access';
 import { ellipsify } from '../ui/ui-layout';
 import { ExplorerLink } from '../cluster/cluster-ui';
 import toast from 'react-hot-toast';
-import { IconTruck, IconCircleX } from '@tabler/icons-react';
+import { IconPackageExport, IconX } from '@tabler/icons-react';
 
 export function OrdersList({
   orders,
@@ -118,7 +118,7 @@ export function OrdersList({
               }}
               style={{ fontSize: '12px', border: 'none' }}
             >
-              <IconTruck className="m-0 p-0" size={12} />
+              <IconPackageExport className="m-0 p-0" size={14} />
               Fulfill
             </button>
             <button
@@ -135,7 +135,7 @@ export function OrdersList({
               }}
               style={{ fontSize: '12px', border: 'none' }}
             >
-              <IconCircleX className="m-0 p-0" size={12} />
+              <IconX className="m-0 p-0" size={14} />
               Cancel
             </button>
           </div>
