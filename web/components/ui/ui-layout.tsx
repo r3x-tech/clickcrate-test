@@ -76,7 +76,7 @@ export function UiLayout({
       <ClusterChecker>
         <AccountChecker />
       </ClusterChecker>
-      <div className="flex-grow mx-4 lg:mx-auto relative overflow-y-auto">
+      <div className="flex-grow mx-auto w-full px-4 sm:px-6 lg:px-8 relative overflow-y-auto">
         <Suspense
           fallback={
             <div className="text-center my-32 bg-transparent">

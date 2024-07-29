@@ -61,15 +61,17 @@ export function OrdersList({
         <div className="w-[15%] text-right">
           <p className="font-bold text-xs">TOTAL PRICE</p>
         </div>
-        <div className="w-[15%] text-right">
+        <div className="w-[7%] text-left ml-[8%]">
           <p className="font-bold text-xs">STATUS</p>
         </div>
         <div className="w-[20%] text-right"></div>
       </div>
-      {orders.map((order) => (
+      {orders.map((order, index) => (
         <div
           key={order.id}
-          className="flex flex-row justify-start items-center w-full px-4 py-2 border-b border-quaternary"
+          className={`flex flex-row justify-start items-center w-full px-4 py-2 ${
+            index === orders.length - 1 ? '' : 'border-b-2'
+          } border-quaternary `}
         >
           <div className="w-[15%] text-start">
             <ExplorerLink
@@ -98,7 +100,7 @@ export function OrdersList({
           <div className="w-[15%] text-right">
             <p className="font-extralight text-xs">{order.totalPrice} SOL</p>
           </div>
-          <div className="w-[15%] text-right">
+          <div className="w-[7%] text-left ml-[8%]">
             <p className="font-extralight text-xs">{order.status}</p>
           </div>
           <div className="flex flex-row w-[15%] ml-[5%]">

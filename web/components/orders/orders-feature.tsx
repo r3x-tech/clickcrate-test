@@ -81,7 +81,7 @@ export default function ClickcrateOrdersFeature() {
               />
             </button>
           </div>
-          <div className="flex flex-row flex-1 justify-end items-start gap-4">
+          {/* <div className="flex flex-row flex-1 justify-end items-start gap-4">
             <div className="dropdown dropdown-end" ref={dropdownRef}>
               <label
                 tabIndex={0}
@@ -105,11 +105,10 @@ export default function ClickcrateOrdersFeature() {
                       Fulfill
                     </button>
                   </li>
-                  {/* Add more actions as needed */}
                 </ul>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
         <OrdersList
           orders={ordersQuery.data}

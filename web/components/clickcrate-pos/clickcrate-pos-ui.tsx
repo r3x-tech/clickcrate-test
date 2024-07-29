@@ -14,7 +14,11 @@ import { Origin, PlacementType, ProductCategory } from '@/types';
 import { BN } from '@coral-xyz/anchor';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
-import { IconEdit, IconShoppingCartFilled } from '@tabler/icons-react';
+import {
+  IconEdit,
+  IconLink,
+  IconShoppingCartFilled,
+} from '@tabler/icons-react';
 import { useClickCrateListingProgramAccount } from '../product-listing/product-listing-data-access';
 
 export function ClickCratePosRegister({
@@ -232,7 +236,7 @@ export function ClickCratePosList({
             <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">ACCOUNT </p>
             </div>
-            <div className="flex flex-row w-[15%]">
+            <div className="flex flex-row w-[10%]">
               <p className="text-start font-bold text-xs">ID </p>
             </div>
             <div className="flex flex-row w-[10%]">
@@ -250,7 +254,7 @@ export function ClickCratePosList({
             <div className="flex flex-row w-[10%] justify-end">
               <p className="text-end font-bold text-xs">INVENTORY </p>
             </div>
-            <div className="flex flex-row w-[10%]"></div>
+            <div className="flex flex-row w-[15%]"></div>
           </div>
           {userAccounts?.map(
             (account: { publicKey: PublicKey }, index: number) => (
@@ -336,6 +340,7 @@ function ClickCratePosCard({
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [showProductInfoModal, setShowProductInfoModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const isUpdateClickCrateFormValid =
     accountQuery.data?.eligiblePlacementType !== null &&
@@ -351,6 +356,9 @@ function ClickCratePosCard({
     accountQuery.data?.product !== undefined &&
     accountQuery.data?.id &&
     accountQuery.data?.id !== undefined;
+
+  const isShareFormValid =
+    accountQuery.data !== null && accountQuery.data !== undefined;
 
   const toggleUpdateModal = () => {
     setShowUpdateModal(!showUpdateModal);
@@ -394,6 +402,26 @@ function ClickCratePosCard({
     }
   };
 
+  const toggleShareModal = () => {
+    // if (
+    //   accountQuery.data?.isActive == undefined ||
+    //   accountQuery.data?.isActive == false
+    // ) {
+    //   toast.error('Clickcrate not active');
+    //   return;
+    // }
+    setShowShareModal(!showShareModal);
+
+    // if (
+    //   accountQuery.data?.product &&
+    //   accountQuery.data?.product !== undefined
+    // ) {
+    //   setShowShareModal(!showShareModal);
+    // } else {
+    //   toast.error('No product to purchase');
+    // }
+  };
+
   const [selected, setSelected] = useState(false);
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -421,106 +449,126 @@ function ClickCratePosCard({
       <span className="loading loading-spinner loading-md"></span>
     </div>
   ) : (
-    <div
-      className={`px-4 py-2 ${!isFirst ? 'border-t-2' : ''} ${
-        !isLast ? 'border-b-2' : ''
-      } border-quaternary`}
-    >
-      <div className="flex flex-row justify-start items-center w-[100%]">
-        <div className="flex flex-row w-[5%]">
-          <input
-            type="checkbox"
-            checked={selected}
-            onChange={handleSelectChange}
-            className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
-          />
-        </div>
-        <div className="flex flex-row w-[10%]">
-          <p className="text-start font-extralight text-xs">
-            <ExplorerLink
-              path={`account/${account}`}
-              label={ellipsify(account.toString())}
-              className="font-extralight underline cursor-pointer"
+    <div>
+      <div
+        className={`px-4 py-2 ${!isFirst ? 'border-t-2' : ''} ${
+          !isLast ? 'border-b-2' : ''
+        } border-quaternary`}
+      >
+        <div className="flex flex-row justify-start items-center w-[100%]">
+          <div className="flex flex-row w-[5%]">
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={handleSelectChange}
+              className="checkbox checkbox-xs bg-quaternary border-quaternary rounded-sm"
             />
-          </p>
-        </div>
-        <div className="flex flex-row w-[15%]">
-          <p className="text-start font-extralight text-xs">
-            <ExplorerLink
-              label={ellipsify(accountQuery.data?.id.toString())}
-              path={`address/${accountQuery.data?.id}`}
-              className="font-extralight underline cursor-pointer"
-            />
-          </p>
-        </div>
-        <div className="flex flex-row w-[10%]">
-          <p className="text-start font-extralight text-xs">
-            {' '}
-            {accountQuery.data?.isActive ? 'Active' : 'Inactive'}{' '}
-          </p>
-        </div>
-        <div className="flex flex-row w-[10%]">
-          <p className="text-start font-extralight text-xs">
-            {accountQuery.data?.eligibleProductCategory
-              ? getDisplayText(
-                  productCategoryMapping,
-                  accountQuery.data?.eligibleProductCategory
-                )
-              : 'NA'}
-          </p>
-        </div>
-        <div className="flex flex-row w-[15%]">
-          <p className="text-start font-extralight text-xs">
-            {accountQuery.data?.eligiblePlacementType
-              ? getDisplayText(
-                  placementTypeMapping,
-                  accountQuery.data?.eligiblePlacementType
-                )
-              : 'NA'}
-          </p>
-        </div>
-        <div className="flex flex-row w-[10%]">
-          <p
-            className={`text-start font-extralight text-xs  ${
-              accountQuery.data?.product !== null && 'underline'
-            }  ${accountQuery.data?.product !== null && 'cursor-pointer'}`}
-            onClick={toggleProductInfoModal}
-          >
-            {accountQuery.data?.product
-              ? ellipsify(accountQuery.data?.product?.toString())
-              : 'None'}
-          </p>
-        </div>
-        <div className="flex flex-row w-[10%] justify-end">
-          <p className="text-end font-extralight text-xs">NA</p>
-        </div>
-        <div className="flex flex-row w-[5%] ml-[5%] ">
-          <button
-            className="btn btn-xs btn-mini w-full flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
-            onClick={toggleUpdateModal}
-            style={{ fontSize: '12px', border: 'none' }}
-          >
-            <IconEdit className="m-0 p-0" size={12} />
-            Edit
-          </button>
-          <button
-            className="btn btn-xs btn-mini w-full flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
-            onClick={togglePurchaseModal}
-            style={{ fontSize: '12px', border: 'none' }}
-          >
-            <IconShoppingCartFilled className="m-0 p-0" size={12} />
-            Buy
-          </button>
-          {showUpdateModal && (
-            <ClickCratePosUpdateModal
-              show={showUpdateModal}
-              onClose={toggleUpdateModal}
-              account={account}
-              isUpdateClickCrateFormValid={isUpdateClickCrateFormValid}
-            />
-          )}
+          </div>
+          <div className="flex flex-row w-[10%]">
+            <p className="text-start font-extralight text-xs">
+              <ExplorerLink
+                path={`account/${account}`}
+                label={ellipsify(account.toString())}
+                className="font-extralight underline cursor-pointer"
+              />
+            </p>
+          </div>
+          <div className="flex flex-row w-[10%]">
+            <p className="text-start font-extralight text-xs">
+              <ExplorerLink
+                label={ellipsify(accountQuery.data?.id.toString())}
+                path={`address/${accountQuery.data?.id}`}
+                className="font-extralight underline cursor-pointer"
+              />
+            </p>
+          </div>
+          <div className="flex flex-row w-[10%]">
+            <p className="text-start font-extralight text-xs">
+              {' '}
+              {accountQuery.data?.isActive ? 'Active' : 'Inactive'}{' '}
+            </p>
+          </div>
+          <div className="flex flex-row w-[10%]">
+            <p className="text-start font-extralight text-xs">
+              {accountQuery.data?.eligibleProductCategory
+                ? getDisplayText(
+                    productCategoryMapping,
+                    accountQuery.data?.eligibleProductCategory
+                  )
+                : 'NA'}
+            </p>
+          </div>
+          <div className="flex flex-row w-[15%]">
+            <p className="text-start font-extralight text-xs">
+              {accountQuery.data?.eligiblePlacementType
+                ? getDisplayText(
+                    placementTypeMapping,
+                    accountQuery.data?.eligiblePlacementType
+                  )
+                : 'NA'}
+            </p>
+          </div>
+          <div className="flex flex-row w-[10%]">
+            <p
+              className={`text-start font-extralight text-xs  ${
+                accountQuery.data?.product !== null && 'underline'
+              }  ${accountQuery.data?.product !== null && 'cursor-pointer'}`}
+              onClick={toggleProductInfoModal}
+            >
+              {accountQuery.data?.product
+                ? ellipsify(accountQuery.data?.product?.toString())
+                : 'None'}
+            </p>
+          </div>
+          <div className="flex flex-row w-[10%] justify-end">
+            <p className="text-end font-extralight text-xs">NA</p>
+          </div>
+          <div className="flex flex-row w-[17%] ml-[3%] justify-end">
+            <button
+              className="btn btn-xs btn-mini w-[33%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
+              onClick={toggleUpdateModal}
+              style={{ fontSize: '12px', border: 'none' }}
+            >
+              <IconEdit className="m-0 p-0" size={12} />
+              Edit
+            </button>
+            <button
+              className="btn btn-xs btn-mini w-[33%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
+              onClick={togglePurchaseModal}
+              style={{ fontSize: '12px', border: 'none' }}
+            >
+              <IconShoppingCartFilled className="m-0 p-0" size={12} />
+              Buy
+            </button>
+            <button
+              className="btn btn-xs btn-mini w-[33%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
+              onClick={toggleShareModal}
+              style={{ fontSize: '12px', border: 'none' }}
+            >
+              <IconLink className="m-0 p-0" size={12} />
+              Share
+            </button>
+            {showUpdateModal && (
+              <ClickCratePosUpdateModal
+                show={showUpdateModal}
+                onClose={toggleUpdateModal}
+                account={account}
+                isUpdateClickCrateFormValid={isUpdateClickCrateFormValid}
+              />
+            )}
+          </div>
         </div>
       </div>
+      {/* && accountQuery.data?.product */}
+      {showShareModal && accountQuery.data && (
+        <ClickCratePosShareModal
+          show={showShareModal}
+          onClose={toggleShareModal}
+          account={account}
+          currentClickcrateId={accountQuery.data?.id}
+          isShareFormValid={isShareFormValid}
+        />
+      )}
       {showPurchaseModal && accountQuery.data?.product && (
         <ClickCratePosPurchaseModal
           show={showPurchaseModal}
@@ -829,6 +877,95 @@ function ClickCratePosProductInfoModal({
             disabled={removeProductListing.isPending || !isProductInfoFormValid}
           >
             {removeProductListing.isPending ? 'Removing...' : 'Remove Product'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ClickCratePosShareModal({
+  show,
+  onClose,
+  account,
+  currentClickcrateId,
+  isShareFormValid,
+}: {
+  show: boolean;
+  onClose: () => void;
+  account: PublicKey;
+  currentClickcrateId: PublicKey;
+  isShareFormValid: boolean;
+}) {
+  const { makePurchase } = useClickcratePosProgramAccount({ account });
+  // const { accountQuery } = useClickCrateListingProgramAccount({
+  //   account: currentProductId,
+  // });
+
+  const { publicKey } = useWallet();
+
+  const handleGenerateBlink = () => {
+    if (publicKey) {
+      // makePurchase.mutateAsync({
+      //   productListingId: currentProductId,
+      //   clickcrateId: currentClickcrateId,
+      //   productId: currentProductId,
+      //   quantity: 1,
+      //   currentBuyer: publicKey,
+      // });
+      toast.success('Blink link copied');
+      onClose();
+    }
+  };
+
+  return (
+    <div
+      className={`modal ${
+        show ? 'modal-open' : ''
+      } absolute top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center`}
+    >
+      <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-6 w-full">
+        <div className="flex flex-row justify-between items-end">
+          <h1 className="text-lg font-bold text-start">Make Purchase</h1>
+          {/* <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+            <p className="text-start font-semibold tracking-wide text-xs">
+              Product:{' '}
+            </p>
+            <p className="pl-2 text-start font-normal text-xs">
+              <ExplorerLink
+                path={`account/${currentProductId}`}
+                label={ellipsify(currentProductId.toString())}
+              />
+            </p>
+          </div> */}
+
+          {/* <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+            <p className="text-start font-semibold tracking-wide text-xs">
+              Inventory:{' '}
+            </p>
+            <p className="pl-2 text-start font-normal text-xs">
+              {accountQuery.data?.inStock
+                ? `${accountQuery.data?.inStock}`
+                : 'NA'}
+            </p>
+          </div> */}
+        </div>
+
+        <div className="flex flex-row gap-[4%] py-2">
+          <button
+            className="btn btn-xs lg:btn-sm btn-outline w-[48%] py-3"
+            onClick={onClose}
+            disabled={makePurchase.isPending}
+          >
+            Cancel
+          </button>
+          <button
+            className="btn btn-xs lg:btn-sm btn-primary w-[48%] py-3"
+            onClick={handleGenerateBlink}
+            disabled={makePurchase.isPending}
+          >
+            Generate share link
+            {/* {makePurchase.isPending ? 'Purchasing...' : 'Confirm Purchase'} */}
           </button>
         </div>
       </div>
