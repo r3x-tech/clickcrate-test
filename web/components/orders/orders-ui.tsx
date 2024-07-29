@@ -2,6 +2,7 @@ import { useUpdateOrderStatus, Order } from './orders-data-access';
 import { ellipsify } from '../ui/ui-layout';
 import { ExplorerLink } from '../cluster/cluster-ui';
 import toast from 'react-hot-toast';
+import { IconPackageExport, IconX } from '@tabler/icons-react';
 
 export function OrdersList({
   orders,
@@ -63,8 +64,8 @@ export function OrdersList({
         <div className="w-1/6">
           <p className="text-start font-bold text-xs">STATUS</p>
         </div>
-        <div className="w-1/6">
-          <p className="text-start font-bold text-xs">ACTIONS</p>
+        <div className="w-[15%] text-right">
+          <p className="font-bold text-xs">STATUS</p>
         </div>
       </div>
       {orders.map((order) => (
@@ -97,35 +98,44 @@ export function OrdersList({
               {order.totalPrice} SOL
             </p>
           </div>
-          <div className="w-1/6">
-            <p className="text-start font-extralight text-xs">{order.status}</p>
+          <div className="w-[15%] text-right">
+            <p className="font-extralight text-xs">{order.status}</p>
           </div>
-          <div className="w-1/6">
-            <select
-              className="select select-bordered select-xs w-full max-w-xs"
-              value={order.status}
-              onChange={(e) => {
-                const newStatus = e.target.value as Order['status'];
+          <div className="flex flex-row w-[15%] ml-[5%]">
+            <button
+              className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.5em]"
+              onClick={() => {
                 updateOrderStatus.mutate(
                   { orderId: order.id, newStatus },
                   {
                     onError: (error) => {
-                      toast.error(
-                        `Failed to update order status: ${error.message}`
-                      );
+                      toast.error(`Failed to fulfill order: ${error.message}`);
                     },
                   }
                 );
               }}
+              style={{ fontSize: '12px', border: 'none' }}
             >
-              <option value="Pending">Pending</option>
-              <option value="Placed">Placed</option>
-              <option value="Confirmed">Confirmed</option>
-              <option value="Fulfilled">Fulfilled</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Completed">Completed</option>
-              <option value="Cancelled">Cancelled</option>
-            </select>
+              <IconPackageExport className="m-0 p-0" size={14} />
+              Fulfill
+            </button>
+            <button
+              className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
+              onClick={() => {
+                updateOrderStatus.mutate(
+                  { orderId: order.id, newStatus: 'Cancelled' },
+                  {
+                    onError: (error) => {
+                      toast.error(`Failed to cancel order: ${error.message}`);
+                    },
+                  }
+                );
+              }}
+              style={{ fontSize: '12px', border: 'none' }}
+            >
+              <IconX className="m-0 p-0" size={16} />
+              Cancel
+            </button>
           </div>
         </div>
       ))}

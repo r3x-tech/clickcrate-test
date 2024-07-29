@@ -13,7 +13,7 @@
 
 html, body {
   height: 100%;
-  /* font-family: var(--font-montserrat); */
+  font-family: var(--font-montserrat);
 }
 
 /* * {
@@ -23,6 +23,18 @@ html, body {
 .active {
   background-color: #1c1c1c;
 }
+
+/* body {
+  overflow-y: scroll !important;
+} */
+
+/* body.modal-open {
+  overflow-y: hidden !important;
+}
+
+.modal {
+  padding-right: 0px !important;
+} */
 
 
 .wallet-adapter-button-trigger {

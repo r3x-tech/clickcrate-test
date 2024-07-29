@@ -835,3 +835,92 @@ function ClickCratePosProductInfoModal({
     </div>
   );
 }
+
+function ClickCratePosShareModal({
+  show,
+  onClose,
+  account,
+  currentClickcrateId,
+  isShareFormValid,
+}: {
+  show: boolean;
+  onClose: () => void;
+  account: PublicKey;
+  currentClickcrateId: PublicKey;
+  isShareFormValid: boolean;
+}) {
+  const { makePurchase } = useClickcratePosProgramAccount({ account });
+  // const { accountQuery } = useClickCrateListingProgramAccount({
+  //   account: currentProductId,
+  // });
+
+  const { publicKey } = useWallet();
+
+  const handleGenerateBlink = () => {
+    if (publicKey) {
+      // makePurchase.mutateAsync({
+      //   productListingId: currentProductId,
+      //   clickcrateId: currentClickcrateId,
+      //   productId: currentProductId,
+      //   quantity: 1,
+      //   currentBuyer: publicKey,
+      // });
+      toast.success('Blink link copied');
+      onClose();
+    }
+  };
+
+  return (
+    <div
+      className={`modal ${
+        show ? 'modal-open' : ''
+      } absolute top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center`}
+    >
+      <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-6 w-full">
+        <div className="flex flex-row justify-between items-end">
+          <h1 className="text-lg font-bold text-start">Share ClickCrate</h1>
+          {/* <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+            <p className="text-start font-semibold tracking-wide text-xs">
+              Product:{' '}
+            </p>
+            <p className="pl-2 text-start font-normal text-xs">
+              <ExplorerLink
+                path={`account/${currentProductId}`}
+                label={ellipsify(currentProductId.toString())}
+              />
+            </p>
+          </div> */}
+
+          {/* <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+            <p className="text-start font-semibold tracking-wide text-xs">
+              Inventory:{' '}
+            </p>
+            <p className="pl-2 text-start font-normal text-xs">
+              {accountQuery.data?.inStock
+                ? `${accountQuery.data?.inStock}`
+                : 'NA'}
+            </p>
+          </div> */}
+        </div>
+
+        <div className="flex flex-row gap-[4%] py-2">
+          <button
+            className="btn btn-xs lg:btn-sm btn-outline w-[48%] py-3"
+            onClick={onClose}
+            disabled={makePurchase.isPending}
+          >
+            Cancel
+          </button>
+          <button
+            className="btn btn-xs lg:btn-sm btn-primary w-[48%] py-3"
+            onClick={handleGenerateBlink}
+            disabled={makePurchase.isPending}
+          >
+            Generate Blink
+            {/* {makePurchase.isPending ? 'Purchasing...' : 'Confirm Purchase'} */}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
