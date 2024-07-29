@@ -106,7 +106,7 @@ export function OrdersList({
               className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.5em]"
               onClick={() => {
                 updateOrderStatus.mutate(
-                  { orderId: order.id, newStatus },
+                  { orderId: order.id, newStatus: 'Fulfilled' },
                   {
                     onError: (error) => {
                       toast.error(`Failed to fulfill order: ${error.message}`);
