@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 
 const API_BASE_URL = 'https://api.clickcrate.xyz/v1';
 
-interface Order {
+export interface Order {
   productId: string;
   buyerId: string;
   sellerId: string;
@@ -52,6 +52,7 @@ export function useClickCrateOrders() {
       );
       return response.data.orders;
     },
+    retry: false,
   });
 }
 
