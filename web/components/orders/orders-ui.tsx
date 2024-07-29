@@ -103,7 +103,7 @@ export function OrdersList({
           </div>
           <div className="flex flex-row w-[15%] ml-[5%]">
             <button
-              className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.5em]"
+              className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
               onClick={() => {
                 updateOrderStatus.mutate(
                   { orderId: order.id, newStatus: 'Fulfilled' },
