@@ -103,24 +103,29 @@ export function OrdersList({
           <div className="w-[7%] text-left ml-[8%]">
             <p className="font-extralight text-xs">{order.status}</p>
           </div>
-          <div className="flex flex-row w-[15%] ml-[5%]">
-            <button
-              className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
-              onClick={() => {
-                updateOrderStatus.mutate(
-                  { orderId: order.id, newStatus: 'Fulfilled' },
-                  {
-                    onError: (error) => {
-                      toast.error(`Failed to fulfill order: ${error.message}`);
-                    },
-                  }
-                );
-              }}
-              style={{ fontSize: '12px', border: 'none' }}
-            >
-              <IconPackageExport className="m-0 p-0" size={14} />
-              Fulfill
-            </button>
+          <div className="flex flex-row w-[15%] ml-[5%] justify-end">
+            {order.status == 'Confirmed' && (
+              <button
+                className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
+                onClick={() => {
+                  updateOrderStatus.mutate(
+                    { orderId: order.id, newStatus: 'Fulfilled' },
+                    {
+                      onError: (error) => {
+                        toast.error(
+                          `Failed to fulfill order: ${error.message}`
+                        );
+                      },
+                    }
+                  );
+                }}
+                style={{ fontSize: '12px', border: 'none' }}
+              >
+                <IconPackageExport className="m-0 p-0" size={14} />
+                Fulfill
+              </button>
+            )}
+
             <button
               className="btn btn-xs btn-mini w-[50%] flex flex-row items-center justify-center m-0 p-0 gap-[0.25em]"
               onClick={() => {
