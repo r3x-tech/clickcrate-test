@@ -213,7 +213,7 @@ pub struct PlaceProducts<'info> {
     // pub vault: Account<'info, VaultAccount>,
     #[account(
       init,
-      seeds = [b"vault".as_ref(), product_listing.key().as_ref()],
+      seeds = [b"vault".as_ref(), product_listing_id.key().as_ref()],
       bump,
       payer = owner,
       space = 8 + VaultAccount::MAX_SIZE,
@@ -249,7 +249,6 @@ pub struct RemoveProducts<'info> {
         mut,
         seeds = [b"vault".as_ref(), product_listing.key().as_ref()],
         bump,
-        constraint = product_listing.vault.is_some() && vault.key() == product_listing.vault.unwrap(),
         close = owner
     )]
     pub vault: Account<'info, VaultAccount>,
@@ -287,8 +286,8 @@ pub struct MakePurchase<'info> {
     pub oracle: Account<'info, OrderOracle>,
     #[account(
       mut,
-      seeds = [b"vault".as_ref(), product_listing.key().as_ref()],
-      bump = vault.bump,
+      seeds = [b"vault".as_ref(), product_listing_id.as_ref()],
+      bump,
     )]
     pub vault: Account<'info, VaultAccount>,
     /// CHECK: This is a Metaplex Core NFT
@@ -341,11 +340,11 @@ pub struct CompleteOrder<'info> {
     mut,
     seeds = [b"listing".as_ref(), product_listing_id.key().as_ref()],
     bump,
-  )]
+    )]
     pub product_listing: Account<'info, ProductListingState>,
     #[account(
       mut,
-      seeds = [b"vault".as_ref(), product_listing.key().as_ref()],
+      seeds = [b"vault".as_ref(), product_listing_id.as_ref()],
       bump,
     )]
     pub vault: Account<'info, VaultAccount>,

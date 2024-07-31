@@ -15,7 +15,7 @@ use mpl_core::{
     },
     Asset, Collection,
 };
-declare_id!("Hap7ccYvMT8GXa57JK37QCHSXKf4rQLSsJmZA3dnmzpx");
+declare_id!("FGNqkRQNKRRAVX5rLBgv7YKQ8fYw5DPjJiKfsem1FpZd");
 
 pub mod account;
 pub mod context;
@@ -187,10 +187,19 @@ pub mod clickcrate_test {
         price: u64,
     ) -> Result<()> {
         let product_listing: &mut Account<ProductListingState> = &mut ctx.accounts.product_listing;
+        msg!("Borrowed product_listing account");
+
         let clickcrate: &mut Account<ClickCrateState> = &mut ctx.accounts.clickcrate;
+        msg!("Borrowed clickcrate account");
+
         let listing_collection = &ctx.accounts.listing_collection;
+        msg!("Borrowed listing_collection account");
+
         let product_accounts = ctx.remaining_accounts;
+        msg!("Got remaining accounts");
+
         let vault = &ctx.accounts.vault;
+        msg!("Borrowed vault account");
 
         let collection_data = listing_collection.try_borrow_data()?;
         let collection_account = Collection::deserialize(&mut &collection_data[..])?;
@@ -220,11 +229,34 @@ pub mod clickcrate_test {
 
         // Lock the NFTs
         for product_account in product_accounts.iter() {
-            let product_data = product_account.try_borrow_data()?;
-            require!(
-                Asset::deserialize(&mut &product_data[..]).is_ok(),
-                ClickCrateErrors::InvalidProductAccount
-            );
+            msg!("Processing product account: {}", product_account.key());
+
+            // Attempt to borrow the data
+            let data = match product_account.try_borrow_data() {
+                Ok(data) => data,
+                Err(e) => {
+                    msg!("Failed to borrow product account data: {:?}", e);
+                    return Err(ClickCrateErrors::AccountBorrowFailed.into());
+                }
+            };
+
+            // Attempt to deserialize into an Asset
+            let asset = match Asset::deserialize(&mut &*data) {
+                Ok(asset) => asset,
+                Err(e) => {
+                    msg!("Failed to deserialize product account into Asset: {:?}", e);
+                    return Err(ClickCrateErrors::InvalidProductAccount.into());
+                }
+            };
+
+            // If we've reached here, we have successfully deserialized the Asset
+            msg!("Successfully deserialized Asset: {:?}", asset);
+
+            // let product_data = product_account.try_borrow_data()?;
+            // let product_data = product_account.try_borrow_mut_data()?;
+
+            // let asset = Asset::deserialize(&mut &*product_data)?;
+
             // let deserialized_product = Asset::deserialize(&mut &product_data[..]).unwrap();
 
             // Freeze the Asset
@@ -240,6 +272,8 @@ pub mod clickcrate_test {
                 })
                 .invoke()?;
 
+            msg!("Successfully froze Asset!");
+
             // Add TransferDelegate Plugin
             AddPluginV1CpiBuilder::new(&core_program_info)
                 .asset(&product_account)
@@ -252,6 +286,8 @@ pub mod clickcrate_test {
                     address: product_listing.key(),
                 })
                 .invoke()?;
+
+            msg!("Successfully added transfer delegate!");
 
             // Add Oracle Plugin
             let (oracle_pda, _) = Pubkey::find_program_address(
@@ -276,12 +312,16 @@ pub mod clickcrate_test {
                 }))
                 .invoke()?;
             product_listing.in_stock += 1;
+
+            msg!("Successfully added oracle!");
         }
 
         product_listing.clickcrate_pos = Some(clickcrate.id);
         product_listing.vault = Some(vault.key());
         product_listing.price = Some(price);
         clickcrate.product = Some(product_listing.id);
+
+        msg!("Completed product placements");
 
         Ok(())
     }

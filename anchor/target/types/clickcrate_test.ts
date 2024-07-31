@@ -5,10 +5,10 @@
  * IDL can be found at `target/idl/clickcrate_test.json`.
  */
 export type ClickcrateTest = {
-  "address": "Hap7ccYvMT8GXa57JK37QCHSXKf4rQLSsJmZA3dnmzpx",
+  "address": "FGNqkRQNKRRAVX5rLBgv7YKQ8fYw5DPjJiKfsem1FpZd",
   "metadata": {
     "name": "clickcrateTest",
-    "version": "0.52.0",
+    "version": "0.56.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
@@ -250,8 +250,8 @@ export type ClickcrateTest = {
                 ]
               },
               {
-                "kind": "account",
-                "path": "productListing"
+                "kind": "arg",
+                "path": "productListingId"
               }
             ]
           }
@@ -591,8 +591,8 @@ export type ClickcrateTest = {
                 ]
               },
               {
-                "kind": "account",
-                "path": "productListing"
+                "kind": "arg",
+                "path": "productListingId"
               }
             ]
           }
@@ -723,8 +723,8 @@ export type ClickcrateTest = {
                 ]
               },
               {
-                "kind": "account",
-                "path": "productListing"
+                "kind": "arg",
+                "path": "productListingId"
               }
             ]
           }
@@ -1362,171 +1362,176 @@ export type ClickcrateTest = {
   "errors": [
     {
       "code": 6000,
+      "name": "accountBorrowFailed",
+      "msg": "Failed to borrow account data"
+    },
+    {
+      "code": 6001,
       "name": "clickCrateExists",
       "msg": "ClickCrate already registered"
     },
     {
-      "code": 6001,
+      "code": 6002,
       "name": "clickCrateActivated",
       "msg": "ClickCrate is actived"
     },
     {
-      "code": 6002,
+      "code": 6003,
       "name": "clickCrateDeactivated",
       "msg": "ClickCrate is deactived"
     },
     {
-      "code": 6003,
+      "code": 6004,
       "name": "clickCrateNotFound",
       "msg": "ClickCrate not found"
     },
     {
-      "code": 6004,
+      "code": 6005,
       "name": "invalidClickCrateRegistration",
       "msg": "Invalid clickcrate registration"
     },
     {
-      "code": 6005,
+      "code": 6006,
       "name": "productNotFound",
       "msg": "Product Listing was not found"
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "productListingExists",
       "msg": "Product Listing already registered"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "productListingActivated",
       "msg": "Product Listing is actived"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "productListingDeactivated",
       "msg": "Product Listing is deactived"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "productNotPlaced",
       "msg": "Product not placed"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "productOutOfStock",
       "msg": "Product out of stock"
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "invalidProductAccount",
       "msg": "Invalid product account"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "invalidStockingRequest",
       "msg": "Invalid stocking request"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "invalidStockingAmount",
       "msg": "Invalid stocking amount"
     },
     {
-      "code": 6014,
+      "code": 6015,
       "name": "invalidRemovalRequest",
       "msg": "Invalid removal request"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "invalidRemovalAmount",
       "msg": "Invalid removal amount"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "invalidProductListingRegistration",
       "msg": "Invalid listing registration"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "productRemovalFailed",
       "msg": "Product removal failed"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "priceNotFound",
       "msg": "Price not found"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "orderNotFound",
       "msg": "Order not found"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "orderNotConfirmed",
       "msg": "Order not confirmed"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "orderNotCompleted",
       "msg": "Order not completed"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "invalidOrderOracleAccount",
       "msg": "Invalid oracle"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "invalidVaultAccount",
       "msg": "Invalid vault"
     },
     {
-      "code": 6024,
+      "code": 6025,
       "name": "freezeAuthorityNotFound",
       "msg": "Freeze authority not found"
     },
     {
-      "code": 6025,
+      "code": 6026,
       "name": "transferAuthorityNotFound",
       "msg": "Transfer authority not found"
     },
     {
-      "code": 6026,
+      "code": 6027,
       "name": "invalidFreezeAuthority",
       "msg": "Invalid freeze authority"
     },
     {
-      "code": 6027,
+      "code": 6028,
       "name": "invalidTransferAuthority",
       "msg": "Invalid transfer authority"
     },
     {
-      "code": 6028,
+      "code": 6029,
       "name": "vaultNotEmpty",
       "msg": "Vault not empty"
     },
     {
-      "code": 6029,
+      "code": 6030,
       "name": "insufficientBalance",
       "msg": "Insufficient balance"
     },
     {
-      "code": 6030,
+      "code": 6031,
       "name": "oracleFailedToClose",
       "msg": "Oracle account closure failed"
     },
     {
-      "code": 6031,
+      "code": 6032,
       "name": "oracleNotFound",
       "msg": "Oracle not found"
     },
     {
-      "code": 6032,
+      "code": 6033,
       "name": "unauthorizedUpdate",
       "msg": "Unauthorized update"
     },
     {
-      "code": 6033,
+      "code": 6034,
       "name": "unauthorizedClose",
       "msg": "Unauthorized close"
     }

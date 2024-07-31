@@ -14,7 +14,7 @@
 html, body {
   height: 100% !important;
   width: 100% !important;
-  font-family: var(--font-montserrat) !important;
+  /* font-family: var(--font-montserrat) !important; */
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
@@ -103,6 +103,15 @@ html, body {
   color: white !important;
   backdrop-filter: blur(0.05rem) !important;
   -webkit-backdrop-filter: blur(0.05rem) !important;
+}
+
+.btn-green {
+  @apply bg-green text-white border-2 border-green rounded-full !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: var(--btn-text-size) !important;
+  letter-spacing: var(--btn-tracking) !important;
+  height: auto !important;
 }
 
 /* .btn-ghost {

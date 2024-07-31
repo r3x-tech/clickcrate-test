@@ -6,7 +6,7 @@ import {
   getClickcrateTestProgramId,
 } from '@clickcrate-test/anchor';
 import { BN, Program } from '@coral-xyz/anchor';
-import { useConnection } from '@solana/wallet-adapter-react';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Cluster, PublicKey, SystemProgram } from '@solana/web3.js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -25,6 +25,10 @@ import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import { dasApi } from '@metaplex-foundation/digital-asset-standard-api';
 import { das } from '@metaplex-foundation/mpl-core-das';
 import { publicKey } from '@metaplex-foundation/umi';
+import {
+  fetchAssetsByCollection,
+  MPL_CORE_PROGRAM_ID,
+} from '@metaplex-foundation/mpl-core';
 
 export function useClickCrateListingProgram() {
   const { connection } = useConnection();
@@ -125,6 +129,7 @@ export function useClickCrateListingProgramAccount({
   account: PublicKey;
 }) {
   const { connection } = useConnection();
+  const { wallet } = useWallet();
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program, accounts, programId } = useClickCrateListingProgram();
@@ -234,13 +239,49 @@ export function useClickCrateListingProgramAccount({
     mutationKey: ['clickcrate-test', 'placeProducts', { cluster, account }],
     mutationFn: async (args: PlaceProductListingArgs) => {
       const { productListingId, clickcrateId, price } = args;
+
+      console.log('ACCOUNT IS: ', account);
+      console.log('CLUSTER IS: ', cluster);
+
       // Initialize Umi with DAS API
       const umi = createUmi(connection.rpcEndpoint).use(dasApi());
+      const collection = publicKey(productListingId);
+      console.log(`CURRENT COLLECTION is: `, collection);
+
+      // const currentAsset = await das.getAsset(umi, collection);
+      // console.log(`CURRENT ASSET is: `, currentAsset);
+
+      // const currColl = await das.dasAssetsToCoreAssets(umi, collection);
+      // console.log(`CURRENT COLL is: `, currColl);
+
+      const owner = wallet?.adapter.publicKey;
+      if (owner == undefined || !owner) {
+        throw Error('Owner not found');
+      }
+      console.log(`CURRENT OWNER is: `, owner);
+
+      // const ownerAsset = await das.getAssetsByOwner(umi, {
+      //   owner: publicKey(owner),
+      // });
+      // console.log(`CURRENT OWNER ASSETS are: `, ownerAsset);
+
+      // const collectionData = await das.getCollection(umi, collection);
+      // console.log(`collection data is: `, collectionData);
 
       // Fetch assets in the collection
-      const assets = await das.getAssetsByCollection(umi, {
-        collection: publicKey(productListingId.toBase58()),
+      // console.log(
+      //   `Fetching assets for collection: ${productListingId.toBase58()}`
+      // );
+      // const assets = await das.getAssetsByCollection(umi, {
+      //   collection,
+      // });
+      // console.log(`Raw assets result:`, assets);
+
+      const assets = await fetchAssetsByCollection(umi, collection, {
+        skipDerivePlugins: false,
       });
+
+      console.log('ASSETS ARE: ', assets);
 
       // Validate number of assets
       if (assets.length < 1 || assets.length > 20) {
@@ -280,9 +321,10 @@ export function useClickCrateListingProgramAccount({
       );
 
       const [vaultAccount] = PublicKey.findProgramAddressSync(
-        [Buffer.from('vault'), account.toBuffer()],
+        [Buffer.from('vault'), productListingId.toBuffer()],
         programId
       );
+      console.log(`INIT ACCOUNTS SUCCESS`);
 
       for (const asset of assets) {
         await initializeOracle(
@@ -290,6 +332,8 @@ export function useClickCrateListingProgramAccount({
           new PublicKey(asset.publicKey)
         );
       }
+
+      console.log(`ORACLE ACCOUNTS INIT SUCCESS`);
 
       return program.methods
         .placeProducts(productListingId, clickcrateId, new BN(price))
@@ -299,9 +343,7 @@ export function useClickCrateListingProgramAccount({
           vault: vaultAccount,
           listingCollection: productListingId,
           owner: program.provider.publicKey,
-          coreProgram: new PublicKey(
-            'CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d'
-          ),
+          coreProgram: MPL_CORE_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
         })
         .remainingAccounts(

@@ -2,6 +2,9 @@ use anchor_lang::prelude::*;
 
 #[error_code]
 pub enum ClickCrateErrors {
+    #[msg("Failed to borrow account data")]
+    AccountBorrowFailed,
+
     #[msg("ClickCrate already registered")]
     ClickCrateExists,
 

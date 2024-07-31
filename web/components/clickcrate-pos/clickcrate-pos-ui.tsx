@@ -918,6 +918,20 @@ function ClickCratePosShareModal({
     }
   };
 
+  const handleCopyEmbed = () => {
+    if (publicKey) {
+      // makePurchase.mutateAsync({
+      //   productListingId: currentProductId,
+      //   clickcrateId: currentClickcrateId,
+      //   productId: currentProductId,
+      //   quantity: 1,
+      //   currentBuyer: publicKey,
+      // });
+      toast.success('Embed copied');
+      onClose();
+    }
+  };
+
   return (
     <div
       className={`modal ${
@@ -926,7 +940,7 @@ function ClickCratePosShareModal({
     >
       <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-6 w-full">
         <div className="flex flex-row justify-between items-end">
-          <h1 className="text-lg font-bold text-start">Make Purchase</h1>
+          <h1 className="text-lg font-bold text-start">Share ClickCrate</h1>
           {/* <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
             <p className="text-start font-semibold tracking-wide text-xs">
               Product:{' '}
@@ -959,12 +973,19 @@ function ClickCratePosShareModal({
           >
             Cancel
           </button>
+          {/* <button
+            className="btn btn-xs lg:btn-sm btn-green w-[32%] py-3"
+            onClick={handleCopyEmbed}
+            disabled={makePurchase.isPending}
+          >
+            Copy Embed
+          </button> */}
           <button
             className="btn btn-xs lg:btn-sm btn-primary w-[48%] py-3"
             onClick={handleGenerateBlink}
             disabled={makePurchase.isPending}
           >
-            Generate share link
+            Generate blink
             {/* {makePurchase.isPending ? 'Purchasing...' : 'Confirm Purchase'} */}
           </button>
         </div>
