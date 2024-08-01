@@ -5,6 +5,9 @@ pub enum ClickCrateErrors {
     #[msg("Failed to borrow account data")]
     AccountBorrowFailed,
 
+    #[msg("Failed to add plugin")]
+    AddPluginFailed,
+
     #[msg("ClickCrate already registered")]
     ClickCrateExists,
 

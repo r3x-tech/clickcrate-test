@@ -5,7 +5,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-clickcrate_test = "FGNqkRQNKRRAVX5rLBgv7YKQ8fYw5DPjJiKfsem1FpZd"
+clickcrate_test = "FrGTV2v3CXzK56Anxr25VRdJhp7abASzje99qdRre449"
 
 [registry]
 url = "https://api.apr.dev"

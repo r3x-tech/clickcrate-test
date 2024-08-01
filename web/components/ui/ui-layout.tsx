@@ -50,7 +50,7 @@ export function UiLayout({
               height={80}
             />
           </Link>
-          <ul className="menu menu-vertical sm:menu-horizontal px-2 space-x-4 font-semibold">
+          <ul className="menu menu-vertical sm:menu-horizontal px-2 space-x-4 font-semibold justify-center w-full">
             {links.map(({ label, path }) => (
               <li key={path}>
                 <Link

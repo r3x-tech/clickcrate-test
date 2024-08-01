@@ -15,11 +15,14 @@ import { BN } from '@coral-xyz/anchor';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+  IconChevronDown,
+  IconChevronRight,
   IconEdit,
   IconLink,
   IconShoppingCartFilled,
 } from '@tabler/icons-react';
 import { useClickCrateListingProgramAccount } from '../product-listing/product-listing-data-access';
+import { BlinkPreview } from '../blinks/BlinkPreview';
 
 export function ClickCratePosRegister({
   show,
@@ -274,7 +277,7 @@ export function ClickCratePosList({
         </div>
       ) : (
         <div>
-          <div className="mb-20 w-[100%] bg-background border-2 border-white rounded-lg">
+          <div className="mb-20 w-[100%] bg-background border-2 border-quaternary rounded-lg">
             <p className="text-sm font-light text-center p-4">
               No ClickCrates found. Register one to get started!
             </p>
@@ -434,11 +437,6 @@ function ClickCratePosCard({
     setSelected(allSelected);
     accountQuery.refetch();
   }, [allSelected]);
-
-  useEffect(() => {
-    setSelected(isSelected);
-    accountQuery.refetch();
-  }, [isSelected]);
 
   if (!publicKey) {
     return <p>Connect your wallet</p>;
@@ -903,19 +901,23 @@ function ClickCratePosShareModal({
   // });
 
   const { publicKey } = useWallet();
+  const [blinkUrl, setBlinkUrl] = useState(
+    `https://api.clickcrate.xyz/blink/${currentClickcrateId.toString()}`
+  );
+  const [showPreview, setShowPreview] = useState(false);
 
   const handleGenerateBlink = () => {
-    if (publicKey) {
-      // makePurchase.mutateAsync({
-      //   productListingId: currentProductId,
-      //   clickcrateId: currentClickcrateId,
-      //   productId: currentProductId,
-      //   quantity: 1,
-      //   currentBuyer: publicKey,
-      // });
-      toast.success('Blink link copied');
-      onClose();
-    }
+    const url = `https://api.clickcrate.xyz/blink/${currentClickcrateId.toString()}`;
+    setBlinkUrl(url);
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        toast.success('Copied to clipboard');
+      })
+      .catch((err) => {
+        console.error('Failed to copy: ', err);
+        toast.error('Failed to copy blink link');
+      });
   };
 
   const handleCopyEmbed = () => {
@@ -932,16 +934,57 @@ function ClickCratePosShareModal({
     }
   };
 
+  const togglePreview = () => {
+    setShowPreview(!showPreview);
+  };
+
   return (
     <div
       className={`modal ${
         show ? 'modal-open' : ''
-      } absolute top-0 left-0 right-0 bottom-0 flex flex-row items-center justify-center`}
+      } absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center`}
     >
-      <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-6 w-full">
+      <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-6 w-full max-w-md">
         <div className="flex flex-row justify-between items-end">
           <h1 className="text-lg font-bold text-start">Share ClickCrate</h1>
-          {/* <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+          <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+            <p className="text-start font-semibold tracking-wide text-xs">
+              ClickCrate ID:{' '}
+            </p>
+            <p className="pl-2 text-start font-normal text-xs">
+              <ExplorerLink
+                path={`account/${currentClickcrateId}`}
+                label={ellipsify(currentClickcrateId.toString())}
+              />
+            </p>
+          </div>
+        </div>
+        {blinkUrl && (
+          <div className="bg-quaternary p-2 rounded w-full">
+            <p className="text-white text-sm break-all">{blinkUrl}</p>
+          </div>
+        )}
+        <div
+          className="flex items-center justify-end cursor-pointer"
+          onClick={togglePreview}
+        >
+          <span className="mr-2 font-body text-xs font-bold">
+            {showPreview ? 'CLOSE PREVIEW' : 'SHOW PREVIEW'}
+          </span>
+          {showPreview ? (
+            <IconChevronDown size={20} />
+          ) : (
+            <IconChevronRight size={20} />
+          )}
+        </div>
+
+        {showPreview && (
+          <div className="blink-preview-container">
+            <BlinkPreview clickcrateId={currentClickcrateId.toString()} />
+          </div>
+        )}
+
+        {/* <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
             <p className="text-start font-semibold tracking-wide text-xs">
               Product:{' '}
             </p>
@@ -953,7 +996,7 @@ function ClickCratePosShareModal({
             </p>
           </div> */}
 
-          {/* <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
+        {/* <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
             <p className="text-start font-semibold tracking-wide text-xs">
               Inventory:{' '}
             </p>
@@ -963,30 +1006,26 @@ function ClickCratePosShareModal({
                 : 'NA'}
             </p>
           </div> */}
-        </div>
 
-        <div className="flex flex-row gap-[4%] py-2">
+        <div className="flex flex-row gap-4 mt-4">
           <button
-            className="btn btn-xs lg:btn-sm btn-outline w-[48%] py-3"
+            className="btn btn-xs lg:btn-sm btn-outline flex-1 py-3"
             onClick={onClose}
-            disabled={makePurchase.isPending}
           >
             Cancel
           </button>
           {/* <button
             className="btn btn-xs lg:btn-sm btn-green w-[32%] py-3"
             onClick={handleCopyEmbed}
-            disabled={makePurchase.isPending}
+            disabled={makePurchase.isPending || true}
           >
             Copy Embed
           </button> */}
           <button
-            className="btn btn-xs lg:btn-sm btn-primary w-[48%] py-3"
+            className="btn btn-xs lg:btn-sm btn-primary flex-1 py-3"
             onClick={handleGenerateBlink}
-            disabled={makePurchase.isPending}
           >
-            Generate blink
-            {/* {makePurchase.isPending ? 'Purchasing...' : 'Confirm Purchase'} */}
+            Copy link
           </button>
         </div>
       </div>

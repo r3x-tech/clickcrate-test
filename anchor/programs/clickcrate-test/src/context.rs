@@ -247,7 +247,7 @@ pub struct RemoveProducts<'info> {
     pub product_listing: Account<'info, ProductListingState>,
     #[account(
         mut,
-        seeds = [b"vault".as_ref(), product_listing.key().as_ref()],
+        seeds = [b"vault".as_ref(), product_listing_id.key().as_ref()],
         bump,
         close = owner
     )]

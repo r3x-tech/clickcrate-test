@@ -7,7 +7,15 @@ import {
 } from '@clickcrate-test/anchor';
 import { BN, Program } from '@coral-xyz/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { Cluster, PublicKey, SystemProgram } from '@solana/web3.js';
+import {
+  Cluster,
+  ComputeBudgetProgram,
+  Keypair,
+  PublicKey,
+  SystemProgram,
+  TransactionMessage,
+  VersionedTransaction,
+} from '@solana/web3.js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useCluster } from '../cluster/cluster-data-access';
@@ -24,14 +32,16 @@ import { useMemo } from 'react';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import { dasApi } from '@metaplex-foundation/digital-asset-standard-api';
 import { das } from '@metaplex-foundation/mpl-core-das';
-import { publicKey } from '@metaplex-foundation/umi';
+import { publicKey, signAllTransactions } from '@metaplex-foundation/umi';
 import {
   fetchAssetsByCollection,
   MPL_CORE_PROGRAM_ID,
 } from '@metaplex-foundation/mpl-core';
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes';
 
 export function useClickCrateListingProgram() {
   const { connection } = useConnection();
+  const { signAllTransactions, sendTransaction } = useWallet();
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const provider = useAnchorProvider();
@@ -129,10 +139,11 @@ export function useClickCrateListingProgramAccount({
   account: PublicKey;
 }) {
   const { connection } = useConnection();
-  const { wallet } = useWallet();
+  const { wallet, signAllTransactions, sendTransaction } = useWallet();
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program, accounts, programId } = useClickCrateListingProgram();
+  const provider = useAnchorProvider();
 
   const accountQuery = useQuery({
     queryKey: ['clickcrate-test', 'fetch', { cluster, account }],
@@ -335,7 +346,7 @@ export function useClickCrateListingProgramAccount({
 
       console.log(`ORACLE ACCOUNTS INIT SUCCESS`);
 
-      return program.methods
+      const ix = await program.methods
         .placeProducts(productListingId, clickcrateId, new BN(price))
         .accountsStrict({
           clickcrate: clickcrateAccount,
@@ -353,7 +364,75 @@ export function useClickCrateListingProgramAccount({
             isSigner: false,
           }))
         )
-        .rpc();
+        .instruction();
+
+      console.log('ix is: ', ix);
+
+      const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+        units: 500000,
+      });
+
+      const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+        microLamports: 1,
+      });
+
+      const blockHash = (await connection.getLatestBlockhash('finalized'))
+        .blockhash;
+      console.log('bkh is: ', blockHash);
+
+      const msg = new TransactionMessage({
+        payerKey: program.provider.publicKey!,
+        recentBlockhash: blockHash,
+        instructions: [modifyComputeUnits, addPriorityFee, ix],
+      }).compileToV0Message();
+
+      console.log('msg is: ', msg);
+
+      const txn = new VersionedTransaction(msg);
+
+      console.log('txn is: ', msg);
+
+      // const solKeypair = Keypair.fromSecretKey(
+      //   bs58.decode(process.env.NEXT_PUBLIC_TEMP_WALLET_SECRET_KEY!)
+      // );
+      // txn.sign([solKeypair]);
+
+      // console.log('TX is: ', msg);
+
+      // tx.feePayer = program.provider.publicKey;
+      // tx.recentBlockhash = blockHash;
+      // tx.sign([wa]);
+
+      console.log(
+        'Serialized TX is: ',
+        Buffer.from(txn.serialize()).toString('base64')
+      );
+
+      return provider.sendAndConfirm(txn);
+
+      // connection.sendEncodedTransaction(
+      //   Buffer.from(txn.serialize()).toString('base64')
+      // );
+
+      // return program.methods
+      //   .placeProducts(productListingId, clickcrateId, new BN(price))
+      //   .accountsStrict({
+      //     clickcrate: clickcrateAccount,
+      //     productListing: productListingAccount,
+      //     vault: vaultAccount,
+      //     listingCollection: productListingId,
+      //     owner: program.provider.publicKey,
+      //     coreProgram: MPL_CORE_PROGRAM_ID,
+      //     systemProgram: SystemProgram.programId,
+      //   })
+      //   .remainingAccounts(
+      //     assets.map((asset) => ({
+      //       pubkey: new PublicKey(asset.publicKey),
+      //       isWritable: true,
+      //       isSigner: false,
+      //     }))
+      //   )
+      //   .rpc();
     },
     onSuccess: (signature) => {
       transactionToast(signature);

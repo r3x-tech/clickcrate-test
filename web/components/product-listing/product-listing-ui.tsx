@@ -315,7 +315,7 @@ export function ProductListingsList({
         </div>
       ) : (
         <div>
-          <div className="mb-20 w-[100%] bg-background border-2 border-white rounded-lg">
+          <div className="mb-20 w-[100%] bg-background border-2 border-quaternary rounded-lg">
             <p className="text-sm font-light text-center p-4">
               No Product Listings found. Register one to get started.
             </p>

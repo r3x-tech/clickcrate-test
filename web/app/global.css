@@ -105,6 +105,8 @@ html, body {
   -webkit-backdrop-filter: blur(0.05rem) !important;
 }
 
+
+
 .btn-green {
   @apply bg-green text-white border-2 border-green rounded-full !important;
   font-family: 'Montserrat', sans-serif !important;
@@ -112,6 +114,10 @@ html, body {
   font-size: var(--btn-text-size) !important;
   letter-spacing: var(--btn-tracking) !important;
   height: auto !important;
+}
+
+.btn-green:hover {
+  @apply bg-hoverGreen border-2 border-hoverGreen !important;
 }
 
 /* .btn-ghost {
@@ -125,3 +131,15 @@ html, body {
 .btn-ghost:hover {
   @apply bg-[#202020] text-white border-2 border-[#202020] rounded-full !important;
 } */
+
+.blink-preview-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.blink-preview {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

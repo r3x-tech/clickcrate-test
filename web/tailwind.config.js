@@ -37,8 +37,9 @@ module.exports = {
         gray: '#A0A0A0',
         lightGray: '#9ba3af',
         darkerGray: '#86868B',
-        green: '00BF63',
-        red: 'FF3131',
+        hoverGreen: '#06d16b',
+        green: '#00BF63',
+        red: '#FF3131',
         input: '#1B1B1F',
         background: '#000000',
         blacks: {
