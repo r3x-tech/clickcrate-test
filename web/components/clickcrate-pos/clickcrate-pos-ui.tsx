@@ -1025,7 +1025,7 @@ function ClickCratePosShareModal({
             className="btn btn-xs lg:btn-sm btn-primary flex-1 py-3"
             onClick={handleGenerateBlink}
           >
-            Copy link
+            Copy Blink
           </button>
         </div>
       </div>
