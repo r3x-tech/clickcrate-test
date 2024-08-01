@@ -983,7 +983,6 @@ function ClickCratePosShareModal({
             <BlinkPreview clickcrateId={currentClickcrateId.toString()} />
           </div>
         )}
-
         {/* <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
             <p className="text-start font-semibold tracking-wide text-xs">
               Product:{' '}
