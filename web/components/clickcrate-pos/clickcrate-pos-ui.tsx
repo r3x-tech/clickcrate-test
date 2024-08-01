@@ -944,7 +944,7 @@ function ClickCratePosShareModal({
         show ? 'modal-open' : ''
       } absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center`}
     >
-      <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-6 w-full max-w-md">
+      <div className="modal-box bg-background p-6 flex flex-col border-2 border-white rounded-lg space-y-6 w-full max-w-md sm:max-h-[80vh]">
         <div className="flex flex-row justify-between items-end">
           <h1 className="text-lg font-bold text-start">Share ClickCrate</h1>
           <div className="flex flex-row justify-end items-end mb-[0.15em] p-0">
