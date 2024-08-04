@@ -290,6 +290,9 @@ pub struct MakePurchase<'info> {
       bump,
     )]
     pub vault: Account<'info, VaultAccount>,
+    /// CHECK: This is the Metaplex core collection account
+    #[account(mut)]
+    pub listing_collection: UncheckedAccount<'info>,
     /// CHECK: This is a Metaplex Core NFT
     #[account(mut)]
     pub product_account: UncheckedAccount<'info>,

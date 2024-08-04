@@ -476,9 +476,15 @@ export function useClickCrateListingProgramAccount({
       );
 
       const [vaultAccount] = PublicKey.findProgramAddressSync(
-        [Buffer.from('vault'), productListingAccount.toBuffer()],
+        [Buffer.from('vault'), productListingId.toBuffer()],
         programId
       );
+
+      for (const asset of assets) {
+        await closeOracle(productListingId, new PublicKey(asset.publicKey));
+      }
+
+      console.log(`ORACLE ACCOUNTS CLOSE SUCCESS`);
 
       return program.methods
         .removeProducts(productListingId, clickcrateId)

@@ -74,6 +74,9 @@ pub enum ClickCrateErrors {
     #[msg("Order not completed")]
     OrderNotCompleted,
 
+    #[msg("Orders in progress")]
+    OrdersInProgress,
+
     #[msg("Invalid oracle")]
     InvalidOrderOracleAccount,
 
@@ -103,6 +106,9 @@ pub enum ClickCrateErrors {
 
     #[msg("Oracle not found")]
     OracleNotFound,
+
+    #[msg("Oracle already updated")]
+    OracleAlreadyUpdated,
 
     #[msg("Unauthorized update")]
     UnauthorizedUpdate,

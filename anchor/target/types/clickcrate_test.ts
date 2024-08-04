@@ -5,10 +5,10 @@
  * IDL can be found at `target/idl/clickcrate_test.json`.
  */
 export type ClickcrateTest = {
-  "address": "FrGTV2v3CXzK56Anxr25VRdJhp7abASzje99qdRre449",
+  "address": "BdCEDZnwFh5wryQuu8tp89QTzwV9UbtrjogmePq8wXa",
   "metadata": {
     "name": "clickcrateTest",
-    "version": "0.69.0",
+    "version": "0.73.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
@@ -596,6 +596,10 @@ export type ClickcrateTest = {
               }
             ]
           }
+        },
+        {
+          "name": "listingCollection",
+          "writable": true
         },
         {
           "name": "productAccount",
@@ -1482,61 +1486,71 @@ export type ClickcrateTest = {
     },
     {
       "code": 6024,
+      "name": "ordersInProgress",
+      "msg": "Orders in progress"
+    },
+    {
+      "code": 6025,
       "name": "invalidOrderOracleAccount",
       "msg": "Invalid oracle"
     },
     {
-      "code": 6025,
+      "code": 6026,
       "name": "invalidVaultAccount",
       "msg": "Invalid vault"
     },
     {
-      "code": 6026,
+      "code": 6027,
       "name": "freezeAuthorityNotFound",
       "msg": "Freeze authority not found"
     },
     {
-      "code": 6027,
+      "code": 6028,
       "name": "transferAuthorityNotFound",
       "msg": "Transfer authority not found"
     },
     {
-      "code": 6028,
+      "code": 6029,
       "name": "invalidFreezeAuthority",
       "msg": "Invalid freeze authority"
     },
     {
-      "code": 6029,
+      "code": 6030,
       "name": "invalidTransferAuthority",
       "msg": "Invalid transfer authority"
     },
     {
-      "code": 6030,
+      "code": 6031,
       "name": "vaultNotEmpty",
       "msg": "Vault not empty"
     },
     {
-      "code": 6031,
+      "code": 6032,
       "name": "insufficientBalance",
       "msg": "Insufficient balance"
     },
     {
-      "code": 6032,
+      "code": 6033,
       "name": "oracleFailedToClose",
       "msg": "Oracle account closure failed"
     },
     {
-      "code": 6033,
+      "code": 6034,
       "name": "oracleNotFound",
       "msg": "Oracle not found"
     },
     {
-      "code": 6034,
+      "code": 6035,
+      "name": "oracleAlreadyUpdated",
+      "msg": "Oracle already updated"
+    },
+    {
+      "code": 6036,
       "name": "unauthorizedUpdate",
       "msg": "Unauthorized update"
     },
     {
-      "code": 6035,
+      "code": 6037,
       "name": "unauthorizedClose",
       "msg": "Unauthorized close"
     }

@@ -698,9 +698,10 @@ function ProductListingPlaceModal({
   currentProductId: PublicKey;
   isPlaceFormValid: boolean;
 }) {
-  const { placeProductListing } = useClickCrateListingProgramAccount({
-    account,
-  });
+  const { placeProductListing, removeProductListing } =
+    useClickCrateListingProgramAccount({
+      account,
+    });
 
   const { publicKey } = useWallet();
   const [clickcrateId, setClickCrateId] = useState('');
@@ -712,6 +713,20 @@ function ProductListingPlaceModal({
         productListingId: currentProductId,
         clickcrateId: new PublicKey(clickcrateId),
         price: new BN(unitPriceInSol * 1000000000),
+      });
+      onClose();
+    }
+  };
+
+  const handleRemove = () => {
+    if (publicKey) {
+      removeProductListing.mutateAsync({
+        productListingId: new PublicKey(
+          '8XivL6fHZHcukd52Ve4qUtGFYmPSrpujFCyMgcRw1Yb7'
+        ),
+        clickcrateId: new PublicKey(
+          'C5f6HTRH4zVtK72tNp3n9VdrQccyqKAtGXY9pWPB8pSs'
+        ),
       });
       onClose();
     }

@@ -23,6 +23,7 @@ import {
 } from '@tabler/icons-react';
 import { useClickCrateListingProgramAccount } from '../product-listing/product-listing-data-access';
 import { BlinkPreview } from '../blinks/BlinkPreview';
+import { fetchCollection } from '@metaplex-foundation/mpl-core';
 
 export function ClickCratePosRegister({
   show,

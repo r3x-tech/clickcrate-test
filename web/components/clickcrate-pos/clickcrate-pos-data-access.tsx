@@ -19,6 +19,11 @@ import {
   getProductCategoryFromString,
 } from '../../types';
 import { useMemo } from 'react';
+import { MPL_CORE_PROGRAM_ID } from '@metaplex-foundation/mpl-core';
+import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
+import { dasApi } from '@metaplex-foundation/digital-asset-standard-api';
+import { publicKey } from '@metaplex-foundation/umi';
+import { das } from '@metaplex-foundation/mpl-core-das';
 
 export function useClickcratePosProgram() {
   const { connection } = useConnection();
@@ -156,6 +161,7 @@ export function useClickcratePosProgramAccount({
   account: PublicKey;
 }) {
   const { cluster } = useCluster();
+  const { connection } = useConnection();
   const transactionToast = useTransactionToast();
   const { program, accounts, programId } = useClickcratePosProgram();
 
@@ -211,43 +217,103 @@ export function useClickcratePosProgramAccount({
   const makePurchase = useMutation({
     mutationKey: ['clickcrate-test', 'makePurchase', { cluster, account }],
     mutationFn: async (args: MakePurchaseArgs) => {
-      const {
-        productListingId,
-        clickcrateId,
-        productId,
-        quantity,
-        currentBuyer,
-      } = args;
+      const { productListingId, clickcrateId, quantity, currentBuyer } = args;
+
+      // Replicate fetchClickCrate
+      const [clickCrateAddress] = PublicKey.findProgramAddressSync(
+        [Buffer.from('clickcrate'), clickcrateId.toBuffer()],
+        programId
+      );
+      const clickcrateAsset = await program.account.clickCrateState.fetch(
+        clickCrateAddress
+      );
+
+      if (!clickcrateAsset.product) {
+        throw new Error('No product found in ClickCrate');
+      }
+
+      // Replicate fetchProductListing
+      const [productListingAddress] = PublicKey.findProgramAddressSync(
+        [Buffer.from('listing'), clickcrateAsset.product.toBuffer()],
+        programId
+      );
+      console.log('productListingAddress:', productListingAddress.toString());
+
+      const productListing = await program.account.productListingState.fetch(
+        productListingAddress
+      );
+      if (!productListing) {
+        throw new Error('Product listing not found');
+      }
+      console.log('productListing:', productListing);
+
+      // Replicate fetchDasCoreCollectionAssets
+      const umi = createUmi(connection).use(dasApi());
+      const collection = publicKey(clickcrateAsset.product.toString());
+      const collectionAssets = await das.getAssetsByCollection(umi, {
+        collection,
+      });
+
+      // Find the matching asset based on the inStock value
+      const productIndex = productListing.inStock;
+      const matchingAsset = collectionAssets.find((asset) => {
+        const name = asset.content.metadata.name;
+        const indexMatch = name.match(/#(\d+)$/);
+        if (indexMatch) {
+          const assetIndex = new BN(indexMatch[1]);
+          return assetIndex.eq(productIndex);
+        }
+        return false;
+      });
+
+      if (!matchingAsset) {
+        throw new Error('Product unavailable');
+      }
+
+      const productAddress = new PublicKey(matchingAsset.publicKey);
+
       const [clickcrateAccount] = PublicKey.findProgramAddressSync(
         [Buffer.from('clickcrate'), clickcrateId.toBuffer()],
         programId
       );
-      const [productListingAccount] = PublicKey.findProgramAddressSync(
-        [Buffer.from('listing'), productListingId.toBuffer()],
-        programId
-      );
+      // const [vaultAccount] = PublicKey.findProgramAddressSync(
+      //   [Buffer.from('vault'), productListingId.toBuffer()],
+      //   programId
+      // );
+
       const [vaultAccount] = PublicKey.findProgramAddressSync(
-        [Buffer.from('vault'), productListingAccount.toBuffer()],
+        [Buffer.from('vault'), productListingId.toBuffer()],
         programId
       );
+      // const vaultAccount = await connection.getAccountInfo(vaultAddress);
+      // if (!vaultAccount) {
+      //   throw new Error(
+      //     'Vault account not initialized. Products may not have been placed yet.'
+      //   );
+      // }
+
       const [oracleAccount] = PublicKey.findProgramAddressSync(
-        [Buffer.from('oracle'), productId.toBuffer()],
+        [Buffer.from('oracle'), productAddress.toBuffer()],
         programId
       );
 
       return await program.methods
-        .makePurchase(productListingId, clickcrateId, productId, quantity)
+        .makePurchase(
+          productListingId,
+          clickcrateId,
+          productAddress,
+          new BN(quantity)
+        )
         .accountsStrict({
           clickcrate: clickcrateAccount,
-          productListing: productListingAccount,
+          productListing: productListingAddress,
           oracle: oracleAccount,
           vault: vaultAccount,
-          productAccount: productId,
+          listingCollection: productListingId,
+          productAccount: productAddress,
           owner: program.provider.publicKey!,
           buyer: currentBuyer,
-          coreProgram: new PublicKey(
-            'CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d'
-          ),
+          coreProgram: MPL_CORE_PROGRAM_ID,
           systemProgram: SystemProgram.programId,
         })
         .rpc();
@@ -256,7 +322,10 @@ export function useClickcratePosProgramAccount({
       transactionToast(signature);
       return accounts.refetch();
     },
-    onError: () => toast.error('Failed to make purchase'),
+    onError: (error) => {
+      console.error('Failed to make purchase:', error);
+      toast.error('Failed to make purchase');
+    },
   });
 
   const updateClickCrate = useMutation({
