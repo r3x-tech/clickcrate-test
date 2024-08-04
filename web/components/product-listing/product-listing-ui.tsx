@@ -737,17 +737,17 @@ function ProductListingPlaceModal({
   //   }
   // };
 
-  // const handleRemoveOracles = async () => {
-  //   if (publicKey) {
-  //     try {
-  //       await closeAllOracles.mutateAsync(currentProductId);
-  //       onClose();
-  //     } catch (error) {
-  //       console.error('Failed to remove oracles:', error);
-  //       toast.error('Failed to remove oracles');
-  //     }
-  //   }
-  // };
+  const handleRemoveOracles = async () => {
+    if (publicKey) {
+      try {
+        await closeAllOracles.mutateAsync(currentProductId);
+        onClose();
+      } catch (error) {
+        console.error('Failed to remove oracles:', error);
+        toast.error('Failed to remove oracles');
+      }
+    }
+  };
 
   return (
     <div
