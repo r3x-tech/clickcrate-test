@@ -903,7 +903,7 @@ function ClickCratePosShareModal({
 
   const { publicKey } = useWallet();
   const [blinkUrl, setBlinkUrl] = useState(
-    `https://api.clickcrate.xyz/blink/${currentClickcrateId.toString()}`
+    `https://dial.to/devnet?action=solana-action:https://api.clickcrate.xyz/blink/${currentClickcrateId.toString()}`
   );
   const [showPreview, setShowPreview] = useState(false);
 
@@ -962,7 +962,7 @@ function ClickCratePosShareModal({
         </div>
         {blinkUrl && (
           <div className="bg-quaternary p-2 rounded w-full">
-            <p className="text-white text-sm break-all">{blinkUrl}</p>
+            <p className="text-white text-sm break-all">{`https://api.clickcrate.xyz/blink/${currentClickcrateId.toString()}`}</p>
           </div>
         )}
         <div
