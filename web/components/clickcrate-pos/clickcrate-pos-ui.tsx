@@ -774,8 +774,8 @@ function ClickCratePosPurchaseModal({
               Inventory:{' '}
             </p>
             <p className="pl-2 text-start font-normal text-xs">
-              {accountQuery.data?.inStock
-                ? `${accountQuery.data?.inStock}`
+              {accountQuery.data?.inStock !== undefined
+                ? accountQuery.data?.inStock.toNumber()
                 : 'NA'}
             </p>
           </div>
@@ -908,7 +908,7 @@ function ClickCratePosShareModal({
   const [showPreview, setShowPreview] = useState(false);
 
   const handleGenerateBlink = () => {
-    const url = `https://api.clickcrate.xyz/blink/${currentClickcrateId.toString()}`;
+    const url = `https://dial.to/devnet?action=solana-action:https://api.clickcrate.xyz/blink/${currentClickcrateId.toString()}`;
     setBlinkUrl(url);
     navigator.clipboard
       .writeText(url)

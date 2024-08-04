@@ -15,7 +15,7 @@ use mpl_core::{
     },
     Asset, Collection,
 };
-declare_id!("BdCEDZnwFh5wryQuu8tp89QTzwV9UbtrjogmePq8wXa");
+declare_id!("DcHjVPY65rkeq6enyZcmbYuxFGt2iEkL3QrezifRXHme");
 
 pub mod account;
 pub mod context;

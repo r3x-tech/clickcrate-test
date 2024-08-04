@@ -496,7 +496,12 @@ function ProductListingCard({
           </p>
         </div>
         <div className="flex flex-row w-[10%] justify-end">
-          <p className="text-end font-extralight text-xs">NA</p>
+          <p className="text-end font-extralight text-xs">
+            {accountQuery.data?.price !== undefined &&
+            accountQuery.data?.clickcratePos !== null
+              ? `${accountQuery.data?.price / LAMPORTS_PER_SOL} SOL`
+              : 'NA'}
+          </p>
         </div>
         <div className="flex flex-row w-[10%] justify-end">
           <p className="text-end font-extralight text-xs">
@@ -698,7 +703,7 @@ function ProductListingPlaceModal({
   currentProductId: PublicKey;
   isPlaceFormValid: boolean;
 }) {
-  const { placeProductListing, removeProductListing } =
+  const { placeProductListing, removeProductListing, closeAllOracles } =
     useClickCrateListingProgramAccount({
       account,
     });
@@ -712,23 +717,35 @@ function ProductListingPlaceModal({
       placeProductListing.mutateAsync({
         productListingId: currentProductId,
         clickcrateId: new PublicKey(clickcrateId),
-        price: new BN(unitPriceInSol * 1000000000),
+        price: new BN(unitPriceInSol * LAMPORTS_PER_SOL),
       });
       onClose();
     }
   };
 
-  const handleRemove = () => {
+  // const handleRemove = () => {
+  //   if (publicKey) {
+  //     removeProductListing.mutateAsync({
+  //       productListingId: new PublicKey(
+  //         '8XivL6fHZHcukd52Ve4qUtGFYmPSrpujFCyMgcRw1Yb7'
+  //       ),
+  //       clickcrateId: new PublicKey(
+  //         'C5f6HTRH4zVtK72tNp3n9VdrQccyqKAtGXY9pWPB8pSs'
+  //       ),
+  //     });
+  //     onClose();
+  //   }
+  // };
+
+  const handleRemoveOracles = async () => {
     if (publicKey) {
-      removeProductListing.mutateAsync({
-        productListingId: new PublicKey(
-          '8XivL6fHZHcukd52Ve4qUtGFYmPSrpujFCyMgcRw1Yb7'
-        ),
-        clickcrateId: new PublicKey(
-          'C5f6HTRH4zVtK72tNp3n9VdrQccyqKAtGXY9pWPB8pSs'
-        ),
-      });
-      onClose();
+      try {
+        await closeAllOracles.mutateAsync(currentProductId);
+        onClose();
+      } catch (error) {
+        console.error('Failed to remove oracles:', error);
+        toast.error('Failed to remove oracles');
+      }
     }
   };
 
@@ -784,6 +801,13 @@ function ProductListingPlaceModal({
           >
             Cancel
           </button>
+          {/* <button
+            className="btn btn-xs lg:btn-sm btn-outline w-[48%] py-3"
+            onClick={handleRemoveOracles}
+            disabled={closeAllOracles.isPending}
+          >
+            {closeAllOracles.isPending ? 'Removing...' : 'Remove Oracles'}
+          </button> */}
           <button
             className="btn btn-xs lg:btn-sm btn-primary w-[48%] py-3"
             onClick={handlePlaceProduct}

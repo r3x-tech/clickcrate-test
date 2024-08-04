@@ -11,6 +11,7 @@ import {
   Cluster,
   ComputeBudgetProgram,
   Keypair,
+  LAMPORTS_PER_SOL,
   PublicKey,
   SystemProgram,
   TransactionMessage,
@@ -337,17 +338,24 @@ export function useClickCrateListingProgramAccount({
       );
       console.log(`INIT ACCOUNTS SUCCESS`);
 
+      console.log(`ASSETS: `, assets);
+
       for (const asset of assets) {
-        await initializeOracle(
-          productListingId,
-          new PublicKey(asset.publicKey)
-        );
+        console.log(`asset: `, asset);
+        console.log(`asset.oracles: `, asset.oracles);
+
+        if (asset.oracles == undefined || asset.oracles.length == 0) {
+          await initializeOracle(
+            productListingId,
+            new PublicKey(asset.publicKey)
+          );
+        }
       }
 
       console.log(`ORACLE ACCOUNTS INIT SUCCESS`);
 
       const ix = await program.methods
-        .placeProducts(productListingId, clickcrateId, new BN(price))
+        .placeProducts(productListingId, clickcrateId, price)
         .accountsStrict({
           clickcrate: clickcrateAccount,
           productListing: productListingAccount,
@@ -369,7 +377,7 @@ export function useClickCrateListingProgramAccount({
       console.log('ix is: ', ix);
 
       const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-        units: 500000,
+        units: 1000000,
       });
 
       const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
@@ -563,6 +571,31 @@ export function useClickCrateListingProgramAccount({
     onError: () => toast.error('Failed to update Product Listing'),
   });
 
+  const closeAllOracles = useMutation({
+    mutationKey: ['clickcrate-test', 'closeAllOracles', { cluster, account }],
+    mutationFn: async (productListingId: PublicKey) => {
+      const umi = createUmi(connection.rpcEndpoint).use(dasApi());
+      const collection = publicKey(productListingId);
+
+      const assets = await fetchAssetsByCollection(umi, collection, {
+        skipDerivePlugins: false,
+      });
+
+      const closePromises = assets.map((asset) =>
+        closeOracle(productListingId, new PublicKey(asset.publicKey))
+      );
+
+      await Promise.all(closePromises);
+
+      return 'All oracles closed successfully';
+    },
+    onSuccess: () => {
+      toast.success('All oracles closed successfully');
+      return accounts.refetch();
+    },
+    onError: () => toast.error('Failed to close all oracles'),
+  });
+
   return {
     accountQuery,
     activateProductListing,
@@ -570,6 +603,7 @@ export function useClickCrateListingProgramAccount({
     placeProductListing,
     removeProductListing,
     updateProductListing,
+    closeAllOracles,
   };
 }
 
