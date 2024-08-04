@@ -450,7 +450,7 @@ function ClickCratePosCard({
   ) : (
     <div>
       <div
-        className={`px-4 py-2 ${!isFirst ? 'border-t-2' : ''} ${
+        className={`px-4 py-2 ${!isFirst ? 'border-t-0' : ''} ${
           !isLast ? 'border-b-2' : ''
         } border-quaternary`}
       >
