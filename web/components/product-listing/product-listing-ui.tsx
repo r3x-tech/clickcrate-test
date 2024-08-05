@@ -226,31 +226,18 @@ export function ProductListingsList({
     account.account.owner.equals(publicKey!)
   );
 
-  if (getProgramAccount.isLoading) {
-    return (
-      <div className="space-y-6 mb-20 w-[100%]">
-        <div className="flex justify-centerw-[100%] p-6">
-          <span className="loading loading-spinner loading-md"></span>
-        </div>
-      </div>
-    );
-  }
-  if (!getProgramAccount.data?.value) {
-    return (
-      <div className="alert alert-info flex justify-center">
-        <span>
-          Program account not found. Make sure the registry is deployed and you
-          are on the correct cluster.
-        </span>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6 mb-20 w-[100%]">
-      {isLoading ? (
+      {isLoading || getProgramAccount.isLoading ? (
         <div className="flex justify-center w-[100%] p-6">
           <span className="loading loading-spinner loading-md"></span>
+        </div>
+      ) : !getProgramAccount.data?.value ? (
+        <div className="alert alert-info flex justify-center">
+          <span>
+            Program account not found. Ensure registry is deployed and you are
+            on the correct cluster.
+          </span>
         </div>
       ) : userAccounts?.length !== undefined && userAccounts.length > 0 ? (
         <div className="w-[100%] bg-background border-2 border-quaternary rounded-lg">

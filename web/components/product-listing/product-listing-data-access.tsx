@@ -462,16 +462,24 @@ export function useClickCrateListingProgramAccount({
       const umi = createUmi(connection.rpcEndpoint).use(dasApi());
 
       // Fetch assets in the collection
-      const assets = await das.getAssetsByCollection(umi, {
-        collection: publicKey(productListingId.toBase58()),
-      });
+      // const assets = await das.getAssetsByCollection(umi, {
+      //   collection: publicKey(productListingId.toBase58()),
+      // });
 
-      // Validate number of assets
-      if (assets.length < 1 || assets.length > 20) {
-        throw new Error(
-          `Invalid number of assets in collection: ${assets.length}. Must be between 1 and 20.`
-        );
-      }
+      const assets = await fetchAssetsByCollection(
+        umi,
+        productListingId.toBase58(),
+        {
+          skipDerivePlugins: false,
+        }
+      );
+
+      // // Validate number of assets
+      // if (assets.length < 1 || assets.length > 20) {
+      //   throw new Error(
+      //     `Invalid number of assets in collection: ${assets.length}. Must be between 1 and 20.`
+      //   );
+      // }
 
       const [clickcrateAccount] = PublicKey.findProgramAddressSync(
         [Buffer.from('clickcrate'), clickcrateId.toBuffer()],
@@ -488,11 +496,13 @@ export function useClickCrateListingProgramAccount({
         programId
       );
 
-      for (const asset of assets) {
-        await closeOracle(productListingId, new PublicKey(asset.publicKey));
-      }
+      // console.log(`ASSETS ARE: `, assets);
 
-      console.log(`ORACLE ACCOUNTS CLOSE SUCCESS`);
+      // for (const asset of assets) {
+      //   await closeOracle(productListingId, new PublicKey(asset.publicKey));
+      // }
+
+      // console.log(`ORACLE ACCOUNTS CLOSE SUCCESS`);
 
       return program.methods
         .removeProducts(productListingId, clickcrateId)
@@ -520,7 +530,7 @@ export function useClickCrateListingProgramAccount({
       transactionToast(signature);
       return accounts.refetch();
     },
-    onError: () => toast.error('Failed to remove Product Listing'),
+    onError: () => toast.error('Failed to remove listing'),
   });
 
   const updateProductListing = useMutation({

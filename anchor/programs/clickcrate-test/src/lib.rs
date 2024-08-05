@@ -15,7 +15,7 @@ use mpl_core::{
     },
     Asset, Collection,
 };
-declare_id!("DcHjVPY65rkeq6enyZcmbYuxFGt2iEkL3QrezifRXHme");
+declare_id!("4foG1ch8SMqE1BgV65BjnfwRFrSjTXqtxJ2fbg3dq857");
 
 pub mod account;
 pub mod context;
@@ -177,120 +177,21 @@ pub mod clickcrate_test {
                 && deserialized_asset.base.owner.key() == product_listing.owner.key(),
             ClickCrateErrors::UnauthorizedClose
         );
+
+        // let (oracle_pda, _) = Pubkey::find_program_address(
+        //     &[b"oracle", product_account.key().as_ref()],
+        //     ctx.program_id,
+        // );
+        // RemoveExternalPluginAdapterV1CpiBuilder::new(&core_program_info)
+        //     .asset(&product_account)
+        //     .collection(Some(&collection_info))
+        //     .payer(&owner_info)
+        //     .authority(Some(&owner_info))
+        //     .system_program(&system_program_info)
+        //     .invoke()?;
+
         Ok(())
     }
-
-    // pub fn remove_products<'a, 'b, 'c: 'info, 'info>(
-    //     ctx: Context<'a, 'b, 'c, 'info, RemoveProducts<'info>>,
-    //     _product_listing_id: Pubkey,
-    //     _clickcrate_id: Pubkey,
-    // ) -> Result<()> {
-    //     let product_listing: &mut Account<ProductListingState> = &mut ctx.accounts.product_listing;
-    //     let clickcrate: &mut Account<ClickCrateState> = &mut ctx.accounts.clickcrate;
-    //     let listing_collection = &ctx.accounts.listing_collection;
-    //     let product_accounts = ctx.remaining_accounts;
-    //     let vault = &ctx.accounts.vault;
-
-    //     let (vault_pda, _vault_bump) = Pubkey::find_program_address(
-    //         &[b"vault", product_listing.key().as_ref()],
-    //         ctx.program_id,
-    //     );
-    //     let collection_data = listing_collection.try_borrow_data()?;
-    //     let collection_account = Collection::deserialize(&mut &collection_data[..])?;
-    //     let total_minted = collection_account.base.num_minted;
-
-    //     require!(
-    //         product_listing.is_active,
-    //         ClickCrateErrors::ProductListingDeactivated
-    //     );
-    //     require!(
-    //         clickcrate.is_active,
-    //         ClickCrateErrors::ClickCrateDeactivated
-    //     );
-    //     require!(
-    //         vault.key() == vault_pda,
-    //         ClickCrateErrors::InvalidVaultAccount
-    //     );
-    //     require!(
-    //         product_accounts.len() as u32 == total_minted
-    //             && product_accounts.len() >= 1
-    //             && product_accounts.len() <= 20,
-    //         ClickCrateErrors::InvalidRemovalRequest
-    //     );
-
-    //     // Check if the vault is empty (of product sale funds)
-    //     require!(
-    //         vault.to_account_info().lamports()
-    //             == Rent::get()?.minimum_balance(VaultAccount::MAX_SIZE),
-    //         ClickCrateErrors::VaultNotEmpty
-    //     );
-
-    //     let core_program_info = ctx.accounts.core_program.to_account_info();
-    //     let collection_info = ctx.accounts.listing_collection.to_account_info();
-    //     let owner_info = ctx.accounts.owner.to_account_info();
-    //     let system_program_info = ctx.accounts.system_program.to_account_info();
-
-    //     // Unlock the NFTs
-    //     for product_account in product_accounts.iter() {
-    //         let product_data = product_account.try_borrow_data()?;
-    //         let deserialized_product = Asset::deserialize(&mut &product_data[..])
-    //             .map_err(|_| ClickCrateErrors::InvalidProductAccount)?;
-
-    //         // Unfreeze the Asset
-    //         UpdatePluginV1CpiBuilder::new(&core_program_info)
-    //             .asset(&product_account)
-    //             .collection(Some(&collection_info))
-    //             .payer(&owner_info)
-    //             .authority(Some(&product_listing.to_account_info()))
-    //             .system_program(&system_program_info)
-    //             .plugin(Plugin::FreezeDelegate(FreezeDelegate { frozen: false }))
-    //             .invoke_signed(&[&[
-    //                 b"listing",
-    //                 product_listing.id.as_ref(),
-    //                 &[ctx.bumps.product_listing],
-    //             ]])?;
-
-    //         // Remove the FreezeDelegate Plugin
-    //         RemovePluginV1CpiBuilder::new(&core_program_info)
-    //             .asset(&product_account)
-    //             .collection(Some(&collection_info))
-    //             .payer(&owner_info)
-    //             .authority(Some(&owner_info))
-    //             .system_program(&system_program_info)
-    //             .plugin_type(PluginType::FreezeDelegate)
-    //             .invoke()?;
-
-    //         // Remove the TransferDelegate Plugin
-    //         RemovePluginV1CpiBuilder::new(&core_program_info)
-    //             .asset(&product_account)
-    //             .collection(Some(&collection_info))
-    //             .payer(&owner_info)
-    //             .authority(Some(&owner_info))
-    //             .system_program(&system_program_info)
-    //             .plugin_type(PluginType::TransferDelegate)
-    //             .invoke()?;
-
-    //         // Remove the Oracle Plugin
-    //         let oracle = deserialized_product
-    //             .external_plugin_adapter_list
-    //             .oracles
-    //             .first()
-    //             .ok_or(ClickCrateErrors::OracleNotFound)?;
-
-    //         RemoveExternalPluginAdapterV1CpiBuilder::new(&core_program_info)
-    //             .asset(&product_account)
-    //             .collection(Some(&collection_info))
-    //             .payer(&owner_info)
-    //             .authority(Some(&owner_info))
-    //             .system_program(&system_program_info)
-    //             .key(ExternalPluginAdapterKey::Oracle(oracle.base_address))
-    //             .invoke()?;
-
-    //         product_listing.in_stock -= 1;
-    //     }
-
-    //     Ok(())
-    // }
 
     pub fn remove_products<'a, 'b, 'c: 'info, 'info>(
         ctx: Context<'a, 'b, 'c, 'info, RemoveProducts<'info>>,
@@ -674,8 +575,8 @@ pub mod clickcrate_test {
             .system_program(&ctx.accounts.system_program.to_account_info())
             .plugin(Plugin::Attributes(Attributes {
                 attribute_list: vec![Attribute {
-                    key: "order_status".to_string(),
-                    value: "pending".to_string(),
+                    key: "Order Status".to_string(),
+                    value: "Confirmed".to_string(),
                 }],
             }))
             .invoke()?;

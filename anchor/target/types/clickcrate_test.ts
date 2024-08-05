@@ -5,10 +5,10 @@
  * IDL can be found at `target/idl/clickcrate_test.json`.
  */
 export type ClickcrateTest = {
-  "address": "DcHjVPY65rkeq6enyZcmbYuxFGt2iEkL3QrezifRXHme",
+  "address": "4foG1ch8SMqE1BgV65BjnfwRFrSjTXqtxJ2fbg3dq857",
   "metadata": {
     "name": "clickcrateTest",
-    "version": "0.76.0",
+    "version": "0.77.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },

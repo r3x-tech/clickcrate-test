@@ -193,31 +193,18 @@ export function ClickCratePosList({
     account.account.owner.equals(publicKey!)
   );
 
-  if (getProgramAccount.isLoading) {
-    return (
-      <div className="space-y-6 mb-20 w-[100%]">
-        <div className="flex justify-centerw-[100%] p-6">
-          <span className="loading loading-spinner loading-md"></span>
-        </div>
-      </div>
-    );
-  }
-  if (!getProgramAccount.data?.value) {
-    return (
-      <div className="alert alert-info flex justify-center">
-        <span>
-          Program account not found. Make sure the registry is deployed and you
-          are on the correct cluster.
-        </span>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6 mb-20 w-[100%]">
-      {isLoading ? (
+      {isLoading || getProgramAccount.isLoading ? (
         <div className="flex justify-center w-[100%] p-6">
           <span className="loading loading-spinner loading-md"></span>
+        </div>
+      ) : !getProgramAccount.data?.value ? (
+        <div className="alert alert-info flex justify-center">
+          <span>
+            Program account not found. Ensure registry is deployed and you are
+            on the correct cluster.
+          </span>
         </div>
       ) : userAccounts?.length !== undefined && userAccounts.length > 0 ? (
         <div className="w-[100%] bg-background border-2 border-quaternary rounded-lg">
@@ -368,14 +355,17 @@ function ClickCratePosCard({
     setShowUpdateModal(!showUpdateModal);
   };
 
+  const [isProductInfoLoading, setIsProductInfoLoading] = useState(false);
+
   const toggleProductInfoModal = () => {
     if (
-      accountQuery.data?.isActive == undefined ||
-      accountQuery.data?.isActive == false
+      accountQuery.data?.isActive === undefined ||
+      accountQuery.data?.isActive === false
     ) {
       toast.error('Clickcrate not active');
       return;
     }
+    setIsProductInfoLoading(true);
     if (
       accountQuery.data?.product &&
       accountQuery.data?.product !== undefined &&
@@ -386,6 +376,7 @@ function ClickCratePosCard({
     } else {
       toast.error('Product info not found');
     }
+    setIsProductInfoLoading(false);
   };
 
   const togglePurchaseModal = () => {
@@ -444,8 +435,8 @@ function ClickCratePosCard({
   }
 
   return accountQuery.isLoading ? (
-    <div className="flex justify-center w-[100%] p-6">
-      <span className="loading loading-spinner loading-md"></span>
+    <div className="flex justify-center w-[100%] p-4">
+      <span className="loading loading-spinner loading-sm"></span>
     </div>
   ) : (
     <div>
@@ -578,16 +569,18 @@ function ClickCratePosCard({
           isMakePurchaseFormValid={isMakePurchaseFormValid}
         />
       )}
-      {showProductInfoModal && accountQuery.data?.product && (
-        <ClickCratePosProductInfoModal
-          show={showProductInfoModal}
-          onClose={toggleProductInfoModal}
-          account={account}
-          currentClickcrateId={accountQuery.data?.id}
-          currentProductId={accountQuery.data?.product}
-          isProductInfoFormValid={isProductInfoFormValid}
-        />
-      )}
+      {showProductInfoModal &&
+        accountQuery.data?.product &&
+        !isProductInfoLoading && (
+          <ClickCratePosProductInfoModal
+            show={showProductInfoModal}
+            onClose={toggleProductInfoModal}
+            account={account}
+            currentClickcrateId={accountQuery.data?.id}
+            currentProductId={accountQuery.data?.product}
+            isProductInfoFormValid={isProductInfoFormValid}
+          />
+        )}
     </div>
   );
 }
@@ -817,24 +810,33 @@ function ClickCratePosProductInfoModal({
   currentProductId: PublicKey;
   isProductInfoFormValid: boolean;
 }) {
-  const { removeProductListing } = useClickCrateListingProgramAccount({
-    account,
-  });
+  const { removeProductListing, closeAllOracles } =
+    useClickCrateListingProgramAccount({
+      account,
+    });
 
   const { publicKey } = useWallet();
 
-  const handleRemoveProduct = () => {
+  const handleRemoveProduct = async () => {
     if (
       publicKey &&
       isProductInfoFormValid &&
       currentClickcrateId &&
       currentProductId
     ) {
-      removeProductListing.mutateAsync({
-        productListingId: currentProductId,
-        clickcrateId: currentClickcrateId,
-      });
-      onClose();
+      try {
+        // First, remove the product listing
+        await removeProductListing.mutateAsync({
+          productListingId: currentProductId,
+          clickcrateId: currentClickcrateId,
+        });
+
+        // await closeAllOracles.mutateAsync(currentProductId);
+
+        onClose();
+      } catch (error) {
+        console.error('Failed to remove product:', error);
+      }
     } else {
       toast.error('Failed to remove product');
     }
