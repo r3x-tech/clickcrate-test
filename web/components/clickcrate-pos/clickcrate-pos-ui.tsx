@@ -975,9 +975,9 @@ function ClickCratePosShareModal({
             {showPreview ? 'CLOSE PREVIEW' : 'SHOW PREVIEW'}
           </span>
           {showPreview ? (
-            <IconChevronDown size={20} />
+            <IconChevronDown size={21} />
           ) : (
-            <IconChevronRight size={20} />
+            <IconChevronRight size={21} />
           )}
         </div>
 
