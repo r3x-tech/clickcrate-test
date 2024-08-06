@@ -905,12 +905,12 @@ function ClickCratePosShareModal({
 
   const { publicKey } = useWallet();
   const [blinkUrl, setBlinkUrl] = useState(
-    `https://dial.to/?action=solana-action:https://api.clickcrate.xyz/blink/${currentClickcrateId.toString()}`
+    `https://dial.to/devnet?action=solana-action:https://api.clickcrate.xyz/blink/${currentClickcrateId.toString()}`
   );
   const [showPreview, setShowPreview] = useState(false);
 
   const handleGenerateBlink = () => {
-    const url = `https://dial.to/?action=solana-action:https://api.clickcrate.xyz/blink/${currentClickcrateId.toString()}`;
+    const url = `https://dial.to/devnet?action=solana-action:https://api.clickcrate.xyz/blink/${currentClickcrateId.toString()}`;
     setBlinkUrl(url);
     navigator.clipboard
       .writeText(url)
